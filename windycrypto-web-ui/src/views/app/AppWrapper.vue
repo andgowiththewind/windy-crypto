@@ -5,8 +5,7 @@
       </Console>
     </div>
     <div v-if="isShowLogo==true">
-      <LogoCover>
-      </LogoCover>
+      <LogoCover @unCoverLogo="isShowLogo=false"></LogoCover>
     </div>
   </div>
 </template>
