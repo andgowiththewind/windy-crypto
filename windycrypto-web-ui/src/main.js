@@ -5,9 +5,12 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 //
 import moment from "moment"
+//
+import drag from './utils/drag.js'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
+Vue.use(drag)
 
 new Vue({
     render: h => h(App),
