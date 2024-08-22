@@ -1,10 +1,10 @@
 export default {
-    i18n: {
+    windy: {
         aside: {
-            inputPath: '输入路径',
+            inputPath: 'please input the path',
         },
         header: {
-            topFolderPathPlaceholder: '请输入顶级目录路径并按回车键...',
+            topFolderPathPlaceholder: 'please enter the desired top-level directory path and press Enter...',
         },
         main: {},
         footer: {},
