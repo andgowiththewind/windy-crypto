@@ -1,6 +1,13 @@
 <template>
   <div>
-    <h1>AppContentWrapper</h1>
+    <div v-if="isShowLogo==false">
+      <Console>
+      </Console>
+    </div>
+    <div v-if="isShowLogo==true">
+      <LogoCover>
+      </LogoCover>
+    </div>
   </div>
 </template>
 
@@ -8,12 +15,16 @@
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
 // import request from '@/utils/request';
 // import * as CommonConsts from '@/config/CommonConsts';
+import LogoCover from '@/views/logo/LogoCover.vue';
+import Console from '@/views/console/Console.vue';
 
 export default {
-  name: "AppContentWrapper",
-  components: {},
+  name: "AppWrapper",
+  components: {LogoCover, Console},
   data() {
-    return {}
+    return {
+      isShowLogo: true,
+    }
   },// data
   methods: {},// methods
   watch: {

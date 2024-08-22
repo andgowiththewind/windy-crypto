@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <AppContentWrapper/>
+    <AppWrapper/>
   </div>
 </template>
 
 <script>
-import AppContentWrapper from "@/views/appcontentwrapper/index.vue";
+import AppWrapper from "@/views/app/AppWrapper.vue";
 
 export default {
   name: 'App',
-  components: {AppContentWrapper}
+  components: {AppWrapper}
 }
 </script>
 
