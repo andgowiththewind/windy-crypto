@@ -72,6 +72,8 @@ export default {
     getTreeData(topFolderPath) {
       devConsoleLog('目录地址框回车事件ON:', topFolderPath);
       this.loading = true;
+      getTreeData({path: topFolderPath}).then(res => {
+      }).finally(() => this.loading = false).catch();
     },
   },// methods
   watch: {
