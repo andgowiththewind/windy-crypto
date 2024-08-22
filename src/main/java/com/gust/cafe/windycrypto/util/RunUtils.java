@@ -54,7 +54,10 @@ public class RunUtils {
         executeCommand(file.getAbsolutePath());
     }
 
+    // 主要通过判断`redis-server.exe`文件判断REDIS是否解压缩成功,如果没有则解压缩
+    // 主要通过判断`up_redis_windows.conf`文件判断是否渲染成功,如果没有则渲染
     private static ResultDTO checkRedis() {
+        TimeInterval timer = DateUtil.timer();
         return null;
     }
 
