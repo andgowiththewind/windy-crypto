@@ -1,6 +1,7 @@
 package com.gust.cafe.windycrypto.util;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
@@ -13,7 +14,9 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -56,8 +59,32 @@ public class RunUtils {
 
     // 主要通过判断`redis-server.exe`文件判断REDIS是否解压缩成功,如果没有则解压缩
     // 主要通过判断`up_redis_windows.conf`文件判断是否渲染成功,如果没有则渲染
+    @SneakyThrows
     private static ResultDTO checkRedis() {
         TimeInterval timer = DateUtil.timer();
+        String currentDir = SystemUtil.getUserInfo().getCurrentDir();
+        File zip = FileUtil.file(currentDir, "attachments", "redis", "REDIS-X64-3.2.100.zip");
+        ArrayList<File> arrayList = ListUtil.toList(
+                FileUtil.file(currentDir, "attachments", "redis", "redis01"),
+                FileUtil.file(currentDir, "attachments", "redis", "redis01")
+        );
+        for (File redisDir : arrayList) {
+            File redisServerExe = FileUtil.file(redisDir, "redis-server.exe");
+            boolean rseOk = FileUtil.exist(redisServerExe) && FileUtil.isFile(redisServerExe);
+            if (!rseOk) {
+                new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
+            }
+            File upRedisWindowsConf = FileUtil.file(redisDir, "up_redis_windows.conf");
+            boolean urwcOk = FileUtil.exist(upRedisWindowsConf) && FileUtil.isFile(upRedisWindowsConf);
+            if (!urwcOk) {
+                // TODO 渲染
+                // TODO 渲染
+                // TODO 渲染
+                // TODO 渲染
+            }
+        }
+
+
         return null;
     }
 
