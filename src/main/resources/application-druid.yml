@@ -10,7 +10,7 @@ spring:
       timeBetweenEvictionRunsMillis: 60000  # 检测空闲连接的时间间隔
       minEvictableIdleTimeMillis: 300000  # 连接在池中最小生存时间
       maxEvictableIdleTimeMillis: 900000  # 连接在池中最大生存时间
-      validationQuery: SELECT count(1) FROM "sys_config"  # 验证连接是否有效的查询语句,视数据库而定,例如MySQL为SELECT 1
+      validationQuery: SELECT count(1) FROM "test_sqlite_validation_query"  # 验证连接是否有效的查询语句,视数据库而定,例如MySQL为SELECT 1
       testWhileIdle: true  # 检测空闲连接时是否执行验证
       testOnBorrow: false  # 检测从连接池借出连接时是否执行验证
       testOnReturn: false  # 检测返回连接到连接池时是否执行验证
