@@ -8,9 +8,10 @@
 </template>
 
 <script>
-// import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
+import {Notification, MessageBox, Message, Loading} from 'element-ui';
+import * as Methods from '@/config/Methods';
+import {devConsoleLog} from '@/utils/commonUtils';
+import {getTreeData} from '@/api/asideApi';
 
 export default {
   name: "Aside",
@@ -66,14 +67,18 @@ export default {
   },// data
   methods: {
     handleNodeClick(data) {
-      console.log(data);
-    }
+      devConsoleLog('handleNodeClick:', data);
+    },
+    getTreeData(topFolderPath) {
+      devConsoleLog('目录地址框回车事件ON:', topFolderPath);
+      this.loading = true;
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    // this.init();
+    this.$bus.$on(Methods.FN_GET_TREE_DATA, (topFolderPath) => this.getTreeData(topFolderPath));
   },// mounted
 }
 </script>

@@ -44,3 +44,7 @@ npm install moment --save
 npm i element-ui -S
 ```
 
+```bash
+npm install crypto-js --save
+```
+

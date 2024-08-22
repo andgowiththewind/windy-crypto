@@ -32,7 +32,7 @@ export default {
 
     },
     handleTopFolderEnter() {
-      devConsoleLog('event: handleTopFolderEnter', this.topFolderPath);
+      devConsoleLog('目录地址框回车事件EMIT:', this.topFolderPath);
       this.$bus.$emit(Methods.FN_GET_TREE_DATA, this.topFolderPath);
     },
   },// methods
