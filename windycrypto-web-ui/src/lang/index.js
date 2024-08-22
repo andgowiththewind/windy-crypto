@@ -32,7 +32,6 @@ const i18n = new VueI18n({
         // 日文环境下的语言数据
         ja: {
             ...elementJA,
-            ...customJA
         }
     }
 })
