@@ -12,7 +12,7 @@
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
-
+import {devConsoleLog} from '@/utils/commonUtils';
 
 export default {
   name: "Header",
@@ -32,6 +32,7 @@ export default {
 
     },
     handleTopFolderEnter() {
+      devConsoleLog('event: handleTopFolderEnter', this.topFolderPath);
       this.$bus.$emit(Methods.FN_GET_TREE_DATA, this.topFolderPath);
     },
   },// methods
