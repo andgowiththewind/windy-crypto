@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="app_dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="spring.profiles.active" value="dev" />
+    </envs>
+    <module name="windy-crypto" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.gust.cafe.windycrypto.WindyCryptoApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
