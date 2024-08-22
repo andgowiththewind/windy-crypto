@@ -7,12 +7,16 @@ import 'element-ui/lib/theme-chalk/index.css'
 import moment from "moment"
 //
 import drag from './utils/drag.js'
+//
+import i18n from '@/lang' // 引入国际化配置
+
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(drag)
 
 new Vue({
+    i18n,
     render: h => h(App),
     beforeCreate() {
         moment.locale('zh-cn');//全局使用moment.js,使用时示例:`this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss')`
