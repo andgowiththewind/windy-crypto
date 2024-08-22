@@ -9,8 +9,11 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -55,8 +58,46 @@ public class RunUtils {
         return null;
     }
 
+    //
     private static ResultDTO checkSqlite() {
-        return null;
+        try {
+            TimeInterval timer = DateUtil.timer();
+            String currentDir = SystemUtil.getUserInfo().getCurrentDir();
+            File sqliteFile = FileUtil.file(currentDir, "attachments", "db", "windy-crypto.sqlite");
+            if (FileUtil.exist(sqliteFile) && FileUtil.isFile(sqliteFile)) {
+                return ResultDTO.builder().success(true).message(StrUtil.format("sqlite文件存在,耗时[{}]ms", timer.intervalMs())).build();
+            }
+            // 否则在目录下找最新时间的zip进行解压缩
+            File parent = FileUtil.getParent(sqliteFile, 1);
+            // windy_crypto_20240822_161418.zip
+            // windy_crypto_20240823_171418.zip
+            Arrays.stream(FileUtil.ls(FileUtil.getAbsolutePath(parent)))
+                    // 过滤出zip文件
+                    .filter(f -> StrUtil.startWithIgnoreCase(f.getName(), "windy_crypto_") && StrUtil.endWithIgnoreCase(f.getName(), ".zip"))
+                    // 比较文件名中的时间部分,返回最新的文件
+                    .max((f1, f2) -> {
+                        String time1 = StrUtil.subBetween(f1.getName(), "windy_crypto_", ".zip");
+                        String time2 = StrUtil.subBetween(f2.getName(), "windy_crypto_", ".zip");
+                        return time1.compareTo(time2);
+                    })
+                    // 解压缩
+                    .ifPresent(f -> {
+                        try {
+                            new ZipFile(f).extractAll(FileUtil.getAbsolutePath(parent));
+                        } catch (ZipException e) {
+                            log.error("解压缩文件失败[{}]", f.getAbsolutePath());
+                            throw new RuntimeException(e);
+                        }
+                    });
+            // 再次检查sqlite文件
+            if (FileUtil.exist(sqliteFile) && FileUtil.isFile(sqliteFile)) {
+                return ResultDTO.builder().success(true).message(StrUtil.format("sqlite文件存在,耗时[{}]ms", timer.intervalMs())).build();
+            } else {
+                return ResultDTO.builder().success(false).message(StrUtil.format("sqlite文件不存在,耗时[{}]ms", timer.intervalMs())).build();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @SneakyThrows
