@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="MY_LOG_MAX_HISTORY" value="60"/>
+    <property name="MY_LOG_HOME" value="./logs/"/>
+    <property name="MY_LOG_CHARSET" value="UTF-8"/>
+    <property name="MY_LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{50} # %method][%line] %msg%n"/>
+
+    <appender name="WATCHDOG_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <appender name="WATCHDOG_FILE_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/debugs/debug_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="WATCHDOG_FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/infos/info_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="WATCHDOG_FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/errors/error_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="WATCHDOG_BUSINESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/business.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/business/business_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <logger name="com.gust.cafe.windycrypto" level="INFO"/>
+    <logger name="org.springframework" level="warn"/>
+
+    <logger name="WATCHDOG_BUSINESS_LOGGER" level="INFO">
+        <appender-ref ref="WATCHDOG_BUSINESS"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="WATCHDOG_CONSOLE"/>
+        <appender-ref ref="WATCHDOG_FILE_DEBUG"/>
+        <appender-ref ref="WATCHDOG_FILE_INFO"/>
+        <appender-ref ref="WATCHDOG_FILE_ERROR"/>
+    </root>
+</configuration>

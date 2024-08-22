@@ -5,3 +5,22 @@ server:
 spring:
   profiles:
     active: prod
+    include:
+      - druid
+      - mybatis
+      - redis
+      - thread-pool
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: ${SQLITE_URL:jdbc:sqlite:file:./attachments/db/windy-crypto.sqlite}
+    username:
+    password:
+    type: com.alibaba.druid.pool.DruidDataSource
+  messages:
+    basename: messages # i18n messages 国际化
+    encoding: utf-8
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml # 指定哪个日志配置文件才生效
+  level:
+    org.apache.ibatis: DEBUG
+    org.mybatis.spring.SqlSessionFactoryBean: DEBUG

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="MY_LOG_MAX_HISTORY" value="60"/>
+    <property name="MY_LOG_HOME" value="${MY_DEV_LOG_HOME:-./logs/}"/>
+    <property name="MY_LOG_CHARSET" value="UTF-8"/>
+    <property name="MY_LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{50} # %method][%line] %msg%n"/>
+
+    <appender name="CONSOLE_ALL_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <appender name="FILE_DEBUG_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/debugs/debug_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="FILE_INFO_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/infos/info_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="FILE_WARN_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/warn.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/warns/warn_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="FILE_ERROR_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/errors/error_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="BUSINESS_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${MY_LOG_HOME}/business.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${MY_LOG_HOME}/businesses/business_%d{yyyyMMdd}.log.gz</fileNamePattern>
+            <maxHistory>${MY_LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${MY_LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <logger name="com.gust.cafe.windycrypto" level="DEBUG"/>
+    <logger name="org.springframework" level="warn"/>
+
+    <logger name="BUSINESS_LOGGER" level="DEBUG">
+        <appender-ref ref="BUSINESS_APPENDER"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_ALL_APPENDER"/>
+        <appender-ref ref="FILE_DEBUG_APPENDER"/>
+        <appender-ref ref="FILE_INFO_APPENDER"/>
+        <appender-ref ref="FILE_WARN_APPENDER"/>
+        <appender-ref ref="FILE_ERROR_APPENDER"/>
+    </root>
+</configuration>

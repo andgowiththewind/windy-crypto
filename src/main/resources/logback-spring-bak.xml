@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+[属性/配置说明][]:[日志级别从低到高分为 TRACE < DEBUG < INFO < WARN < ERROR < FATAL，如果设置为 WARN，则低于 WARN 的信息都不会输出]
+[属性/配置说明][scan]:[当此属性设置为 true 时,配置文件如果发生改变,将会被重新加载,默认值为 true]
+[属性/配置说明][scanPeriod]:[设置监测配置文件是否有修改的时间间隔,如果没有给出时间单位,则默认单位是毫秒,当 scan 为 true 时,此属性生效,默认的时间间隔为 1 分钟]
+[属性/配置说明][debug]:[当此属性设置为 true 时,将打印出 logback 内部日志信息,默认值为 false]
+[属性/配置说明][property]:[`property`定义常量属性,便于在配置文件的其他位置使用${name}来获取 value 值]
+[属性/配置说明][appender]:
+`logback`中`appender`是负责写日志的组件,主要用于指定日志输出的目的地,目的地可以是控制台、文件、远程套接字服务器、MySQL和其他数据库、JMS和远程UNIX Syslog守护进程等;`name`属性是自定义的,class一般是固定;
+(1)`ch.qos.logback.core.ConsoleAppender`: 负责把日志打印到控制台;
+(2)`ch.qos.logback.core.rolling.RollingFileAppender`:滚动记录地把日志输出到文件,可以支持日志文件按文件大小拆分,或者按日期拆分,一般会设置多个,以对应不同的日志等级,或者自定义记录某个比较重要的日志等;
+(3)`ch.qos.logback.core.FileAppender`:把日志输出到文件(一般不会设置这个,扩展了解一下);
+-->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--通过环境变量`LOGBACK_ROOT_LOGGING_LEVEL`,控制开发阶段使用DEBUG打印信息-->
+    <property name="MY_LOG_LEVEL" value="${LOGBACK_ROOT_LOGGING_LEVEL:-DEBUG}"/>
+    <property name="MY_LOG_CHARSET" value="${LOGBACK_LOG_CHARSET:-UTF-8}"/>
+
+    <property name="LOG_HOME" value="${LOGBACK_LOG_HOME:-./logs/}"/>
+    <property name="LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{50} # %method][%line] %msg%n"/>
+    <property name="LOG_MAX_HISTORY" value="60"/>
+
+    <appender name="watchdogConsole" class="ch.qos.logback.core.ConsoleAppender">
+        <!--[属性/配置说明][encoder]:两个作用(1)将日志信息转换(格式化)为字符串;(2)然后写入到文件中;-->
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <appender name="watchdogFileInfo" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/sys_info.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/info/sys_info_%d{yyyy_MM_dd}.log.gz</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+            <!--<charset>gbk</charset>-->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--只记录INFO级别的日志-->
+            <level>INFO</level>
+            <!--表示当日志事件匹配过滤条件（即级别为 INFO）时，接受该事件-->
+            <onMatch>ACCEPT</onMatch>
+            <!--表示当日志事件不匹配过滤条件时，拒绝该事件-->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="watchdogFileError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/sys_error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/error/sys_error_%d{yyyy_MM_dd}.log.gz</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+            <!--<charset>gbk</charset>-->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="watchdogFileDebug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/sys_debug.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/debug/sys_debug_%d{yyyy_MM_dd}.log.gz</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+            <!--<charset>gbk</charset>-->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+
+    <!--可以为某些业务专门设置一个`appender`,这里不用指定日志等级-->
+    <appender name="sys_user_appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/sys_user.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/user/sys_user_%d{yyyy_MM_dd}.log.gz</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>${MY_LOG_CHARSET}</charset>
+            <!--<charset>gbk</charset>-->
+        </encoder>
+    </appender>
+
+    <!--
+    [logger]:日志记录器,用于记录日志,一般我们会为不同的包设置不同的日志等级,以便于我们在开发调试的时候,可以只看到我们关心的日志信息;
+    [name]:表示日志记录器的名称，通常使用类的全路径名作为名称。该属性用于指定配置应用于哪个具体的包或类;
+    [level]：表示日志记录器的日志级别。指定了记录器应该记录的最低级别的日志事件。比如，如果设置为 `INFO`，那么 `INFO`、`WARN`、`ERROR` 等级别的日志都会被记录，而 `DEBUG` 级别的日志不会。
+    [appender-ref]：表示引用的 appender，即将日志事件输出到哪个 appender 进行处理。这是一个或多个 `<appender-ref>` 子元素，用于将日志事件传递给指定的 appender 进行处理。可以指定多个 appender，每个 appender 处理不同级别的日志或将日志输出到不同的目的地。
+    [addtivity]:一个布尔值，表示是否将日志事件传递给上级 logger。默认为 `true`，表示将日志事件传递给上级 logger；如果设置为 `false`，则不会传递。;
+    -->
+
+    <!--系统模块日志级别控制,注意包名-->
+    <logger name="com.breeze.shortlife" level="${MY_LOG_LEVEL}"/>
+
+    <!--Spring日志级别控制-->
+    <logger name="org.springframework" level="warn"/>
+
+    <!--系统用户操作日志,在代码里面通过`private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");`的方式拿到这个`logger`;-->
+    <logger name="sys_user_logger" level="info">
+        <appender-ref ref="sys_user_appender"/>
+    </logger>
+
+    <!--如果有多模块,需要特别设置-->
+    <logger name="com.zhien.igrow" level="info">
+        <appender-ref ref="sys_user_appender"/>
+    </logger>
+
+
+    <!--
+        在Logback中，`<root>` 节点是根日志记录器，是所有日志记录器的父级。根日志记录器定义了全局的默认日志级别和默认的 appender，它会接收所有未被具体指定的日志事件。以下是 `<root>` 节点的主要属性及其作用：
+        - `level`：表示根日志记录器的默认日志级别。所有未被具体指定级别的日志事件将使用该级别。例如，如果根节点的级别设置为 `INFO`，那么所有未指定级别的日志事件将被认为是 `INFO` 级别。
+        - `<appender-ref>`：表示引用的 appender，即将根日志记录器的日志事件输出到哪个 appender 进行处理。这是一个或多个 `<appender-ref>` 子元素，用于将根日志记录器的日志事件传递给指定的 appender 进行处理。
+        以下是一个例子：
+        ```xml
+        <root level="DEBUG">
+            <appender-ref ref="consoleAppender"/>
+            <appender-ref ref="fileAppender"/>
+        </root>
+        ```
+        在这个例子中：
+        - `level="DEBUG"`：表示根日志记录器的默认日志级别为 `DEBUG`。所有未被具体指定级别的日志事件将默认使用 `DEBUG` 级别。
+        - `<appender-ref ref="consoleAppender"/>` 和 `<appender-ref ref="fileAppender"/>`：表示将根日志记录器的日志事件分别传递给名为 `consoleAppender` 和 `fileAppender` 的 appender 进行处理。
+        根日志记录器是所有日志记录器的顶级父节点，未被特定配置的日志事件将由根日志记录器进行处理。
+    -->
+
+    <root level="INFO">
+        <appender-ref ref="watchdogConsole"/>
+        <appender-ref ref="watchdogFileInfo"/>
+        <appender-ref ref="watchdogFileError"/>
+    </root>
+
+</configuration>
