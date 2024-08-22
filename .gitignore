@@ -43,3 +43,7 @@ attachments/db/*.sqlite
 !attachments/db/*.zip
 
 ### REDIS ###
+
+
+### log ###
+logs/
