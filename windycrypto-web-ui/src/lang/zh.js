@@ -1,5 +1,5 @@
 export default {
-    windy: {
+    i18n: {
         aside: {
             inputPath: '输入路径',
         },

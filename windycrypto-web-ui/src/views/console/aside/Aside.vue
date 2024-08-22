@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading">
     <el-button type="warning" size="mini" style="width: 100%;height: 50px;" @click="dialogVo.show=true">
-      <i>{{ $t('windy.aside.inputPath') }}</i>
+      <i>{{ $t('i18n.aside.inputPath') }}</i>
     </el-button>
     <el-tree :data="treeVo.data" :props="treeVo.defaultProps" @node-click="handleNodeClick"></el-tree>
   </div>
