@@ -37,3 +37,9 @@ build/
 
 ### plugins ###
 rebel.xml
+
+### DB ###
+attachments/db/*.sqlite
+!attachments/db/*.zip
+
+### REDIS ###
