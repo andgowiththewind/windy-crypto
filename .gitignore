@@ -43,7 +43,10 @@ attachments/db/*.sqlite
 !attachments/db/*.zip
 
 ### REDIS ###
-
+!attachments/redis/REDIS-X64-3.2.100.zip
+!attachments/redis/redis01/up.bat
+!attachments/redis/redis02/up.bat
+!attachments/redis/打开两个REDIS.bat
 
 ### log ###
 logs/
