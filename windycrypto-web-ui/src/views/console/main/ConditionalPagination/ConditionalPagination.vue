@@ -40,11 +40,9 @@
 </template>
 
 <script>
-// import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
-
+import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import {devConsoleLog} from "@/utils/commonUtils";
+import {getInsightTableData} from "@/api/conditionalPaginationApi";
 
 export default {
   name: "ConditionalPagination",
@@ -64,6 +62,12 @@ export default {
     },
     submitConditionPagingQuery() {
       devConsoleLog('submitConditionPagingQuery');
+      getInsightTableData(this.payload).then(response => {
+        devConsoleLog(response);
+        // this.payload.page.total = response.data.total;
+      }).catch(error => {
+        devConsoleLog(error);
+      });
     },
     handleSizeChange(val) {
       this.payload.page.pageSize = val;
