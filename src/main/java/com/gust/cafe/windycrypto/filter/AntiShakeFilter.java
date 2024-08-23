@@ -1,6 +1,7 @@
 package com.gust.cafe.windycrypto.filter;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.CryptoException;
@@ -8,6 +9,7 @@ import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
+import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.filter.core.CachedBodyHttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +71,13 @@ public class AntiShakeFilter extends OncePerRequestFilter {
         JSONObject jsonObjectInCache = cacheManager.getCache(CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK).get(cacheKey, JSONObject.class);
         if (jsonObjectInCache != null) {
             // 说明处于防抖期间
-            log.debug("一级缓存内容:{}", JSONUtil.toJsonPrettyStr(jsonObjectInCache));
-            throw new RuntimeException("请求过于频繁,请稍后再试");
+            log.debug("一级缓存内容:\r\n{}", JSONUtil.toJsonPrettyStr(jsonObjectInCache));
+            throw new WindyException(StrUtil.format("请求过于频繁,请稍后再试"));
         } else {
             // 说明不处于防抖期间,缓存
             JSONObject cacheJson = JSONUtil.createObj()
                     .putOpt("msg", "接口正在防抖")
+                    .putOpt("datetime", DateUtil.now())
                     .putOpt("uri", requestURI)
                     .putOpt("body", JSONUtil.parseObj(requestBody));
             cacheManager.getCache(CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK).put(cacheKey, cacheJson);

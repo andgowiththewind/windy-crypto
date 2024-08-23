@@ -53,6 +53,16 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 自定义异常
+     * <p>设计上,当主动抛出指定的自定义异常,可以仅DEBUG打印</p>
+     */
+    @ExceptionHandler(WindyException.class)
+    public R HandleWindyException(WindyException e, HttpServletRequest request) {
+        log.debug("发生自定义异常'{}'", request.getRequestURI(), e.getMessage());
+        return R.error(e.getMessage());
+    }
+
+    /**
      * 权限校验异常
      */
     @ResponseStatus(HttpStatus.FORBIDDEN)
