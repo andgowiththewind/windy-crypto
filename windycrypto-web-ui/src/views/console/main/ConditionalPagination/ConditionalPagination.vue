@@ -5,7 +5,7 @@
       <el-form @submit.native.prevent size="mini" :inline="true" :model="payload" ref="payloadRef">
         <el-form-item :label="$t('i18n_1826861420642439168')" prop="payloadParamsScope">
           <el-radio-group v-model="payload.params.searchScope">
-            <el-radio-button label="notEncrypted">{{ $t('i18n_1826862190838288384') }}</el-radio-button>
+            <el-radio-button label="unencrypted">{{ $t('i18n_1826862190838288384') }}</el-radio-button>
             <el-radio-button label="encrypted">{{ $t('i18n_1826862378374008832') }}</el-radio-button>
             <el-radio-button label="all">{{ $t('i18n_1826862378374008833') }}</el-radio-button>
           </el-radio-group>
