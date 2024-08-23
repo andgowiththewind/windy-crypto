@@ -1,5 +1,6 @@
 <template>
   <div v-loading="loading">
+    <!--form-->
     <div style="text-align: right;">
       <el-form @submit.native.prevent size="mini" :inline="true" :model="payload" ref="payloadRef">
         <el-form-item :label="$t('i18n_1826861420642439168')" prop="payloadParamsScope">
@@ -20,7 +21,21 @@
         </el-form-item>
       </el-form>
     </div>
-    <div></div>
+    <!--pagination-->
+    <div style="text-align: right; margin-top: -15px;" v-cloak>
+      <el-form @submit.native.prevent size="mini">
+        <el-form-item label="">
+          <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page.sync="payload.page.pageNum"
+              :page-size="payload.page.pageSize"
+              :total="payload.page.total"
+              layout="total, prev, pager, next, jumper">
+          </el-pagination>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -28,6 +43,8 @@
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
 // import request from '@/utils/request';
 // import * as CommonConsts from '@/config/CommonConsts';
+
+import {devConsoleLog} from "@/utils/commonUtils";
 
 export default {
   name: "ConditionalPagination",
@@ -46,6 +63,15 @@ export default {
     resetConditionalForm() {
     },
     submitConditionPagingQuery() {
+      devConsoleLog('submitConditionPagingQuery');
+    },
+    handleSizeChange(val) {
+      this.payload.page.pageSize = val;
+      this.submitConditionPagingQuery();
+    },
+    handleCurrentChange(val) {
+      this.payload.page.pageNum = val;
+      this.submitConditionPagingQuery();
     },
   },// methods
   watch: {
