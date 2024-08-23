@@ -41,6 +41,9 @@ public class RunUtils {
                 String msg = CollectionUtil.toList(sqliteResult.getMessage(), redisResult.getMessage()).stream().collect(Collectors.joining(";"));
                 return ResultDTO.builder().success(false).message(msg).build();
             }
+        }).exceptionally(e -> {
+            log.error("未知异常 => ", e);
+            throw new RuntimeException(e);
         });
         // 阻塞主线程
         ResultDTO resultDTO = complexFuture.get();
@@ -59,40 +62,44 @@ public class RunUtils {
     // 主要通过判断`up_redis_windows.conf`文件判断是否渲染成功,如果没有则渲染
     @SneakyThrows
     private static ResultDTO checkRedis() {
-        TimeInterval timer = DateUtil.timer();
-        String currentDir = SystemUtil.getUserInfo().getCurrentDir();
-        File zip = FileUtil.file(currentDir, "attachments", "redis", "REDIS-X64-3.2.100.zip");
-        ArrayList<File> arrayList = ListUtil.toList(
-                FileUtil.file(currentDir, "attachments", "redis", "redis01"),
-                FileUtil.file(currentDir, "attachments", "redis", "redis01")
-        );
-        //
-        Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("masterPort", "6391");
-        dataModel.put("slavePort", "6392");
-        dataModel.put("masterPassword", "gust.cafe");
-        //
-        for (File redisDir : arrayList) {
-            File redisServerExe = FileUtil.file(redisDir, "redis-server.exe");
-            boolean rseOk = FileUtil.exist(redisServerExe) && FileUtil.isFile(redisServerExe);
-            // 如果不存在则解压缩
-            if (!rseOk) new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
-            File upRedisWindowsConf = FileUtil.file(redisDir, "up_redis_windows.conf");
-            // 如果不存在则渲染
-            boolean urwcOk = FileUtil.exist(upRedisWindowsConf) && FileUtil.isFile(upRedisWindowsConf);
-            if (!urwcOk) {
-                FreeMarkerUtils.renderFile(FreeMarkerUtils.FmConfig.builder()
-                        .directoryForTemplateLoading(redisDir)
-                        .dataModel(dataModel)
-                        .templateName("up_redis_windows.conf.ftl")
-                        .outputFile(upRedisWindowsConf)
-                        .build());
-                log.info("渲染文件[{}]成功", upRedisWindowsConf.getAbsolutePath());
+        try {
+            TimeInterval timer = DateUtil.timer();
+            String currentDir = SystemUtil.getUserInfo().getCurrentDir();
+            File zip = FileUtil.file(currentDir, "attachments", "redis", "REDIS-X64-3.2.100.zip");
+            ArrayList<File> arrayList = ListUtil.toList(
+                    FileUtil.file(currentDir, "attachments", "redis", "redis01"),
+                    FileUtil.file(currentDir, "attachments", "redis", "redis02")
+            );
+            //
+            Map<String, Object> dataModel = new HashMap<>();
+            dataModel.put("masterPort", "6391");
+            dataModel.put("slavePort", "6392");
+            dataModel.put("masterPassword", "gust.cafe");
+            //
+            for (File redisDir : arrayList) {
+                File redisServerExe = FileUtil.file(redisDir, "redis-server.exe");
+                boolean rseOk = FileUtil.exist(redisServerExe) && FileUtil.isFile(redisServerExe);
+                // 如果不存在则解压缩
+                if (!rseOk) new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
+                File upRedisWindowsConf = FileUtil.file(redisDir, "up_redis_windows.conf");
+                // 如果不存在则渲染
+                boolean urwcOk = FileUtil.exist(upRedisWindowsConf) && FileUtil.isFile(upRedisWindowsConf);
+                if (!urwcOk) {
+                    FreeMarkerUtils.renderFile(FreeMarkerUtils.FmConfig.builder()
+                            .directoryForTemplateLoading(redisDir)
+                            .dataModel(dataModel)
+                            .templateName("up_redis_windows.conf.ftl")
+                            .outputFile(upRedisWindowsConf)
+                            .build());
+                    log.info("渲染文件[{}]成功", upRedisWindowsConf.getAbsolutePath());
+                }
             }
+            log.info("REDIS环境检查完毕,耗时[{}]ms", timer.intervalMs());
+            return ResultDTO.builder().success(true).message(StrUtil.format("REDIS环境检查完毕,耗时[{}]ms", timer.intervalMs())).build();
+        } catch (ZipException e) {
+            log.error("REDIS检查失败 => ", e);
+            return ResultDTO.builder().success(false).message("解压缩文件失败").build();
         }
-
-
-        return null;
     }
 
     //
