@@ -1,12 +1,9 @@
 import request from '@/utils/request';
 
-export function getTreeData(query) {
+export function getTreeData(_data) {
     return request({
-        url: '/folder/getTreeData',
-        method: 'get',
-        params: query,
-        headers: {
-            enableAntiShake: false
-        }
+        url: '/folderTree/getTreeData',
+        method: 'post',
+        data: _data
     })
 }
