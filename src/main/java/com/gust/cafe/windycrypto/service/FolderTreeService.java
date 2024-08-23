@@ -33,11 +33,8 @@ public class FolderTreeService {
         AtomicInteger atomicId = new AtomicInteger(1);
         // 树顶级节点
         TreeLeafDTO topLeaf = TreeLeafDTO.builder().id(atomicId.get()).parentId(topId).label(FileUtil.getName(path)).absPath(path).build();
-
         // 子节点
         recursivelyCollect(topLeaf, atomicId);
-
-
         //
         return CollectionUtil.toList(topLeaf);
     }
