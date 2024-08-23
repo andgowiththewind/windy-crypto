@@ -24,6 +24,6 @@ public class FolderTreeController {
 
     @PostMapping("/getTreeData")
     public R getTreeData(@RequestBody @Validated FolderTreeReqVo folderTreeReqVo) {
-        return R.data(folderTreeService.getTreeData(folderTreeReqVo));
+        return R.data(folderTreeService.getElementUiTreeData(folderTreeReqVo));
     }
 }

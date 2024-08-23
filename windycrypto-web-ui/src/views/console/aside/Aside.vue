@@ -3,7 +3,13 @@
     <el-button type="warning" size="mini" style="width: 100%;height: 50px;" @click="dialogVo.show=true">
       <i>{{ $t('i18n.aside.inputPath') }}</i>
     </el-button>
-    <el-tree :data="treeVo.data" :props="treeVo.defaultProps" @node-click="handleNodeClick"></el-tree>
+    <el-tree
+        :data="treeVo.data"
+        :props="treeVo.defaultProps"
+        node-key="id"
+        :default-expanded-keys="treeVo.defaultExpandedKeys"
+        @node-click="handleNodeClick">
+    </el-tree>
   </div>
 </template>
 
@@ -23,41 +29,8 @@ export default {
         show: false,
       },
       treeVo: {
-        data: [{
-          label: '一级 1',
-          children: [{
-            label: '二级 1-1',
-            children: [{
-              label: '三级 1-1-1'
-            }]
-          }]
-        }, {
-          label: '一级 2',
-          children: [{
-            label: '二级 2-1',
-            children: [{
-              label: '三级 2-1-1'
-            }]
-          }, {
-            label: '二级 2-2',
-            children: [{
-              label: '三级 2-2-1'
-            }]
-          }]
-        }, {
-          label: '一级 3',
-          children: [{
-            label: '二级 3-1',
-            children: [{
-              label: '三级 3-1-1'
-            }]
-          }, {
-            label: '二级 3-2',
-            children: [{
-              label: '三级 3-2-1'
-            }]
-          }]
-        }],
+        data: [],
+        defaultExpandedKeys: [1, 2],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -68,11 +41,13 @@ export default {
   methods: {
     handleNodeClick(data) {
       devConsoleLog('handleNodeClick:', data);
+
     },
     getTreeData(topFolderPath) {
       devConsoleLog('目录地址框回车事件ON:', topFolderPath);
       this.loading = true;
       getTreeData({path: topFolderPath}).then(res => {
+        this.treeVo.data = res.data;
       }).finally(() => this.loading = false).catch();
     },
   },// methods
