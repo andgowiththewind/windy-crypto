@@ -43,6 +43,7 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import {devConsoleLog} from "@/utils/commonUtils";
 import {getInsightTableData} from "@/api/conditionalPaginationApi";
+import * as Methods from '@/config/Methods';
 
 export default {
   name: "ConditionalPagination",
@@ -53,7 +54,7 @@ export default {
       payload: {
         model: {name: ''},
         page: {pageNum: 1, pageSize: 10, total: 0},
-        params: {scope: 'all', path: process.env.VUE_APP_DEV_TEST_FOLDER_PATH || ''},
+        params: {scope: 'all', path: ''},
       },
     }
   },// data
@@ -62,6 +63,10 @@ export default {
     },
     submitConditionPagingQuery() {
       devConsoleLog('submitConditionPagingQuery');
+
+      // 激活其他组件的方法,向当前组件更新payload
+
+
       getInsightTableData(this.payload).then(response => {
         devConsoleLog(response);
         // this.payload.page.total = response.data.total;
@@ -82,7 +87,11 @@ export default {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    // this.init();
+    this.$bus.$on(Methods.FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD, (payloadPart) => {
+      devConsoleLog('接收其他组件的部分参数合并入最终payload', payloadPart);
+      Object.assign(this.payload, payloadPart);
+      devConsoleLog('更新后的payload', this.payload);
+    });
   },// mounted
 }
 </script>

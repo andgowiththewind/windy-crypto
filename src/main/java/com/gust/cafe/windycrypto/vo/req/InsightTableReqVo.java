@@ -4,6 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,8 +15,11 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InsightTableReqVo {
+    @Valid
     private Windy model;
+    @Valid
     private PageDTO page;
+    @Valid
     private ParamsDTO params;
 
 
@@ -34,6 +39,7 @@ public class InsightTableReqVo {
     @AllArgsConstructor
     public static class ParamsDTO {
         private String scope;
+        @NotBlank(message = "路径不能为空")
         private String path;
     }
 
