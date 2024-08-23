@@ -14,9 +14,7 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -68,19 +66,28 @@ public class RunUtils {
                 FileUtil.file(currentDir, "attachments", "redis", "redis01"),
                 FileUtil.file(currentDir, "attachments", "redis", "redis01")
         );
+        //
+        Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("masterPort", "6391");
+        dataModel.put("slavePort", "6392");
+        dataModel.put("masterPassword", "gust.cafe");
+        //
         for (File redisDir : arrayList) {
             File redisServerExe = FileUtil.file(redisDir, "redis-server.exe");
             boolean rseOk = FileUtil.exist(redisServerExe) && FileUtil.isFile(redisServerExe);
-            if (!rseOk) {
-                new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
-            }
+            // 如果不存在则解压缩
+            if (!rseOk) new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
             File upRedisWindowsConf = FileUtil.file(redisDir, "up_redis_windows.conf");
+            // 如果不存在则渲染
             boolean urwcOk = FileUtil.exist(upRedisWindowsConf) && FileUtil.isFile(upRedisWindowsConf);
             if (!urwcOk) {
-                // TODO 渲染
-                // TODO 渲染
-                // TODO 渲染
-                // TODO 渲染
+                FreeMarkerUtils.renderFile(FreeMarkerUtils.FmConfig.builder()
+                        .directoryForTemplateLoading(redisDir)
+                        .dataModel(dataModel)
+                        .templateName("up_redis_windows.conf.ftl")
+                        .outputFile(upRedisWindowsConf)
+                        .build());
+                log.info("渲染文件[{}]成功", upRedisWindowsConf.getAbsolutePath());
             }
         }
 
