@@ -4,7 +4,7 @@
     <div style="text-align: right;">
       <el-form @submit.native.prevent size="mini" :inline="true" :model="payload" ref="payloadRef">
         <el-form-item :label="$t('i18n_1826861420642439168')" prop="payloadParamsScope">
-          <el-radio-group v-model="payload.params.scope">
+          <el-radio-group v-model="payload.params.searchScope">
             <el-radio-button label="notEncrypted">{{ $t('i18n_1826862190838288384') }}</el-radio-button>
             <el-radio-button label="encrypted">{{ $t('i18n_1826862378374008832') }}</el-radio-button>
             <el-radio-button label="all">{{ $t('i18n_1826862378374008833') }}</el-radio-button>
@@ -54,7 +54,7 @@ export default {
       payload: {
         model: {name: ''},
         page: {pageNum: 1, pageSize: 10, total: 0},
-        params: {scope: 'all', path: ''},
+        params: {searchScope: 'all', path: ''},
       },
     }
   },// data
@@ -88,7 +88,14 @@ export default {
   mounted() {
     this.$bus.$on(Methods.FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD, (payloadPart) => {
       devConsoleLog('接收其他组件的部分参数合并入最终payload', payloadPart);
-      Object.assign(this.payload, payloadPart);
+      let mergedObject = {
+        ...this.payload,
+        params: {
+          ...this.payload.params,
+          ...payloadPart.params
+        }
+      };
+      this.payload = mergedObject;
       devConsoleLog('更新后的payload', this.payload);
     });
   },// mounted
