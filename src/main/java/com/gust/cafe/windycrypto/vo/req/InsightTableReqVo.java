@@ -38,7 +38,7 @@ public class InsightTableReqVo {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ParamsDTO {
-        private String scope;
+        private String searchScope;
         @NotBlank(message = "路径不能为空")
         private String path;
     }
