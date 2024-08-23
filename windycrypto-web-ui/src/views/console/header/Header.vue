@@ -13,6 +13,7 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from '@/utils/commonUtils';
+import {FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD} from "@/config/Methods";
 
 export default {
   name: "Header",
@@ -35,12 +36,18 @@ export default {
       devConsoleLog('目录地址框回车事件EMIT:', this.topFolderPath);
       this.$bus.$emit(Methods.FN_GET_TREE_DATA, this.topFolderPath);
     },
+    // 被通知
+    contractPayload() {
+      // 收到通知后向目标组件传递数据
+      this.$bus.$emit(Methods.FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD, {params: {path: this.topFolderPath}});
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
     this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (_topFolderPath) => this.topFolderPath = _topFolderPath);
+    this.$bus.$on(Methods.FN_CONTRACT_PAYLOAD, () => this.contractPayload());
   },// mounted
 }
 </script>

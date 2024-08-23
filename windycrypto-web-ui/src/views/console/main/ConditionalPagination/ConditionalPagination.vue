@@ -63,10 +63,8 @@ export default {
     },
     submitConditionPagingQuery() {
       devConsoleLog('submitConditionPagingQuery');
-
-      // 激活其他组件的方法,向当前组件更新payload
-
-
+      // 激活其他多个组件的合约,要求其向当前组件传递数据更新payload
+      this.$bus.$emit(Methods.FN_CONTRACT_PAYLOAD);
       getInsightTableData(this.payload).then(response => {
         devConsoleLog(response);
         // this.payload.page.total = response.data.total;
