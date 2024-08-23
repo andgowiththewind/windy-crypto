@@ -41,7 +41,7 @@ export default {
   methods: {
     handleNodeClick(data) {
       devConsoleLog('handleNodeClick:', data);
-
+      this.$bus.$emit(Methods.FN_UPDATE_TOP_FOLDER_PATH, data.absPath);
     },
     getTreeData(topFolderPath) {
       devConsoleLog('目录地址框回车事件ON:', topFolderPath);

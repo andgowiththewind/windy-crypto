@@ -40,7 +40,7 @@ export default {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (topFolderPath) => this.topFolderPath = topFolderPath);
+    this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (_topFolderPath) => this.topFolderPath = _topFolderPath);
   },// mounted
 }
 </script>
