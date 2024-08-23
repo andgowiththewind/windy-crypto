@@ -23,6 +23,13 @@ export default {
     }
   },// data
   methods: {
+    langInit() {
+      // 从`localStorage`中读取上次设置的语言
+      let lang = localStorage.getItem('lang');
+      if (lang) {
+        this.$i18n.locale = lang;
+      }
+    },
     changeLanguage() {
       let expectLang = 'zh' === this.$i18n.locale ? 'en' : 'zh';
       this.$i18n.locale = expectLang // 设置给本地的i18n插件
@@ -47,6 +54,8 @@ export default {
   mounted() {
     this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (_topFolderPath) => this.topFolderPath = _topFolderPath);
     this.$bus.$on(Methods.FN_CONTRACT_PAYLOAD, () => this.contractPayload());
+    // 从`localStorage`中读取上次设置的语言
+    this.langInit();
   },// mounted
 }
 </script>
