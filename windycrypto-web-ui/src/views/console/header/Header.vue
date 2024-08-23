@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="windy-path-input">
-      <el-input size="mini" v-model="topFolderPath" :placeholder="$t('i18n.header.topFolderPathPlaceholder')" @keyup.enter.native="handleTopFolderEnter"></el-input>
+      <el-input size="mini" v-model="topFolderPath" :placeholder="$t('i18n_1826859557616488448')" @keyup.enter.native="handleTopFolderEnter"></el-input>
     </div>
     <div class="windy-change-language" @click="changeLanguage">
       <i>{{ 'zh' === this.$i18n.locale ? 'Switch English' : '切换中文' }}</i>

@@ -1,12 +1,4 @@
 export default {
-    i18n: {
-        aside: {
-            inputPath: '输入路径',
-        },
-        header: {
-            topFolderPathPlaceholder: '请输入顶级目录路径并按回车键...',
-        },
-        main: {},
-        footer: {},
-    }
+    i18n_1826858923819405312: '输入路径',
+    i18n_1826859557616488448: '请输入顶级目录路径并按回车键...',
 }
