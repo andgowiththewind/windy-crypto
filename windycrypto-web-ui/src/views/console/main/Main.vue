@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>Main</h1>
+    <ConditionalPagination></ConditionalPagination>
+    <InsightTable></InsightTable>
+    <Password2FA></Password2FA>
+    <ProcessTable></ProcessTable>
   </div>
 </template>
 
@@ -8,10 +11,19 @@
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
 // import request from '@/utils/request';
 // import * as CommonConsts from '@/config/CommonConsts';
+import ConditionalPagination from '@/views/console/main/ConditionalPagination/ConditionalPagination.vue';
+import InsightTable from '@/views/console/main/InsightTable/InsightTable.vue';
+import Password2FA from '@/views/console/main/Password2FA/Password2FA.vue';
+import ProcessTable from '@/views/console/main/ProcessTable/ProcessTable.vue';
 
 export default {
   name: "Main",
-  components: {},
+  components: {
+    ConditionalPagination,
+    InsightTable,
+    Password2FA,
+    ProcessTable
+  },
   data() {
     return {}
   },// data
