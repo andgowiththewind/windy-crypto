@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.function.Consumer;
+
 /**
  * 自定义业务异常
  */
@@ -21,4 +23,17 @@ public class WindyException extends RuntimeException {
         super(message);
         this.message = message;
     }
+
+
+    /**
+     * 调用此方法运行的代码块，如果有异常则抛出指定的异常{@link WindyException}
+     */
+    public static void run(Consumer<Void> consumer) {
+        try {
+            consumer.accept(null);
+        } catch (Exception e) {
+            throw new WindyException(e.getMessage());
+        }
+    }
+
 }
