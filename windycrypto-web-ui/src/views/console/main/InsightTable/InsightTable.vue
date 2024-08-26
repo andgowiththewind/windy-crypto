@@ -72,7 +72,7 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from "@/utils/commonUtils";
-import {cryptoSubmitFn, rowStyleFn, cellStyleFn, headerCellStyleFn, cryptoSubmitFn} from "@/api/insightTableApi";
+import {cryptoSubmitFn, rowStyleFn, cellStyleFn, headerCellStyleFn} from "@/api/insightTableApi";
 
 export default {
   name: "InsightTable",
@@ -128,6 +128,7 @@ export default {
         userPassword: this.userPasswordCopy,
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
+        Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
       }).finally().catch();
     },
   },// methods

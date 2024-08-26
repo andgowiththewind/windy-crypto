@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.controller;
 
+import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.dto.core.R;
 import com.gust.cafe.windycrypto.service.CryptoPreparationService;
 import com.gust.cafe.windycrypto.service.CryptoService;
@@ -32,6 +33,6 @@ public class CryptoController {
     @PostMapping("/submit")
     public R submit(@RequestBody @Validated CryptoSubmitReqVo reqVo) {
         List<String> absPathList = cryptoPreparationService.prepare(reqVo);
-        return R.ok("任务已提交");
+        return R.ok(WindyLang.msg("i18n_1827976801159352320"));
     }
 }
