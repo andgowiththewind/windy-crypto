@@ -35,6 +35,7 @@ public class Windy implements Serializable {
     private String percentageLabel;// 文件加解密进度百分百标签
     private Long size;// 文件大小
     private String sizeLabel;// 可读性文件大小
+    private Boolean hadEncrypted;// 是否已加密
     private String createTime;// 创建时间
     private String updateTime;// 更新时间
 }

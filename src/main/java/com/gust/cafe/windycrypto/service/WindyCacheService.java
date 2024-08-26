@@ -8,6 +8,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
+import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
@@ -57,6 +58,9 @@ public class WindyCacheService {
             Integer code = (FileUtil.exist(FileUtil.file(absPath)) ? WindyStatusEnum.FREE.getCode() : WindyStatusEnum.NOT_EXIST.getCode());
             long size = FileUtil.size(FileUtil.file(absPath));
             String sizeLabel = FileUtil.readableFileSize(size);
+            // 根据文件名判断是否已加密
+            boolean hadEncrypted = StrUtil.startWithIgnoreCase(FileUtil.getName(absPath), CommonConstants.ENCRYPTED_PREFIX);
+            //
             Windy insertVo = Windy.builder()
                     .id(parseId(absPath))
                     // 统一转正斜杠"/"
@@ -72,6 +76,7 @@ public class WindyCacheService {
                     .percentageLabel(null)
                     .size(size)
                     .sizeLabel(sizeLabel)
+                    .hadEncrypted(hadEncrypted)
                     .createTime(DateUtil.now())
                     .updateTime(DateUtil.now())
                     .build();
