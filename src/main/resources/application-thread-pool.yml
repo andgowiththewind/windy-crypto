@@ -1,4 +1,4 @@
-dororo-thread-pool:
+windy-thread-pool:
   dispatcher:
     core-pool-size: 500
     max-pool-size: 1000

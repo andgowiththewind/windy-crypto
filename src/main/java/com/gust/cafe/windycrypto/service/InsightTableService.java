@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -38,8 +36,17 @@ public class InsightTableService {
         this.windyCacheService = windyCacheService;
     }
 
-
     public InsightTableResVo getInsightTableData(InsightTableReqVo reqVo) {
+        // (0)校验
+        verify(reqVo);
+        // (1)只处理条件查询未分页
+        List<Windy> all = handleConditional(reqVo);
+        // (2)处理分页
+        List<Windy> filter = handlePaging(reqVo, all);
+        return InsightTableResVo.builder().list(filter).total(Long.valueOf(all.size())).build();
+    }
+
+    private void verify(InsightTableReqVo reqVo) {
         // 路径
         String path = reqVo.getParams().getPath();
         // 范围
@@ -48,11 +55,6 @@ public class InsightTableService {
         WindyException.run((Void) -> Assert.isTrue(FileUtil.exist(path) && FileUtil.isDirectory(path), WindyLang.msg("i18n_1826891933163851776")));
         // 范围校验
         WindyException.run((Void) -> Assert.notNull(scopeEnum, WindyLang.msg("i18n_1826891933163851777")));
-        // (1)只处理条件查询未分页
-        List<Windy> all = handleConditional(reqVo);
-        // (2)处理分页
-        List<Windy> filter = handlePaging(reqVo, all);
-        return InsightTableResVo.builder().list(filter).total(Long.valueOf(all.size())).build();
     }
 
     private List<Windy> handleConditional(InsightTableReqVo reqVo) {
@@ -62,9 +64,8 @@ public class InsightTableService {
         try {
             TimeInterval timer = DateUtil.timer();
             List<File> loopFiles = FileUtil.loopFiles(reqVo.getParams().getPath());
-            InsightTableReqVo reqVoCopy = BeanUtil.copyProperties(reqVo, InsightTableReqVo.class);
-            // TODO 通过 `ForkJoinPool` 的 `submit` 方法来执行 `parallelStream` 操作，`get()`方法会阻塞直到所有任务完成
-            List<Windy> windyList = customThreadPool.submit(getListCallable(loopFiles, reqVoCopy)).get();
+            // 取消ForkJoinPool
+            List<Windy> windyList = getWindyList(loopFiles, BeanUtil.copyProperties(reqVo, InsightTableReqVo.class));
             log.debug("线程池并行性[parallelism={}],从[{}]文件筛查出[{}]对象,耗时[{}]ms",
                     customThreadPool.getParallelism(), loopFiles.size(), windyList.size(), timer.intervalMs());
             return windyList;
@@ -76,12 +77,12 @@ public class InsightTableService {
         }
     }
 
-    // `customThreadPool.submit`的参数是一个`Callable`对象，这里使用lambda表达式实现了`Callable`接口的`call`方法
-    private Callable<List<Windy>> getListCallable(List<File> loopFiles, InsightTableReqVo reqVo) {
-        return () -> loopFiles.parallelStream()
+    private List<Windy> getWindyList(List<File> loopFiles, InsightTableReqVo reqVo) {
+        List<Windy> collect = loopFiles.stream()
                 .filter(getFilePredicate(reqVo))
                 .map(getFileWindyFunction(reqVo))
                 .collect(Collectors.toList());
+        return collect;
     }
 
     // 谓词:从所有文件中筛选符合要求的文件

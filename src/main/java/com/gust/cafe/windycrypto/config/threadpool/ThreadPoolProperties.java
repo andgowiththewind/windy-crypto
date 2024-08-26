@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Slf4j
 @Component
-@ConfigurationProperties(prefix = "dororo-thread-pool")
+@ConfigurationProperties(prefix = "windy-thread-pool")
 public class ThreadPoolProperties {
     private PropDTO dispatcher;
     private PropDTO crypto;
