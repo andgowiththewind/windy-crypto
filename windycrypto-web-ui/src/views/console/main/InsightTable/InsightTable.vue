@@ -24,7 +24,11 @@
           <span v-else style="opacity: 25%">/</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('i18n_1827913996980850689')" prop="absPath" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1827913996980850689')" :show-overflow-tooltip="true">
+        <template v-slot="scope">
+          <span @click="absPathClickCopy(scope.row.absPath)">{{ scope.row.absPath }}</span>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -32,6 +36,7 @@
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
+import {devConsoleLog} from "@/utils/commonUtils";
 import {rowStyleFn, cellStyleFn, headerCellStyleFn} from "@/api/insightTableApi";
 
 export default {
@@ -45,7 +50,11 @@ export default {
       tableData: [],
     }
   },// data
-  methods: {},// methods
+  methods: {
+    absPathClickCopy(absPath) {
+      devConsoleLog('absPathClickCopy', absPath);
+    },
+  },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
