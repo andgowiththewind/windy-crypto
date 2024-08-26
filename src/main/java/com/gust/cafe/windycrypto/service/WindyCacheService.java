@@ -1,6 +1,7 @@
 package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
@@ -38,10 +39,12 @@ public class WindyCacheService {
 
     // 通过绝对路径获取Windy对象
     public Windy lockGetOrDefault(String absPath) {
+        TimeInterval timer = DateUtil.timer();
         // 定义业务操作
         Supplier<Windy> supplier = getSupplier(absPath);
         // 提交业务操作到分布式锁代码结构
         Windy windy = lockExecute(absPath, supplier);
+        log.debug("获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         return windy;
     }
 
