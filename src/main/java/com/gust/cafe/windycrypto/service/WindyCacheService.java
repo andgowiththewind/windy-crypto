@@ -44,7 +44,7 @@ public class WindyCacheService {
         Supplier<Windy> supplier = getSupplier(absPath);
         // 提交业务操作到分布式锁代码结构
         Windy windy = lockExecute(absPath, supplier);
-        log.debug("获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
+        // log.debug("获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         return windy;
     }
 

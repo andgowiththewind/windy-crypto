@@ -58,23 +58,12 @@ public class InsightTableService {
     }
 
     private List<Windy> handleConditional(InsightTableReqVo reqVo) {
-        // 自定义临时大容量线程池
-        ForkJoinPool customThreadPool = new ForkJoinPool(3000);
-        log.debug("开启一个自定义线程池,线程数[{}]", customThreadPool.getParallelism());
-        try {
-            TimeInterval timer = DateUtil.timer();
-            List<File> loopFiles = FileUtil.loopFiles(reqVo.getParams().getPath());
-            // 取消ForkJoinPool
-            List<Windy> windyList = getWindyList(loopFiles, BeanUtil.copyProperties(reqVo, InsightTableReqVo.class));
-            log.debug("线程池并行性[parallelism={}],从[{}]文件筛查出[{}]对象,耗时[{}]ms",
-                    customThreadPool.getParallelism(), loopFiles.size(), windyList.size(), timer.intervalMs());
-            return windyList;
-        } catch (Exception e) {
-            throw new WindyException(e.getMessage());
-        } finally {
-            log.debug("关闭自定义线程池");
-            customThreadPool.shutdown();
-        }
+        TimeInterval timer = DateUtil.timer();
+        List<File> loopFiles = FileUtil.loopFiles(reqVo.getParams().getPath());
+        // 取消ForkJoinPool
+        List<Windy> windyList = getWindyList(loopFiles, BeanUtil.copyProperties(reqVo, InsightTableReqVo.class));
+        log.debug("处理条件查询耗时[{}]ms", timer.intervalMs());
+        return windyList;
     }
 
     private List<Windy> getWindyList(List<File> loopFiles, InsightTableReqVo reqVo) {
