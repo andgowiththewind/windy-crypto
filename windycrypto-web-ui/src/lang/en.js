@@ -16,4 +16,7 @@ export default {
     i18n_1827946899051778048: 'copy success',
     i18n_1827946899051778049: 'copy failed',
     i18n_1827946899051778052: 'operation',
+    i18n_1827950850597851136: 'unknown status',
+    i18n_1827950850597851137: 'not exist',
+    i18n_1827950850597851138: 'in queue',
 }
