@@ -32,9 +32,9 @@ public class Windy implements Serializable {
     private String desc;//  状态码描述
     private String latestMsg;// 最近消息
     private Integer percentage;// 文件加解密进度百分百
-    private Integer percentageLabel;// 文件加解密进度百分百标签
+    private String percentageLabel;// 文件加解密进度百分百标签
     private Long size;// 文件大小
     private String sizeLabel;// 可读性文件大小
-    private Date createTime;// 创建时间
-    private Date updateTime;// 更新时间
+    private String createTime;// 创建时间
+    private String updateTime;// 更新时间
 }

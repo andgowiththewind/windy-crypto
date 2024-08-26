@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.service;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
@@ -7,9 +8,15 @@ import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
+import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
+import com.gust.cafe.windycrypto.exception.WindyException;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -18,6 +25,7 @@ import java.util.function.Supplier;
  * @author Dororo
  * @date 2024-08-23 17:06
  */
+@Slf4j
 @Service
 public class WindyCacheService {
     private final RedisMasterCache redisMasterCache;
@@ -43,15 +51,59 @@ public class WindyCacheService {
             Windy cacheVo = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId(absPath));
             if (cacheVo != null) return cacheVo;
             // 如果缓存中不存在对应的文件信息,则新建并返回
-            // Integer code=(FileUtil.exist(FileUtil.file(absPath)) ? 1 : 0);
-
-
-            return null;
+            Integer code = (FileUtil.exist(FileUtil.file(absPath)) ? WindyStatusEnum.FREE.getCode() : WindyStatusEnum.NOT_EXIST.getCode());
+            long size = FileUtil.size(FileUtil.file(absPath));
+            String sizeLabel = FileUtil.readableFileSize(size);
+            Windy insertVo = Windy.builder()
+                    .id(parseId(absPath))
+                    .absPath(FileUtil.file(absPath).getAbsolutePath())
+                    .mainName(FileUtil.mainName(absPath))
+                    .extName(FileUtil.extName(absPath))
+                    .name(FileUtil.getName(absPath))
+                    .code(code)
+                    .label(WindyStatusEnum.getByCode(code).getLabel())
+                    .desc(WindyStatusEnum.getByCode(code).getRemark())
+                    .latestMsg("create just 1 second")
+                    .percentage(null)
+                    .percentageLabel(null)
+                    .size(size)
+                    .sizeLabel(sizeLabel)
+                    .createTime(DateUtil.now())
+                    .updateTime(DateUtil.now())
+                    .build();
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, insertVo.getId(), insertVo);
+            return insertVo;
         };
     }
 
+    // 分布式锁执行业务操作
+    // 防止并发操作,保证数据一致性;即防止同一个绝对路径的文件被多次创建
+    @SneakyThrows // `tryLock()`方法抛出`InterruptedException`异常
     private Windy lockExecute(String absPath, Supplier<Windy> supplier) {
-        return null;
+        String threadName = Thread.currentThread().getName();
+        Windy result = null;
+        // 绝对路径转ID
+        String id = parseId(absPath);
+        // 拼接分布式锁KEY
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.PREFIX_GET_OR_DEFAULT_WINDY_LOCK, id);
+        // 定义锁对象
+        RLock lock = redissonClient.getLock(lockKey);
+        // 根据当前业务设计的超时时间、过期时间,尝试获取锁
+        // tryLock(最多等待锁的时间,获取锁成功后锁的过期时间,时间单位)
+        if (lock.tryLock(5, 15, TimeUnit.SECONDS)) {
+            // 当前线程加锁成功,执行业务操作
+            try {
+                result = supplier.get();
+            } finally {
+                // 确保释放锁
+                lock.unlock();
+            }
+        } else {
+            // 如果当前线程获取锁失败,说明有其他线程正在处理相同的绝对路径,但是耗时过长
+            log.debug("其他线程`lockGetOrDefault`耗时过长,线程[{}]获取锁失败", threadName);
+            throw new WindyException("获取锁失败");
+        }
+        return result;
     }
 
 
