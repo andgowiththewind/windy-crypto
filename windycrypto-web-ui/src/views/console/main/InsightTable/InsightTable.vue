@@ -72,7 +72,7 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from "@/utils/commonUtils";
-import {rowStyleFn, cellStyleFn, headerCellStyleFn} from "@/api/insightTableApi";
+import {cryptoSubmitFn, rowStyleFn, cellStyleFn, headerCellStyleFn, cryptoSubmitFn} from "@/api/insightTableApi";
 
 export default {
   name: "InsightTable",
@@ -83,6 +83,7 @@ export default {
       cellStyleFnVal: cellStyleFn,
       headerCellStyleFnVal: headerCellStyleFn,
       tableData: [],
+      userPasswordCopy: '',
     }
   },// data
   methods: {
@@ -117,6 +118,17 @@ export default {
     decryptOne(row) {
     },
     encryptOne(row) {
+      // 要求更新密码
+      this.$bus.$emit(Methods.FN_CONTRACT_USER_PASSWORD);
+      // 提交加密请求
+      let cryptoSubmitPayload = {
+        windyPathList: [row.absPath],
+        dirPathList: [],
+        askEncrypt: true,
+        userPassword: this.userPasswordCopy,
+      };
+      cryptoSubmitFn(cryptoSubmitPayload).then(res => {
+      }).finally().catch();
     },
   },// methods
   watch: {
@@ -124,11 +136,8 @@ export default {
   },// watch
   mounted() {
     // 收到tableData
-    this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => {
-      this.tableData = data;
-    });
-
-
+    this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => this.tableData = data);
+    this.$bus.$on(Methods.FN_UPDATE_USER_PASSWORD, (data) => this.userPasswordCopy = data);
   },// mounted
 }
 </script>

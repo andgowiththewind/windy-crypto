@@ -17,9 +17,9 @@
 </template>
 
 <script>
-// import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
+import {Notification, MessageBox, Message, Loading} from 'element-ui';
+import * as Methods from '@/config/Methods';
+
 
 export default {
   name: "Password2FA",
@@ -34,12 +34,17 @@ export default {
     },
     decryptAll() {
     },
+    // 被通知
+    // 收到通知后向目标组件传递数据
+    contractUserPassword() {
+      this.$bus.$emit(Methods.FN_UPDATE_USER_PASSWORD, this.userPassword);
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    // this.init();
+    this.$bus.$on(Methods.FN_CONTRACT_USER_PASSWORD, () => this.contractUserPassword());
   },// mounted
 }
 </script>

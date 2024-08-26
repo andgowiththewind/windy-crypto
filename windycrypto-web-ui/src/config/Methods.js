@@ -4,3 +4,6 @@ export const FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD = 'fnUpdateConditionPaging
 //
 export const FN_CONTRACT_PAYLOAD = 'fnContractPayload';
 export const FN_UPDATE_INSIGHT_TABLE_DATA = 'fnUpdateInsightTableData';
+//
+export const FN_CONTRACT_USER_PASSWORD = 'fnContractUserPassword';
+export const FN_UPDATE_USER_PASSWORD = 'fnUpdateUserPassword';

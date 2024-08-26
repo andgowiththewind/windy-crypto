@@ -1,5 +1,14 @@
 import request from '@/utils/request';
 
+export function cryptoSubmitFn(_data) {
+    return request({
+        url: '/crypto/submit',
+        method: 'post',
+        data: _data,
+        headers: {enableAntiShake: true}
+    })
+}
+
 
 /**
  * 表格样式_行样式_根据行号换不同的背景色
