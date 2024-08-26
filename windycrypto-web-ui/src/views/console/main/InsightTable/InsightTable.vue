@@ -22,10 +22,13 @@
         </template>
       </el-table-column>
       <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
+      <!--操作-->
+      <el-table-column :label="$t('i18n_1827946899051778052')" width="120">
+      </el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656385')" width="250" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
       <!--进度-->
-      <el-table-column :label="$t('i18n_1827913996980850688')" width="350" prop="percentage">
+      <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
         <template v-slot="scope">
           <div v-if="scope.row.code>=20 && scope.row.code<=40">
             <el-progress v-if="scope.row.percentage" :percentage="scope.row.percentage||0"></el-progress>
@@ -71,11 +74,11 @@ export default {
     absPathClickCopy(row) {
       let absPathCellClipboard = new this.clipboard("#" + this.getAbsPathCellId(row));
       absPathCellClipboard.on('success', () => {
-        Message.success(this.$t('i18n_1827946899051778048'));
+        Message.success(this.$t('i18n_1827913996980850689') + " " + this.$t('i18n_1827946899051778048'));
         absPathCellClipboard.destroy();
       });
       absPathCellClipboard.on('error', () => {
-        Message.error(this.$t('i18n_1827946899051778049'));
+        Message.error(this.$t('i18n_1827913996980850689') + " " + this.$t('i18n_1827946899051778049'));
         absPathCellClipboard.destroy();
       });
     },
@@ -85,11 +88,11 @@ export default {
     idClickCopy(row) {
       let idCellClipboard = new this.clipboard("#" + this.getIdCellId(row));
       idCellClipboard.on('success', () => {
-        Message.success(this.$t('i18n_1827946899051778048'));
+        Message.success("ID " + this.$t('i18n_1827946899051778048'));
         idCellClipboard.destroy();
       });
       idCellClipboard.on('error', () => {
-        Message.error(this.$t('i18n_1827946899051778049'));
+        Message.error("ID " + this.$t('i18n_1827946899051778049'));
         idCellClipboard.destroy();
       });
     },

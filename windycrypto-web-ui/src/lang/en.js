@@ -15,4 +15,5 @@ export default {
     i18n_1827913996980850689: 'absolute path',
     i18n_1827946899051778048: 'copy success',
     i18n_1827946899051778049: 'copy failed',
+    i18n_1827946899051778052: 'operation',
 }
