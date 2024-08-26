@@ -9,4 +9,5 @@ export default {
     i18n_1826863045788438529: 'filename supports fuzzy query',
     i18n_1826863045788438530: 'query file list',
     i18n_1826863045788438531: 'reset',
+    i18n_1827913996976656384: 'size',
 }

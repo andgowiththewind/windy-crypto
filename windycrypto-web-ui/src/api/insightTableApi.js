@@ -19,7 +19,7 @@ export function cellStyleFn({row, column, rowIndex, columnIndex}) {
     if (['name', 'absPath'].includes(column.property)) {
         return {textAlign: 'left'};
     }
-    if (['status', 'percentage', 'readableFileSize', 'extName'].includes(column.property)) {
+    if (['status', 'percentage', 'sizeLabel', 'extName'].includes(column.property)) {
         return {textAlign: 'center'};
     }
 }

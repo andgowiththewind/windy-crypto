@@ -12,6 +12,8 @@
         :data="tableData"
         style="width: 100%;min-height:500px;">
       <el-table-column label="ID" width="170" prop="id" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
     </el-table>
   </div>
 </template>
