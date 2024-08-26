@@ -25,9 +25,6 @@
       <!--操作-->
       <el-table-column :label="$t('i18n_1827946899051778052')" width="120" prop="_operation">
         <template v-slot="scope">
-          <div v-if="scope.row.code==null||scope.row.code==undefined">
-            <span>{{ $t('i18n_1827950850597851136') }}</span>
-          </div>
           <div v-else-if="scope.row.code==-1">
             <span>{{ $t('i18n_1827950850597851137') }}</span>
           </div>
@@ -36,6 +33,12 @@
           </div>
           <div v-else-if="scope.row.code==10">
             <span>{{ $t('i18n_1827950850597851138') }}</span>
+          </div>
+          <div v-else-if="scope.row.code>=20 && scope.row.code<=40">
+            <span>{{ $t('i18n_1827950850597851139') }}</span>
+          </div>
+          <div v-else>
+            <span>{{ $t('i18n_1827950850597851136') }}</span>
           </div>
         </template>
       </el-table-column>
