@@ -4,6 +4,7 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.dto.core.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
         // 记录日志,可以使用任意日志框架
         log.error("请求地址'{}',发生系统异常.错误详情: {}", request.getRequestURI(), stackTraceString);
         // 返回给前端的信息,可能需要对信息进行适当的隐藏或简化,避免暴露敏感信息
-        String msg = StrUtil.isBlank(rootCauseMessage) ? "系统错误,请联系管理员。" : rootCauseMessage;
+        String msg = WindyLang.msg("i18n_1827983611958267904");// 系统错误,请联系管理员
         return R.error(msg);
     }
 

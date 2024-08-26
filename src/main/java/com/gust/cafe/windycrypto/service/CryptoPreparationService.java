@@ -8,11 +8,6 @@ import java.util.List;
 @Service
 public class CryptoPreparationService {
     public List<String> prepare(CryptoSubmitReqVo reqVo) {
-
-
-
-
-
         return null;
     }
 }
