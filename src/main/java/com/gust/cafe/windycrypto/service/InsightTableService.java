@@ -144,6 +144,7 @@ public class InsightTableService {
     }
 
     private List<Windy> handlePaging(InsightTableReqVo reqVo, List<Windy> all) {
+        TimeInterval timer = DateUtil.timer();
         if (CollectionUtil.isEmpty(all)) return new ArrayList<>();
         Integer pageNum = reqVo.getPage().getPageNum();
         Integer pageSize = reqVo.getPage().getPageSize();
@@ -158,6 +159,7 @@ public class InsightTableService {
                 break;
             }
         }
+        log.debug("分页处理耗时[{}]ms", timer.intervalMs());
         return after;
     }
 }
