@@ -8,6 +8,7 @@ import cn.hutool.core.lang.Assert;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
+import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.SneakyThrows;
@@ -46,9 +47,11 @@ public class CryptoPreparationService {
 
     private List<Windy> filterWindyCache(List<Windy> windyCache) {
         List<Windy> collect = windyCache.stream().filter(cache -> {
-            // TODO
-            // TODO
-            // TODO
+            // 仅空闲状态的文件才能被加解密
+            WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
+            boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
+            if (!statusMatch) return false;
+            // TODO 如果是加密任务,排除已经加密过的文件;如果是解密任务,排除未加密过的文件
             return true;
         }).collect(Collectors.toList());
         return collect;
