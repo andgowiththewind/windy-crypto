@@ -39,19 +39,23 @@ public class CryptoPreparationService {
         // 根据传参将所有的文件转为Windy缓存对象
         List<Windy> windyCache = toWindyCache(reqVo);
         // 一些筛选判断不需要放在加解密阶段
-        List<Windy> windyFilter = filterWindyCache(windyCache);
+        List<Windy> windyFilter = filterWindyCache(windyCache, reqVo);
         // 传递绝对路径即可
         List<String> absPathList = windyFilter.stream().map(Windy::getAbsPath).collect(Collectors.toList());
         return absPathList;
     }
 
-    private List<Windy> filterWindyCache(List<Windy> windyCache) {
+    private List<Windy> filterWindyCache(List<Windy> windyCache, CryptoSubmitReqVo reqVo) {
+        Boolean askEncrypt = reqVo.getAskEncrypt();
         List<Windy> collect = windyCache.stream().filter(cache -> {
             // 仅空闲状态的文件才能被加解密
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
             if (!statusMatch) return false;
             // TODO 如果是加密任务,排除已经加密过的文件;如果是解密任务,排除未加密过的文件
+            Boolean hadEncrypted = cache.getHadEncrypted();
+            if (askEncrypt && hadEncrypted) return false;
+            if (!askEncrypt && !hadEncrypted) return false;
             return true;
         }).collect(Collectors.toList());
         return collect;

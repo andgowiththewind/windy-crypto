@@ -2,6 +2,7 @@ package com.gust.cafe.windycrypto.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.gust.cafe.windycrypto.components.WindyLang;
+import com.gust.cafe.windycrypto.controller.core.BaseController;
 import com.gust.cafe.windycrypto.dto.core.R;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.service.CryptoPreparationService;
@@ -24,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @RestController
 @RequestMapping("/crypto")
-public class CryptoController {
+public class CryptoController extends BaseController {
     private final CryptoPreparationService cryptoPreparationService;
     private final CryptoService cryptoService;
 
@@ -35,10 +36,9 @@ public class CryptoController {
 
     @PostMapping("/submit")
     public R submit(@RequestBody @Validated CryptoSubmitReqVo reqVo) {
-        List<String> prepare = cryptoPreparationService.prepare(reqVo);
-        if (CollectionUtil.isEmpty(prepare)) {
-            throw new WindyException(WindyLang.msg("i18n_1828011035181846528"));
-        }
+        List<String> absPathList = cryptoPreparationService.prepare(reqVo);
+        if (CollectionUtil.isEmpty(absPathList)) throw new WindyException(WindyLang.msg("i18n_1828011035181846528"));
+        super.runAsyncExceptionally((v) -> cryptoService.cryptoSubmitAsync(absPathList, reqVo));
         return R.ok(WindyLang.msg("i18n_1827976801159352320"));
     }
 }
