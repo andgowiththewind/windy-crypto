@@ -8,3 +8,6 @@ export const FN_UPDATE_INSIGHT_TABLE_DATA = 'fnUpdateInsightTableData';
 export const FN_CONTRACT_USER_PASSWORD = 'fnContractUserPassword';
 export const FN_UPDATE_USER_PASSWORD = 'fnUpdateUserPassword';
 //
+export const FN_CONTRACT_TOP_FOLDER_PATH_COPY = 'fnContractTopFolderPathCopy';
+export const FN_UPDATE_TOP_FOLDER_PATH_COPY = 'fnUpdateTopFolderPathCopy';
+//

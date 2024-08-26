@@ -19,7 +19,7 @@
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
-
+import {cryptoSubmitFn} from "@/api/insightTableApi";
 
 export default {
   name: "Password2FA",
@@ -27,12 +27,35 @@ export default {
   data() {
     return {
       userPassword: process.env.VUE_APP_DEV_TEST_PASSWORD || '',
+      topFolderPathCopy: '',
     }
   },// data
   methods: {
     encryptAll() {
+      // 要求更新`topFolderPathCopy`
+      this.$bus.$emit(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY);
+      let cryptoSubmitPayload = {
+        windyPathList: [],
+        dirPathList: [this.topFolderPathCopy],
+        askEncrypt: true,
+        userPassword: this.userPassword,
+      };
+      cryptoSubmitFn(cryptoSubmitPayload).then(res => {
+        Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
+      });
     },
     decryptAll() {
+      // 要求更新`topFolderPathCopy`
+      this.$bus.$emit(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY);
+      let cryptoSubmitPayload = {
+        windyPathList: [],
+        dirPathList: [this.topFolderPathCopy],
+        askEncrypt: false,
+        userPassword: this.userPassword,
+      };
+      cryptoSubmitFn(cryptoSubmitPayload).then(res => {
+        Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
+      });
     },
     // 被通知
     // 收到通知后向目标组件传递数据
@@ -45,6 +68,7 @@ export default {
   },// watch
   mounted() {
     this.$bus.$on(Methods.FN_CONTRACT_USER_PASSWORD, () => this.contractUserPassword());
+    this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH_COPY, (_topFolderPathCopy) => this.topFolderPathCopy = _topFolderPathCopy);
   },// mounted
 }
 </script>

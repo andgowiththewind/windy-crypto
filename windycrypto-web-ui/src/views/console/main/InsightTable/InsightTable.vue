@@ -116,6 +116,18 @@ export default {
       });
     },
     decryptOne(row) {
+      // 要求更新密码
+      this.$bus.$emit(Methods.FN_CONTRACT_USER_PASSWORD);
+      // 提交解密请求
+      let cryptoSubmitPayload = {
+        windyPathList: [row.absPath],
+        dirPathList: [],
+        askEncrypt: false,
+        userPassword: this.userPasswordCopy,
+      };
+      cryptoSubmitFn(cryptoSubmitPayload).then(res => {
+        Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
+      });
     },
     encryptOne(row) {
       // 要求更新密码

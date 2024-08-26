@@ -47,6 +47,10 @@ export default {
       // 收到通知后向目标组件传递数据
       this.$bus.$emit(Methods.FN_UPDATE_CONDITION_PAGING_QUERY_PAYLOAD, {params: {path: this.topFolderPath}});
     },
+    contractTopFolderPathCopy() {
+      // 收到通知后向目标组件传递数据
+      this.$bus.$emit(Methods.FN_UPDATE_TOP_FOLDER_PATH_COPY, this.topFolderPath);
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
@@ -54,6 +58,7 @@ export default {
   mounted() {
     this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (_topFolderPath) => this.topFolderPath = _topFolderPath);
     this.$bus.$on(Methods.FN_CONTRACT_PAYLOAD, () => this.contractPayload());
+    this.$bus.$on(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY, () => this.contractTopFolderPathCopy());
     // 从`localStorage`中读取上次设置的语言
     this.langInit();
   },// mounted
