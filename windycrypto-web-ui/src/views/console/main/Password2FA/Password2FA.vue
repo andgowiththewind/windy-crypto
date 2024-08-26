@@ -7,7 +7,7 @@
         </el-form-item>
         <el-form-item label="">
           <el-button-group>
-            <el-button size="mini" type="primary" @click="encryptAll" :style="{minWidth:'25vw'}"><span><i class="fa fa-lock"></i>&nbsp;目录下全部加密</span></el-button>
+            <el-button size="mini" type="info" @click="encryptAll" :style="{minWidth:'25vw'}"><span><i class="fa fa-lock"></i>&nbsp;目录下全部加密</span></el-button>
             <el-button size="mini" type="danger" plain @click="decryptAll"><span>全部解密&nbsp;<i class="fa fa-wrench"></i></span></el-button>
           </el-button-group>
         </el-form-item>
