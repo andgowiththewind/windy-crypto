@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.vo.req;
 
+import com.gust.cafe.windycrypto.components.WindyLang;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +17,6 @@ import java.util.List;
 public class CryptoSubmitReqVo {
     private List<String> windyPathList;
     private List<String> dirPathList;
-    @NotNull
     private Boolean askEncrypt;
-    @NotBlank
     private String userPassword;
 }
