@@ -25,11 +25,12 @@
       <!--操作-->
       <el-table-column :label="$t('i18n_1827946899051778052')" width="120" prop="_operation">
         <template v-slot="scope">
-          <div v-else-if="scope.row.code==-1">
+          <div v-if="scope.row.code==-1">
             <span>{{ $t('i18n_1827950850597851137') }}</span>
           </div>
           <div v-else-if="scope.row.code==0">
-            <span>空闲</span>
+            <el-button v-if="scope.row.hadEncrypted" type="danger" plain size="mini" @click="decryptOne(scope.row)">{{ $t('i18n_1827961313217875969')}}</el-button>
+            <el-button v-else type="success" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1827961313217875968')}}</el-button>
           </div>
           <div v-else-if="scope.row.code==10">
             <span>{{ $t('i18n_1827950850597851138') }}</span>
@@ -112,6 +113,10 @@ export default {
         Message.error("ID " + this.$t('i18n_1827946899051778049'));
         idCellClipboard.destroy();
       });
+    },
+    decryptOne(row) {
+    },
+    encryptOne(row) {
     },
   },// methods
   watch: {
