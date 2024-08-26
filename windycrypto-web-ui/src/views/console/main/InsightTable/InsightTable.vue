@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--table-->
     <el-table
         size="mini"
         :fit="true"
@@ -9,8 +10,8 @@
         :cell-style="cellStyleFnVal"
         :header-cell-style="headerCellStyleFnVal"
         :data="tableData"
-        style="width: 100%;min-height:200px;">
-      <el-table-column label="ID" width="50" prop="id" :show-overflow-tooltip="true"></el-table-column>
+        style="width: 100%;min-height:500px;">
+      <el-table-column label="ID" width="170" prop="id" :show-overflow-tooltip="true"></el-table-column>
     </el-table>
   </div>
 </template>

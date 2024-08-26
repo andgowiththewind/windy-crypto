@@ -1,8 +1,8 @@
 <template>
   <div>
     <ConditionalPagination></ConditionalPagination>
-    <InsightTable></InsightTable>
     <Password2FA></Password2FA>
+    <InsightTable></InsightTable>
     <ProcessTable></ProcessTable>
   </div>
 </template>
