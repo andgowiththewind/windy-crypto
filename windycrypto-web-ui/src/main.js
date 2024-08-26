@@ -11,6 +11,8 @@ import drag from './utils/drag.js'
 import i18n from '@/lang' // 引入国际化配置
 //
 import clipboard from 'clipboard';
+//
+import 'font-awesome/css/font-awesome.css';
 
 // 
 //
