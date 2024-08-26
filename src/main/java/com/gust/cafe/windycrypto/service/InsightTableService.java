@@ -1,14 +1,18 @@
 package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
+import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.vo.req.InsightTableReqVo;
 import com.gust.cafe.windycrypto.vo.res.InsightTableResVo;
@@ -16,7 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
@@ -46,7 +52,7 @@ public class InsightTableService {
         List<Windy> all = handleConditional(reqVo);
         // (2)处理分页
         List<Windy> filter = handlePaging(reqVo, all);
-        return InsightTableResVo.builder().list(all).total(Long.valueOf(all.size())).build();
+        return InsightTableResVo.builder().list(filter).total(Long.valueOf(all.size())).build();
     }
 
     private List<Windy> handleConditional(InsightTableReqVo reqVo) {
@@ -115,23 +121,43 @@ public class InsightTableService {
 
             // 结合当前系统设计的加解密生命周期进行筛选
             Windy windy = windyCacheService.lockGetOrDefault(absPath);
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-
+            // 只需要展示部分状态的文件
+            ArrayList<Integer> showCodeList = ListUtil.toList(
+                    WindyStatusEnum.FREE.getCode(),
+                    WindyStatusEnum.WAITING.getCode(),
+                    WindyStatusEnum.OUTPUTTING.getCode(),
+                    WindyStatusEnum.ALMOST.getCode()
+            );
+            if (!showCodeList.contains(windy.getCode())) return false;
+            // 符合要求则返回true
             return true;
         };
     }
 
     // 函数:将文件转换为Windy对象
     private Function<File, Windy> getFileWindyFunction(InsightTableReqVo reqVo) {
-        return ff -> Windy.builder().build();
+        return ff -> {
+            String absolutePath = FileUtil.getAbsolutePath(ff);
+            Windy windy = windyCacheService.lockGetOrDefault(absolutePath);
+            return windy;
+        };
     }
 
     private List<Windy> handlePaging(InsightTableReqVo reqVo, List<Windy> all) {
-        return null;
+        if (CollectionUtil.isEmpty(all)) return new ArrayList<>();
+        Integer pageNum = reqVo.getPage().getPageNum();
+        Integer pageSize = reqVo.getPage().getPageSize();
+        // 禁止使用 List.subList(start, end)
+        List<Windy> after = new ArrayList<>();
+        int[] startEnd = PageUtil.transToStartEnd(pageNum - 1, pageSize);
+        for (int i = 0; i < all.size(); i++) {
+            if (i >= startEnd[0] && i < startEnd[1]) {
+                after.add(all.get(i));
+            }
+            if (i >= startEnd[1]) {
+                break;
+            }
+        }
+        return after;
     }
 }
