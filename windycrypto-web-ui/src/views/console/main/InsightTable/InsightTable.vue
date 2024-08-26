@@ -14,6 +14,17 @@
       <el-table-column label="ID" width="170" prop="id" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1827913996976656385')" width="250" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
+      <!--进度-->
+      <el-table-column :label="$t('i18n_1827913996980850688')" width="350" prop="percentage">
+        <template v-slot="scope">
+          <div v-if="scope.row.code>=20 && scope.row.code<=40">
+            <el-progress v-if="scope.row.percentage" :percentage="scope.row.percentage||0"></el-progress>
+          </div>
+          <span v-else style="opacity: 25%">/</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('i18n_1827913996980850689')" prop="absPath" :show-overflow-tooltip="true"></el-table-column>
     </el-table>
   </div>
 </template>

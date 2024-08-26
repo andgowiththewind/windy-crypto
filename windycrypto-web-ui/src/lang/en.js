@@ -10,4 +10,7 @@ export default {
     i18n_1826863045788438530: 'query file list',
     i18n_1826863045788438531: 'reset',
     i18n_1827913996976656384: 'size',
+    i18n_1827913996976656385: 'latest msg',
+    i18n_1827913996980850688: 'progress',
+    i18n_1827913996980850689: 'absolute path',
 }
