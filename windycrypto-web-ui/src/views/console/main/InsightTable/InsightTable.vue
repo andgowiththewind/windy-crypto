@@ -26,7 +26,12 @@
       </el-table-column>
       <el-table-column :label="$t('i18n_1827913996980850689')" :show-overflow-tooltip="true">
         <template v-slot="scope">
-          <span @click="absPathClickCopy(scope.row.absPath)">{{ scope.row.absPath }}</span>
+          <span
+              :id="getAbsPathCellId(scope.row)"
+              :data-clipboard-text="scope.row.absPath"
+              @click="absPathClickCopy(scope.row)">
+            {{ scope.row.absPath }}
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -51,8 +56,19 @@ export default {
     }
   },// data
   methods: {
-    absPathClickCopy(absPath) {
-      devConsoleLog('absPathClickCopy', absPath);
+    getAbsPathCellId(row) {
+      return 'absPathCellId_' + row.id;
+    },
+    absPathClickCopy(row) {
+      let absPathCellClipboard = new this.clipboard("#" + this.getAbsPathCellId(row));
+      absPathCellClipboard.on('success', () => {
+        Message.success(this.$t('i18n_1827946899051778048'));
+        absPathCellClipboard.destroy();
+      });
+      absPathCellClipboard.on('error', () => {
+        Message.error(this.$t('i18n_1827946899051778049'));
+        absPathCellClipboard.destroy();
+      });
     },
   },// methods
   watch: {

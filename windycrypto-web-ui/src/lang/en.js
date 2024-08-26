@@ -13,4 +13,6 @@ export default {
     i18n_1827913996976656385: 'latest msg',
     i18n_1827913996980850688: 'progress',
     i18n_1827913996980850689: 'absolute path',
+    i18n_1827946899051778048: 'copy success',
+    i18n_1827946899051778049: 'copy failed',
 }

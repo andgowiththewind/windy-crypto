@@ -9,11 +9,16 @@ import moment from "moment"
 import drag from './utils/drag.js'
 //
 import i18n from '@/lang' // 引入国际化配置
+//
+import clipboard from 'clipboard';
 
-
+// 
+//
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(drag)
+// 全局方法挂载
+Vue.prototype.clipboard = clipboard
 
 new Vue({
     i18n,
