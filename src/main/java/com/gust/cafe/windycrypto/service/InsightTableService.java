@@ -26,6 +26,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class InsightTableService {
+    private final WindyCacheService windyCacheService;
+
+    public InsightTableService(WindyCacheService windyCacheService) {
+        this.windyCacheService = windyCacheService;
+    }
+
+
     public InsightTableResVo getInsightTableData(InsightTableReqVo reqVo) {
         // 路径
         String path = reqVo.getParams().getPath();
@@ -64,7 +71,7 @@ public class InsightTableService {
     }
 
     // `customThreadPool.submit`的参数是一个`Callable`对象，这里使用lambda表达式实现了`Callable`接口的`call`方法
-    private static Callable<List<Windy>> getListCallable(List<File> loopFiles, InsightTableReqVo reqVo) {
+    private Callable<List<Windy>> getListCallable(List<File> loopFiles, InsightTableReqVo reqVo) {
         return () -> loopFiles.parallelStream()
                 .filter(getFilePredicate(reqVo))
                 .map(getFileWindyFunction(reqVo))
@@ -72,7 +79,7 @@ public class InsightTableService {
     }
 
     // 谓词:从所有文件中筛选符合要求的文件
-    private static Predicate<File> getFilePredicate(InsightTableReqVo reqVo) {
+    private Predicate<File> getFilePredicate(InsightTableReqVo reqVo) {
         return f -> {
             // 基础信息
             String name = FileUtil.getName(f);
@@ -107,6 +114,7 @@ public class InsightTableService {
             }
 
             // 结合当前系统设计的加解密生命周期进行筛选
+            Windy windy = windyCacheService.lockGetOrDefault(absPath);
             // TODO
             // TODO
             // TODO
@@ -119,7 +127,7 @@ public class InsightTableService {
     }
 
     // 函数:将文件转换为Windy对象
-    private static Function<File, Windy> getFileWindyFunction(InsightTableReqVo reqVo) {
+    private Function<File, Windy> getFileWindyFunction(InsightTableReqVo reqVo) {
         return ff -> Windy.builder().build();
     }
 
