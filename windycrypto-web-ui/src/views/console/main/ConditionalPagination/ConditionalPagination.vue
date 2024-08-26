@@ -68,7 +68,8 @@ export default {
       this.$bus.$emit(Methods.FN_CONTRACT_PAYLOAD);
       getInsightTableData(this.payload).then(response => {
         devConsoleLog(response);
-        // this.payload.page.total = response.data.total;
+        this.payload.page.total = response.data.total;
+        this.$bus.$emit(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, response.data.list);
       }).catch(error => {
         devConsoleLog(error);
       });
