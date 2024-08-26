@@ -11,7 +11,16 @@
         :header-cell-style="headerCellStyleFnVal"
         :data="tableData"
         style="width: 100%;min-height:500px;">
-      <el-table-column label="ID" width="170" prop="id" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column label="ID" width="170" :show-overflow-tooltip="true">
+        <template v-slot="scope">
+          <span
+              :id="getIdCellId(scope.row)"
+              :data-clipboard-text="scope.row.id"
+              @click="idClickCopy(scope.row)">
+            {{ scope.row.id }}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656385')" width="250" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
@@ -68,6 +77,20 @@ export default {
       absPathCellClipboard.on('error', () => {
         Message.error(this.$t('i18n_1827946899051778049'));
         absPathCellClipboard.destroy();
+      });
+    },
+    getIdCellId(row) {
+      return 'idCellId_' + row.id;
+    },
+    idClickCopy(row) {
+      let idCellClipboard = new this.clipboard("#" + this.getIdCellId(row));
+      idCellClipboard.on('success', () => {
+        Message.success(this.$t('i18n_1827946899051778048'));
+        idCellClipboard.destroy();
+      });
+      idCellClipboard.on('error', () => {
+        Message.error(this.$t('i18n_1827946899051778049'));
+        idCellClipboard.destroy();
       });
     },
   },// methods
