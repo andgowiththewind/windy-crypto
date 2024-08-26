@@ -59,7 +59,8 @@ public class WindyCacheService {
             String sizeLabel = FileUtil.readableFileSize(size);
             Windy insertVo = Windy.builder()
                     .id(parseId(absPath))
-                    .absPath(FileUtil.file(absPath).getAbsolutePath())
+                    // 统一转正斜杠"/"
+                    .absPath(FileUtil.file(absPath).getAbsolutePath().replace("\\", "/"))
                     .mainName(FileUtil.mainName(absPath))
                     .extName(FileUtil.extName(absPath))
                     .name(FileUtil.getName(absPath))
