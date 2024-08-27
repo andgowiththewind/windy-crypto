@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(WindyException.class)
     public R HandleWindyException(WindyException e, HttpServletRequest request) {
-        log.debug("发生自定义异常'{}'", request.getRequestURI(), e.getMessage());
+        log.debug("捕获自定义异常'{}'", request.getRequestURI(), e.getMessage());
         return R.error(e.getMessage());
     }
 
