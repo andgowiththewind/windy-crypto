@@ -42,7 +42,7 @@ public class AntiShakeFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String requestURI = request.getRequestURI();
         // 需要过滤的接口,模式:equal
-        List<String> equalList = ListUtil.toList("/folderTree/getTreeData", "/sys/checkSecretKey");
+        List<String> equalList = ListUtil.toList("/insightTable/getData");
         boolean equalAnyMatch = equalList.stream().anyMatch(s -> s.equals(requestURI));
 
         // 需要过滤的接口,模式:startWith
