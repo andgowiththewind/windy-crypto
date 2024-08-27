@@ -48,8 +48,8 @@ public class CryptoPreparationService {
     }
 
     private static void preVerify(CryptoSubmitReqVo reqVo) {
-        WindyException.run((Void) -> Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208")));
         WindyException.run((Void -> {
+            Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));
             String userPassword = reqVo.getUserPassword();
             Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));
             // 8~32位限制
@@ -60,6 +60,10 @@ public class CryptoPreparationService {
     private List<Windy> filterWindyCache(List<Windy> windyCache, CryptoSubmitReqVo reqVo) {
         Boolean askEncrypt = reqVo.getAskEncrypt();
         List<Windy> collect = windyCache.stream().filter(cache -> {
+            // 仅支持文件不支持文件夹
+            File file = FileUtil.file(cache.getAbsPath());
+            if (file.isDirectory()) return false;
+
             // 仅空闲状态的文件才能被加解密
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);

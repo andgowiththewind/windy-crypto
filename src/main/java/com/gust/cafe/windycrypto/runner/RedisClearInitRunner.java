@@ -52,7 +52,7 @@ public class RedisClearInitRunner implements ApplicationRunner {
     private void deleteByPrefixMatch() {
         List<String> prefixList = ListUtil.toList(
                 CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK
-                , CacheConstants.PREFIX_GET_OR_DEFAULT_WINDY_LOCK
+                , CacheConstants.WINDY_LOCK
         );
         prefixList.forEach(prefix -> {
             Collection<String> keys = redisMasterCache.keys(prefix + "*");

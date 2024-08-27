@@ -2,8 +2,12 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Assert;
+import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
+import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +31,7 @@ public class CryptoService {
     private ThreadPoolTaskExecutor cryptoTaskExecutor;
 
     //
-    public void cryptoSubmitAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
+    public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
         TimeInterval timer = DateUtil.timer();
         for (String beforePath : absPathList) {
             // 上下文对象记录必要信息,异步线程采用thenRunAsync,确保按顺序执行
@@ -47,6 +51,11 @@ public class CryptoService {
     }
 
     private void futureQueue(CryptoContext cryptoContext) {
+        String beforePath = cryptoContext.getBeforePath();
+        WindyException.run((Void) -> {
+            Assert.isTrue(FileUtil.exist(beforePath), WindyLang.msg("i18n_1828354895514832896"));
+        });
+        // 涉及修改缓存状态的操作也要在加锁环境进行处理
     }
 
     // 异步加解密阶段

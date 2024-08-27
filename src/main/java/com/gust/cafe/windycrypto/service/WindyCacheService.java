@@ -94,7 +94,7 @@ public class WindyCacheService {
         // 绝对路径转ID
         String id = parseId(absPath);
         // 拼接分布式锁KEY
-        String lockKey = StrUtil.format("{}:{}", CacheConstants.PREFIX_GET_OR_DEFAULT_WINDY_LOCK, id);
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_LOCK, id);
         // 定义锁对象
         RLock lock = redissonClient.getLock(lockKey);
         // 根据当前业务设计的超时时间、过期时间,尝试获取锁

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 加解密控制器
@@ -36,9 +35,14 @@ public class CryptoController extends BaseController {
 
     @PostMapping("/submit")
     public R submit(@RequestBody @Validated CryptoSubmitReqVo reqVo) {
+        // 计算任务量
         List<String> absPathList = cryptoPreparationService.prepare(reqVo);
         if (CollectionUtil.isEmpty(absPathList)) throw new WindyException(WindyLang.msg("i18n_1828011035181846528"));
-        super.runAsyncExceptionally((v) -> cryptoService.cryptoSubmitAsync(absPathList, reqVo));
+
+        // 异步处理长耗时任务
+        super.runAsyncExceptionally((v) -> cryptoService.actionAsync(absPathList, reqVo));
+
+        // 反馈
         return R.ok(WindyLang.msg("i18n_1827976801159352320") + "\tcount=" + absPathList.size());
     }
 }
