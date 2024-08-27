@@ -133,8 +133,6 @@ public class CryptoService {
         // 在源文件的同级目录下创建临时文件
         String tmpAbsPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(beforePath, 1), tmpName));
         Windy windy = windyCacheService.lockGetOrDefault(tmpAbsPath);
-        WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
-        Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), "状态码应该为FREE,请检查代码");
         // 更新缓存状态信息
         windy.setCode(WindyStatusEnum.INPUTTING.getCode());
         windy.setLabel(WindyStatusEnum.INPUTTING.getLabel());
@@ -170,6 +168,7 @@ public class CryptoService {
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
+            System.out.println("coverNameDTO=" + coverNameDTO);
         }
 
     }
