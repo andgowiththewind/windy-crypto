@@ -37,7 +37,7 @@ public class CryptoPreparationService {
     @SneakyThrows
     public List<String> prepare(CryptoSubmitReqVo reqVo) {
         // 根据传参将所有的文件转为Windy缓存对象
-        List<Windy> windyCache = toWindyCache(reqVo);
+        List<Windy> windyCache = getWindyCache(reqVo);
         // 一些筛选判断不需要放在加解密阶段
         List<Windy> windyFilter = filterWindyCache(windyCache, reqVo);
         // 传递绝对路径即可
@@ -61,10 +61,15 @@ public class CryptoPreparationService {
         return collect;
     }
 
-    private List<Windy> toWindyCache(CryptoSubmitReqVo reqVo) throws InterruptedException, ExecutionException {
+    private List<Windy> getWindyCache(CryptoSubmitReqVo reqVo) throws InterruptedException, ExecutionException {
         // 一些判断不需要放在加解密阶段
         WindyException.run((Void) -> Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208")));
-        WindyException.run((Void) -> Assert.notBlank(reqVo.getUserPassword(), WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210")));
+        WindyException.run((Void -> {
+            String userPassword = reqVo.getUserPassword();
+            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));
+            // 8~32位限制
+            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32, WindyLang.msg("i18n_1828312465394503680"));
+        }));
         //
         List<Windy> windyList = new ArrayList<>();
         //
