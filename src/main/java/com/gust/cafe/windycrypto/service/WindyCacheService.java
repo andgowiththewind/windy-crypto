@@ -1,5 +1,7 @@
 package com.gust.cafe.windycrypto.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
@@ -42,14 +44,14 @@ public class WindyCacheService {
     public Windy lockGetOrDefault(String absPath) {
         TimeInterval timer = DateUtil.timer();
         // 定义业务操作
-        Supplier<Windy> supplier = getSupplier(absPath);
+        Supplier<Windy> supplier = getGetOrDefaultSupplier(absPath);
         // 提交业务操作到分布式锁代码结构
-        Windy windy = lockExecute(absPath, supplier);
+        Windy windy = handleGetOrDefaultLockExecute(absPath, supplier);
         // log.debug("获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         return windy;
     }
 
-    private Supplier<Windy> getSupplier(String absPath) {
+    private Supplier<Windy> getGetOrDefaultSupplier(String absPath) {
         // Supplier主要内容:如果缓存中有,则返回缓存中的Windy对象,否则新建一个Windy对象返回
         return () -> {
             Windy cacheVo = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId(absPath));
@@ -88,13 +90,13 @@ public class WindyCacheService {
     // 分布式锁执行业务操作
     // 防止并发操作,保证数据一致性;即防止同一个绝对路径的文件被多次创建
     @SneakyThrows // `tryLock()`方法抛出`InterruptedException`异常
-    private Windy lockExecute(String absPath, Supplier<Windy> supplier) {
+    private Windy handleGetOrDefaultLockExecute(String absPath, Supplier<Windy> supplier) {
         String threadName = Thread.currentThread().getName();
         Windy result = null;
         // 绝对路径转ID
         String id = parseId(absPath);
         // 拼接分布式锁KEY
-        String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_LOCK, id);
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_GET_OR_DEFAULT_LOCK, id);
         // 定义锁对象
         RLock lock = redissonClient.getLock(lockKey);
         // 根据当前业务设计的超时时间、过期时间,尝试获取锁
@@ -114,7 +116,6 @@ public class WindyCacheService {
         }
         return result;
     }
-
 
     /**
      * 根据绝对路径获取全局ID,缓存此对应关系
@@ -138,4 +139,32 @@ public class WindyCacheService {
         return nextIdStr;
     }
 
+    @SneakyThrows
+    public void lockUpdate(Windy windyContainer) {
+        Assert.isTrue(windyContainer != null && StrUtil.isNotBlank(windyContainer.getAbsPath()), "绝对路径不能为空");
+        String id = parseId(windyContainer.getAbsPath());
+        Windy currentCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, id);// 需要通过`redisMasterCache`来查
+        Assert.notNull(currentCache, "当前缓存对象不能为空");
+        // 获取当前线程名称
+        String threadName = Thread.currentThread().getName();
+        // 拼接分布式锁KEY
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_UPDATE_LOCK, id);
+        // 定义锁对象
+        RLock lock = redissonClient.getLock(lockKey);
+        if (lock.tryLock(5, 15, TimeUnit.SECONDS)) {
+            // 当前线程加锁成功,执行业务操作
+            try {
+                // 基于`BeanUtil.copyProperties`方法复制对象属性,实现类似于JavaScript中`Object.assign`的功
+                BeanUtil.copyProperties(windyContainer, currentCache, CopyOptions.create().setIgnoreNullValue(true));
+                // 更新缓存
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, currentCache.getId(), currentCache);
+            } finally {
+                // 确保释放锁
+                lock.unlock();
+            }
+        } else {
+            // 没抢到锁就不要更新
+            throw new WindyException("获取锁失败");
+        }
+    }
 }

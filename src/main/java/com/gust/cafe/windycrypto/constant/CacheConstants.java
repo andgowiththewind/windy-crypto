@@ -7,6 +7,8 @@ public class CacheConstants {
     public static final String PATH_ID_MAP = "pathIdMap";
     // 存放<ID,文件对象>的map
     public static final String WINDY_MAP = "windyMap";
-    // 加锁,(1)当通过绝对路径获取Windy对象时;(2)涉及到修改Windy关键信息时;
-    public static final String WINDY_LOCK = "windyLock";
+    // 加锁,当通过绝对路径获取Windy对象时
+    public static final String WINDY_GET_OR_DEFAULT_LOCK = "windyGetOrDefaultLock";
+    // 加锁,当通过绝对路径更新Windy对象时
+    public static final String WINDY_UPDATE_LOCK = "windyUpdateLock";
 }
