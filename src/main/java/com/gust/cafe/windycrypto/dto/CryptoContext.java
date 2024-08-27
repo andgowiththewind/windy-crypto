@@ -28,6 +28,7 @@ public class CryptoContext {
     private BufferedInputStream bis;// 输入流,被加解密的文件读取流
     private BufferedOutputStream bos;// 输出流,临时文件写入流
     private List<Integer> intSaltList;// 整数盐值列表
+    private String intSaltStr;// 字符串盐值
     //
     private String thread;// 线程信息
 }

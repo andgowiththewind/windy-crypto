@@ -1,11 +1,14 @@
 package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -165,6 +169,7 @@ public class CryptoService {
                 list.add(RandomUtil.randomInt(0, 256));
             }
             cryptoContext.setIntSaltList(list);
+            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
@@ -179,6 +184,79 @@ public class CryptoService {
         // TODO
         // TODO
         // TODO
+        // 缓冲区大小
+        try {
+            // 读取源文件的缓存对象
+            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+
+            // 每次读取的字节数
+            Integer bufferSize = 1024;
+
+            // 每次实际读取到字节数
+            int len;
+
+            // 已经读取的字节数
+            long total = 0;
+
+            // 缓冲区
+            byte[] buffer = new byte[bufferSize];
+
+            // 计时器,控制打印频率
+            TimeInterval timer = DateUtil.timer();
+
+            // 源文件大小,用于计算百分比
+            long windyBeforeSize = windyBefore.getSize();
+
+            // 记录所有字节的位置
+            long position = 0;
+
+            // 整数盐值列表
+            List<Integer> intSaltList = cryptoContext.getIntSaltList();
+
+            // 本次操作是否为加密
+            Boolean askEncrypt = cryptoContext.getAskEncrypt();
+
+            // 循环读取源文件的输入流,写入到临时文件的输出流
+            while ((len = cryptoContext.getBis().read(buffer)) != -1) {
+                // 此处已经将字节读取到缓冲区,不能在此缓冲区中直接修改,应该用一个新的字节数组来接收加盐后的字节,定义临时缓冲区副本
+                byte[] newBuffer = new byte[len];
+                // 对每个字节加减整数盐后重新收集:(1)加密时,增加整数盐;(2)解密时,减去整数盐
+                for (int i = 0; i < len; i++) {
+                    position = position + 1;
+                    // 位置数值与整数盐值列表长度取余,得到当前位置对应的整数盐值
+                    int salt = intSaltList.get((int) (position % intSaltList.size()));
+                    // 加密时,增加整数盐;解密时,减去整数盐
+                    newBuffer[i] = (byte) (buffer[i] + (askEncrypt ? salt : -salt));
+                }
+                // 加盐后的字节写入到临时文件的输出流
+                cryptoContext.getBos().write(newBuffer);
+                // 更新已经读取的字节数
+                total += len;
+                //
+                // 流读取的频率是非常快的,如果每次都更新缓存和发布消息,会导致卡死,所以需要通过间隔时间控制频率
+                if (timer.intervalMs() > 800L) {
+                    // 计算当前百分比
+                    Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
+                    // TODO 更新缓存状态信息
+                    // TODO 更新缓存状态信息
+                    // TODO 更新缓存状态信息
+                    // 重置计时器,重新计时直至下一次周期
+                    timer.restart();
+                }
+            }
+
+            // 防止最后一次结果丢失,循环结束后指定百分比更新一次
+            // TODO 直接更新100%
+
+            // 清除计时器
+            timer.clear();
+            timer = null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            IoUtil.close(cryptoContext.getBis());
+            IoUtil.close(cryptoContext.getBos());
+        }
     }
 
     private void futureCryptoFinal(CryptoContext cryptoContext) {
