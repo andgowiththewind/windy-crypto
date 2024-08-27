@@ -4,12 +4,19 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
+import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
+import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
+import com.gust.cafe.windycrypto.dto.core.Windy;
+import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -17,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Slf4j
@@ -29,6 +37,9 @@ public class CryptoService {
     @Autowired
     @Qualifier(ThreadPoolConstants.CRYPTO)
     private ThreadPoolTaskExecutor cryptoTaskExecutor;
+    //
+    @Autowired
+    private WindyCacheService windyCacheService;
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
@@ -54,8 +65,13 @@ public class CryptoService {
         String beforePath = cryptoContext.getBeforePath();
         WindyException.run((Void) -> {
             Assert.isTrue(FileUtil.exist(beforePath), WindyLang.msg("i18n_1828354895514832896"));
+            // 实时查询缓存
+            Windy windy = windyCacheService.lockGetOrDefault(beforePath);
+            // 状态要求FREE
+            WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
+            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), WindyLang.msg("i18n_1828354895519027200"));
         });
-        // 涉及修改缓存状态的操作也要在加锁环境进行处理
+        // 满足条件则将状态更新为排队中,加锁处理
     }
 
     // 异步加解密阶段
