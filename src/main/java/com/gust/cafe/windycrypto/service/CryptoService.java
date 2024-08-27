@@ -33,17 +33,11 @@ public class CryptoService {
                     .userPassword(reqVo.getUserPassword())
                     .beforePath(beforePath)
                     .build();
-            // (1)处理排队
-            CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureQueue(cryptoContext), dispatchTaskExecutor);
-            // (2)处理实际加解密
-            CompletableFuture<Void> future02 = future01.thenRunAsync(() -> futureCrypto(cryptoContext), cryptoTaskExecutor);
-            // (3)异常处理,处理文件回滚
-            future02.exceptionally(captureUnknownExceptions(cryptoContext));
+            // 处理实际加解密
+            CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureCrypto(cryptoContext), cryptoTaskExecutor);
+            // 异常处理,处理文件回滚
+            future01.exceptionally(captureUnknownExceptions(cryptoContext));
         }
-    }
-
-    // 异步排队阶段,再次实时查询状态判断是否满足条件
-    private void futureQueue(CryptoContext cryptoContext) {
     }
 
     // 异步加解密阶段
@@ -51,6 +45,9 @@ public class CryptoService {
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
-        return null;
+        return throwable -> {
+            log.error("加解密异常,文件回滚,异常信息:{}", throwable.getMessage());
+            return null;
+        };
     }
 }

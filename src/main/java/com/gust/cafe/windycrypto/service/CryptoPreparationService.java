@@ -36,6 +36,8 @@ public class CryptoPreparationService {
 
     @SneakyThrows
     public List<String> prepare(CryptoSubmitReqVo reqVo) {
+        // 一些判断不需要放在加解密阶段
+        preVerify(reqVo);
         // 根据传参将所有的文件转为Windy缓存对象
         List<Windy> windyCache = getWindyCache(reqVo);
         // 一些筛选判断不需要放在加解密阶段
@@ -45,6 +47,16 @@ public class CryptoPreparationService {
         return absPathList;
     }
 
+    private static void preVerify(CryptoSubmitReqVo reqVo) {
+        WindyException.run((Void) -> Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208")));
+        WindyException.run((Void -> {
+            String userPassword = reqVo.getUserPassword();
+            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));
+            // 8~32位限制
+            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32, WindyLang.msg("i18n_1828312465394503680"));
+        }));
+    }
+
     private List<Windy> filterWindyCache(List<Windy> windyCache, CryptoSubmitReqVo reqVo) {
         Boolean askEncrypt = reqVo.getAskEncrypt();
         List<Windy> collect = windyCache.stream().filter(cache -> {
@@ -52,6 +64,11 @@ public class CryptoPreparationService {
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
             if (!statusMatch) return false;
+
+            // 文件大小不能为零
+            Long size = cache.getSize();
+            if (size == null || size == 0) return false;
+
             // 如果是加密任务,排除已经加密过的文件;如果是解密任务,排除未加密过的文件
             Boolean hadEncrypted = cache.getHadEncrypted();
             if (askEncrypt && hadEncrypted) return false;
@@ -62,14 +79,6 @@ public class CryptoPreparationService {
     }
 
     private List<Windy> getWindyCache(CryptoSubmitReqVo reqVo) throws InterruptedException, ExecutionException {
-        // 一些判断不需要放在加解密阶段
-        WindyException.run((Void) -> Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208")));
-        WindyException.run((Void -> {
-            String userPassword = reqVo.getUserPassword();
-            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));
-            // 8~32位限制
-            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32, WindyLang.msg("i18n_1828312465394503680"));
-        }));
         //
         List<Windy> windyList = new ArrayList<>();
         //
