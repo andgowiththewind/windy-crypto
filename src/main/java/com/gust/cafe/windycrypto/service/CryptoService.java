@@ -24,11 +24,12 @@ public class CryptoService {
 
     //
     public void cryptoSubmitAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
-        for (String absPath : absPathList) {
+        for (String beforePath : absPathList) {
             // 上下文对象记录必要信息
             CryptoContext cryptoContext = CryptoContext.builder()
                     .askEncrypt(reqVo.getAskEncrypt())
                     .userPassword(reqVo.getUserPassword())
+                    .beforePath(beforePath)
                     .build();
         }
     }
