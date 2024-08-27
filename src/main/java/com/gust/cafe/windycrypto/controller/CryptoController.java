@@ -39,6 +39,6 @@ public class CryptoController extends BaseController {
         List<String> absPathList = cryptoPreparationService.prepare(reqVo);
         if (CollectionUtil.isEmpty(absPathList)) throw new WindyException(WindyLang.msg("i18n_1828011035181846528"));
         super.runAsyncExceptionally((v) -> cryptoService.cryptoSubmitAsync(absPathList, reqVo));
-        return R.ok(WindyLang.msg("i18n_1827976801159352320"));
+        return R.ok(WindyLang.msg("i18n_1827976801159352320") + "\tcount=" + absPathList.size());
     }
 }
