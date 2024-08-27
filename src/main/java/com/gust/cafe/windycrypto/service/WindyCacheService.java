@@ -148,10 +148,10 @@ public class WindyCacheService {
         leaseTime = Optional.ofNullable(leaseTime).orElse(15L);
         unit = Optional.ofNullable(unit).orElse(TimeUnit.SECONDS);
         //
-        Assert.isTrue(StrUtil.isNotBlank(absPath), "绝对路径不能为空");
+        WindyException.run((Void) -> Assert.isTrue(StrUtil.isNotBlank(absPath), "绝对路径不能为空"));
         String id = parseId(absPath);
         Windy currentCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, id);// 需要通过`redisMasterCache`来查
-        Assert.notNull(currentCache, "当前缓存对象不能为空,不能执行更新");
+        WindyException.run((Void) -> Assert.notNull(currentCache, "当前缓存对象不能为空,不能执行更新"));
         // 拼接分布式锁KEY
         String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_UPDATE_LOCK, id);
         // 定义锁对象
