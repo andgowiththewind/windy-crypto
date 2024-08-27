@@ -26,4 +26,6 @@ public class CryptoContext {
     private String afterPath;// 目标文件路
     private BufferedInputStream bis;// 输入流,被加解密的文件读取流
     private BufferedOutputStream bos;// 输出流,临时文件写入流
+    //
+    private String thread;// 线程信息
 }
