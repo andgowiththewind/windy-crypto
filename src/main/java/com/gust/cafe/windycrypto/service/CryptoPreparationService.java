@@ -52,7 +52,7 @@ public class CryptoPreparationService {
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
             if (!statusMatch) return false;
-            // TODO 如果是加密任务,排除已经加密过的文件;如果是解密任务,排除未加密过的文件
+            // 如果是加密任务,排除已经加密过的文件;如果是解密任务,排除未加密过的文件
             Boolean hadEncrypted = cache.getHadEncrypted();
             if (askEncrypt && hadEncrypted) return false;
             if (!askEncrypt && !hadEncrypted) return false;
@@ -98,7 +98,7 @@ public class CryptoPreparationService {
 
             List<CompletableFuture<Windy>> futureList = collect.stream()
                     .map(FileUtil::getAbsolutePath)
-                    .map(path -> CompletableFuture.supplyAsync(() -> windyCacheService.lockGetOrDefault(path)))
+                    .map(path -> CompletableFuture.supplyAsync(() -> windyCacheService.lockGetOrDefault(path), dispatchTaskExecutor))
                     .collect(Collectors.toList());
             // 使用 CompletableFuture.allOf 等待所有任务完成
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));// 0是惯用写法

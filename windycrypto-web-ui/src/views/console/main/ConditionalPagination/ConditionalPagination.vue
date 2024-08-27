@@ -62,6 +62,7 @@ export default {
     resetConditionalForm() {
     },
     submitConditionPagingQuery() {
+      this.loading = true;
       devConsoleLog('submitConditionPagingQuery');
       devConsoleLog('接收合并之前的payload', this.payload);
       // 激活其他多个组件的合约,要求其向当前组件传递数据更新payload
@@ -70,9 +71,7 @@ export default {
         devConsoleLog(response);
         this.payload.page.total = response.data.total;
         this.$bus.$emit(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, response.data.list);
-      }).catch(error => {
-        devConsoleLog(error);
-      });
+      }).finally(() => this.loading = false).catch(error => devConsoleLog(error));
     },
     handleSizeChange(val) {
       this.payload.page.pageSize = val;
@@ -99,6 +98,10 @@ export default {
       this.payload = mergedObject;
       devConsoleLog('更新后的payload', this.payload);
     });
+
+
+    this.submitConditionPagingQuery();
+
   },// mounted
 }
 </script>
