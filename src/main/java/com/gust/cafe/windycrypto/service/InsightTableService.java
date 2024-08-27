@@ -11,30 +11,35 @@ import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
+import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.vo.req.InsightTableReqVo;
 import com.gust.cafe.windycrypto.vo.res.InsightTableResVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class InsightTableService {
-    private final WindyCacheService windyCacheService;
-
-    public InsightTableService(WindyCacheService windyCacheService) {
-        this.windyCacheService = windyCacheService;
-    }
+    @Autowired
+    @Qualifier(ThreadPoolConstants.DISPATCH)
+    private ThreadPoolTaskExecutor dispatchTaskExecutor;
+    @Autowired
+    private WindyCacheService windyCacheService;
 
     public InsightTableResVo getInsightTableData(InsightTableReqVo reqVo) {
         // (0)校验
@@ -60,23 +65,30 @@ public class InsightTableService {
     private List<Windy> handleConditional(InsightTableReqVo reqVo) {
         TimeInterval timer = DateUtil.timer();
         List<File> loopFiles = FileUtil.loopFiles(reqVo.getParams().getPath());
-        // 取消ForkJoinPool
+        log.debug("文件遍历耗时[{}]ms", timer.intervalMs());
+        // 多线程处理
         List<Windy> windyList = getWindyList(loopFiles, BeanUtil.copyProperties(reqVo, InsightTableReqVo.class));
         log.debug("处理条件查询耗时[{}]ms", timer.intervalMs());
         return windyList;
     }
 
+    // TODO
     private List<Windy> getWindyList(List<File> loopFiles, InsightTableReqVo reqVo) {
-        List<Windy> collect = loopFiles.stream()
-                .filter(getFilePredicate(reqVo))
-                .map(getFileWindyFunction(reqVo))
+        // 使用指定线程池处理,合并所有数据
+        List<CompletableFuture<Windy>> futureList = loopFiles.stream()
+                .map(f -> CompletableFuture.supplyAsync(getWindySupplier(f, reqVo), dispatchTaskExecutor))
                 .collect(Collectors.toList());
-        return collect;
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
+        CompletableFuture<List<Windy>> allResults = allFutures.thenApply(v -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+        List<Windy> join = allResults.join();
+        // 过滤null
+        join = join.stream().filter(windy -> windy != null).collect(Collectors.toList());
+        return join;
     }
 
-    // 谓词:从所有文件中筛选符合要求的文件
-    private Predicate<File> getFilePredicate(InsightTableReqVo reqVo) {
-        return f -> {
+    private Supplier<Windy> getWindySupplier(File f, InsightTableReqVo reqVo) {
+        // 取巧:如果不符合要求的返回null,实现筛选的目的
+        return () -> {
             // 基础信息
             String name = FileUtil.getName(f);
             String extName = FileUtil.extName(f);
@@ -87,24 +99,24 @@ public class InsightTableService {
             boolean cryptoByCurrentSys = StrUtil.isNotBlank(name) && StrUtil.startWithIgnoreCase(name, CommonConstants.ENCRYPTED_PREFIX);
             //
             // 排除文件夹
-            if (FileUtil.isDirectory(f)) return false;
+            if (FileUtil.isDirectory(f)) return null;
             // 排除自定义的临时文件,不需要在table中展示
-            if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return false;
+            if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return null;
             // 根据期望搜索范围结合是否加密过滤
             if (scopeEnum.equals(InsightTableReqVo.ScopeEnum.ALL)) {
                 // 期望查看所有文件,无需过滤
             } else if (scopeEnum.equals(InsightTableReqVo.ScopeEnum.ENCRYPTED)) {
                 // 期望查看加密文件,如果不是加密文件则过滤
-                if (!cryptoByCurrentSys) return false;
+                if (!cryptoByCurrentSys) return null;
             } else if (scopeEnum.equals(InsightTableReqVo.ScopeEnum.NOT_ENCRYPTED)) {
                 // 期望查看未加密文件,如果是加密文件则过滤
-                if (cryptoByCurrentSys) return false;
+                if (cryptoByCurrentSys) return null;
             }
             // 模拟`mybatis.findByAll`,根据对象的各个属性进行筛选
             if (reqVo.getModel() != null) {
                 if (StrUtil.isNotBlank(reqVo.getModel().getName())) {
                     // 如果用户输入了文件名,则进行模糊查询
-                    if (!StrUtil.containsIgnoreCase(name, reqVo.getModel().getName())) return false;
+                    if (!StrUtil.containsIgnoreCase(name, reqVo.getModel().getName())) return null;
                 }
                 // 其他字段略...
             }
@@ -118,20 +130,12 @@ public class InsightTableService {
                     WindyStatusEnum.OUTPUTTING.getCode(),
                     WindyStatusEnum.ALMOST.getCode()
             );
-            if (!showCodeList.contains(windy.getCode())) return false;
-            // 符合要求则返回true
-            return true;
-        };
-    }
-
-    // 函数:将文件转换为Windy对象
-    private Function<File, Windy> getFileWindyFunction(InsightTableReqVo reqVo) {
-        return ff -> {
-            String absolutePath = FileUtil.getAbsolutePath(ff);
-            Windy windy = windyCacheService.lockGetOrDefault(absolutePath);
+            if (!showCodeList.contains(windy.getCode())) return null;
+            // 符合要求则返回
             return windy;
         };
     }
+
 
     private List<Windy> handlePaging(InsightTableReqVo reqVo, List<Windy> all) {
         TimeInterval timer = DateUtil.timer();

@@ -1,6 +1,6 @@
 windy-thread-pool:
   dispatcher:
-    core-pool-size: 500
+    core-pool-size: 250
     max-pool-size: 1000
     queue-capacity: 500
     keep-alive-seconds: 60

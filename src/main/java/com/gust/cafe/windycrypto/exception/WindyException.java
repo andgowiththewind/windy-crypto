@@ -26,7 +26,7 @@ public class WindyException extends RuntimeException {
 
 
     /**
-     * 调用此方法运行的代码块，如果有异常则抛出指定的异常{@link WindyException}
+     * 调用此方法运行的代码块，如果有异常则抛出指定的自定义异常{@link WindyException}
      */
     public static void run(Consumer<Void> consumer) {
         try {
