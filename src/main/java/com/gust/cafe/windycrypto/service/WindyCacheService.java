@@ -20,6 +20,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -140,8 +141,13 @@ public class WindyCacheService {
         return nextIdStr;
     }
 
+
     @SneakyThrows
-    public void lockUpdate(String absPath, Consumer<String> consumer, long waitTime, long leaseTime, TimeUnit unit) {
+    public void lockUpdate(String absPath, Consumer<String> consumer, Long waitTime, Long leaseTime, TimeUnit unit) {
+        waitTime = Optional.ofNullable(waitTime).orElse(5L);
+        leaseTime = Optional.ofNullable(leaseTime).orElse(15L);
+        unit = Optional.ofNullable(unit).orElse(TimeUnit.SECONDS);
+        //
         Assert.isTrue(StrUtil.isNotBlank(absPath), "绝对路径不能为空");
         String id = parseId(absPath);
         Windy currentCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, id);// 需要通过`redisMasterCache`来查
@@ -163,5 +169,9 @@ public class WindyCacheService {
             // 没抢到锁就不要更新
             throw new WindyException("获取锁失败,无法更新");
         }
+    }
+
+    public void lockUpdate(String absPath, Consumer<String> consumer) {
+        lockUpdate(absPath, consumer, null, null, null);
     }
 }
