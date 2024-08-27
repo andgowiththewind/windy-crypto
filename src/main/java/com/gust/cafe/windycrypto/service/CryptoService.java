@@ -1,10 +1,12 @@
 package com.gust.cafe.windycrypto.service;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
@@ -24,7 +26,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -126,24 +131,44 @@ public class CryptoService {
         String tmpName = StrUtil.format("0000000000-{}-{}.{}", DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss"), IdUtil.getSnowflakeNextIdStr(), CommonConstants.TMP_EXT_NAME);
         // 在源文件的同级目录下创建临时文件
         String tmpAbsPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(beforePath, 1), tmpName));
-        windyCacheService.lockUpdate(tmpAbsPath, (path) -> {
-            Windy windy = windyCacheService.lockGetOrDefault(path);
-            // 更新状态信息
-            windy.setCode(WindyStatusEnum.INPUTTING.getCode());
-            windy.setLabel(WindyStatusEnum.INPUTTING.getLabel());
-            windy.setDesc(WindyStatusEnum.INPUTTING.getRemark());
-            windy.setLatestMsg("inputting");
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        });
+        Windy windy = windyCacheService.lockGetOrDefault(tmpAbsPath);
+        WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
+        Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), "状态码应该为FREE,请检查代码");
+        // 更新缓存状态信息
+        windy.setCode(WindyStatusEnum.INPUTTING.getCode());
+        windy.setLabel(WindyStatusEnum.INPUTTING.getLabel());
+        windy.setDesc(WindyStatusEnum.INPUTTING.getRemark());
+        windy.setLatestMsg("inputting");
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        // 记录上下文
+        cryptoContext.setTmpPath(tmpAbsPath);
     }
 
     private void futureCryptoStream(CryptoContext cryptoContext) {
-
+        String beforePath = cryptoContext.getBeforePath();
+        String tmpPath = cryptoContext.getTmpPath();
+        Assert.notBlank(beforePath, "beforePath不能为空");
+        Assert.notBlank(tmpPath, "tmpPath不能为空");
+        // 准备输入输出流
+        BufferedInputStream bis = FileUtil.getInputStream(FileUtil.file(beforePath));
+        BufferedOutputStream bos = FileUtil.getOutputStream(FileUtil.file(tmpPath));
+        // 记录上下文
+        cryptoContext.setBis(bis);
+        cryptoContext.setBos(bos);
     }
 
     private void futureCryptoSalt(CryptoContext cryptoContext) {
-
+        if (cryptoContext.getAskEncrypt()) {
+            // 如果是加密操作,则生成盐值数组,三位大于0小于256的随机数
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < 3; i++) {
+                list.add(RandomUtil.randomInt(0, 256));
+            }
+            cryptoContext.setIntSaltList(list);
+        } else {
+            // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
+        }
 
     }
 
