@@ -21,6 +21,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -140,31 +141,27 @@ public class WindyCacheService {
     }
 
     @SneakyThrows
-    public void lockUpdate(Windy windyContainer) {
-        Assert.isTrue(windyContainer != null && StrUtil.isNotBlank(windyContainer.getAbsPath()), "绝对路径不能为空");
-        String id = parseId(windyContainer.getAbsPath());
+    public void lockUpdate(String absPath, Consumer<String> consumer, long waitTime, long leaseTime, TimeUnit unit) {
+        Assert.isTrue(StrUtil.isNotBlank(absPath), "绝对路径不能为空");
+        String id = parseId(absPath);
         Windy currentCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, id);// 需要通过`redisMasterCache`来查
-        Assert.notNull(currentCache, "当前缓存对象不能为空");
-        // 获取当前线程名称
-        String threadName = Thread.currentThread().getName();
+        Assert.notNull(currentCache, "当前缓存对象不能为空,不能执行更新");
         // 拼接分布式锁KEY
         String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_UPDATE_LOCK, id);
         // 定义锁对象
         RLock lock = redissonClient.getLock(lockKey);
-        if (lock.tryLock(5, 15, TimeUnit.SECONDS)) {
+        // 5, 15, TimeUnit.SECONDS
+        if (lock.tryLock(waitTime, leaseTime, unit)) {
             // 当前线程加锁成功,执行业务操作
             try {
-                // 基于`BeanUtil.copyProperties`方法复制对象属性,实现类似于JavaScript中`Object.assign`的功
-                BeanUtil.copyProperties(windyContainer, currentCache, CopyOptions.create().setIgnoreNullValue(true));
-                // 更新缓存
-                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, currentCache.getId(), currentCache);
+                consumer.accept(absPath);
             } finally {
                 // 确保释放锁
                 lock.unlock();
             }
         } else {
             // 没抢到锁就不要更新
-            throw new WindyException("获取锁失败");
+            throw new WindyException("获取锁失败,无法更新");
         }
     }
 }
