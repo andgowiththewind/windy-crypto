@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 秘钥工具类
  *
  * @author Dororo
- * @version 2.0 解决单例模式下的线程安全问题
+ * @version 2.0 解决单例模式下的线程安全问题&效率问题
  * @date 2024-08-27 20:43:20
  * @see DigestUtil#sha256Hex(String)
  * <p>摘要算法请使用DigestUtil</p>
