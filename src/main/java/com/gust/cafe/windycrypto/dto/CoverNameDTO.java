@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.dto;
 
+import cn.hutool.core.lang.Assert;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +46,8 @@ public class CoverNameDTO {
      * @return 解析结果
      */
     public static CoverNameDTO analyse(String coverName, String inputUserPassword) {
+        Assert.notBlank(coverName, "coverName must not be blank");
+        Assert.notBlank(inputUserPassword, "inputUserPassword must not be blank");
         return null;
     }
 

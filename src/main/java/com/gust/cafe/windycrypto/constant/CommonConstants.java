@@ -8,5 +8,6 @@ public class CommonConstants {
     public static final Version FREEMARKER_VERSION = Configuration.VERSION_2_3_32;
     public static final String TMP_EXT_NAME = "windytmp";
     public static final String ENCRYPTED_MARK = "safeLockedV2";
-    public static final String ENCRYPTED_PREFIX = StrUtil.format("${}$", ENCRYPTED_MARK);
+    public static final String ENCRYPTED_SEPARATOR = "$";
+    public static final String ENCRYPTED_PREFIX = StrUtil.format("{}{}{}", ENCRYPTED_SEPARATOR, ENCRYPTED_MARK, ENCRYPTED_SEPARATOR);
 }
