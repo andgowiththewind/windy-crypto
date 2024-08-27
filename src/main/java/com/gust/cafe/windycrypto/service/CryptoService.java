@@ -13,6 +13,7 @@ import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
+import com.gust.cafe.windycrypto.dto.CoverNameDTO;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
@@ -168,6 +169,7 @@ public class CryptoService {
             cryptoContext.setIntSaltList(list);
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
+            CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
         }
 
     }
