@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <div class="business-btn-zone">
       <el-form @submit.native.prevent :inline="true" size="small">
         <el-form-item label="">
@@ -26,12 +26,14 @@ export default {
   components: {},
   data() {
     return {
+      loading: false,
       userPassword: process.env.VUE_APP_DEV_TEST_PASSWORD || '',
       topFolderPathCopy: '',
     }
   },// data
   methods: {
     encryptAll() {
+      this.loading = true;
       // 要求更新`topFolderPathCopy`
       this.$bus.$emit(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY);
       let cryptoSubmitPayload = {
@@ -42,9 +44,10 @@ export default {
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
-      });
+      }).finally(() => this.loading = false);
     },
     decryptAll() {
+      this.loading = true;
       // 要求更新`topFolderPathCopy`
       this.$bus.$emit(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY);
       let cryptoSubmitPayload = {
@@ -55,7 +58,7 @@ export default {
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
-      });
+      }).finally(() => this.loading = false);
     },
     // 被通知
     // 收到通知后向目标组件传递数据
@@ -77,6 +80,5 @@ export default {
 .business-btn-zone {
   text-align: right;
   margin-top: -15px;
-  margin-bottom: -15px;
 }
 </style>
