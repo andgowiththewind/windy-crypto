@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CfgTxtContentDTO {
     private String sourceName;// 原文件名(含可能存在的扩展名)
+    private String sourceMainName;// 原文件名(不含扩展名)
+    private String sourceExtName;// 原扩展名
     // 其他信息待扩展
     //
     private String createTime;// 创建时间

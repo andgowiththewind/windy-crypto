@@ -282,13 +282,15 @@ public class CryptoService {
                 // 格式参考:`固定识别前缀`+`密码摘要算法密文`+`雪花算法ID作为文件名`+`.windycfg`
                 String cfgTxtName = StrUtil.format("{}{}{}{}.{}"
                         , CommonConstants.ENCRYPTED_PREFIX
-                        , DigestUtil.sha256Hex(cryptoContext.getUserPassword())
+                        , cryptoContext.getUserPasswordSha256Hex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , windy.getId()
                         , CommonConstants.CFG_EXT_NAME);
                 // 存储加密后的文件名
                 CfgTxtContentDTO contentDTO = CfgTxtContentDTO.builder()
                         .sourceName(windy.getName())
+                        .sourceMainName(windy.getMainName())
+                        .sourceExtName(windy.getExtName())
                         .createTime(DateUtil.now())
                         .updateTime(DateUtil.now())
                         .build();
@@ -307,7 +309,6 @@ public class CryptoService {
                 afterName = StrUtil.format("{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
                         , DigestUtil.sha256Hex(cryptoContext.getUserPassword())
-
                 );
             }
         } else {
