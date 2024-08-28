@@ -117,6 +117,7 @@ public class CryptoService {
 
     // 异步加解密阶段
     private void futureCrypto(CryptoContext cryptoContext) {
+        log.debug("[{}]-成功进入加解密线程", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
         // 成功进入加解密阶段,更新状态
         Windy windy = windyCacheService.lockGetOrDefault(beforePath);
