@@ -296,7 +296,7 @@ public class CryptoService {
             // 健壮
             if (!FileUtil.exist(cryptoContext.getAfterPath())) {
                 // 说明改名失败,抛出异常触发进入下一循环
-                throw new CryptoException("改名失败");
+                throw new CryptoException("本次改名失败,触发重试");
             }
         };
         // 成功回调
@@ -446,7 +446,7 @@ public class CryptoService {
             long maxMs = 60_000L;
             Consumer<Void> actionCs = aVoid -> {
                 FileUtil.del(path);
-                if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败"));
+                if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败,触发重试"));
             };
             Consumer<Void> successCs = aVoid -> {
                 log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
@@ -490,6 +490,7 @@ public class CryptoService {
         return throwable -> {
             if (throwable == null) return null;
             try {
+                // 处理文件回滚等
                 globalWindyRollback(cryptoContext, throwable);
             } catch (Exception e) {
                 // 如果在全局异常处理时发生未知异常,那么就是极其严重的异常,需要打印日志,及时修复
@@ -503,5 +504,40 @@ public class CryptoService {
     }
 
     private void globalWindyRollback(CryptoContext cryptoContext, Throwable throwable) {
+        if (cryptoContext == null) return;
+        // 1.0 删除可能存在的临时文件以及最终文件
+        List<String> pathList = ListUtil.toLinkedList(cryptoContext.getTmpPath(), cryptoContext.getAfterPath());
+        for (String path : pathList) {
+            if (StrUtil.isBlank(path) || !FileUtil.exist(path)) {
+                continue;
+            }
+            // 同样需要考虑锁的问题
+            long intervalMs = 2_000L;
+            long maxMs = 60_000L;
+            TimeInterval timer = DateUtil.timer();
+            Consumer<Void> actionCs = aVoid -> {
+                IoUtil.close(cryptoContext.getBis());
+                IoUtil.close(cryptoContext.getBos());
+                FileUtil.del(FileUtil.file(path));
+                if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败,触发重试"));
+            };
+            Consumer<Void> successCs = aVoid -> {
+                log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
+                windyCacheService.lockUpdate(path, (p) -> {
+                    Windy windy = windyCacheService.lockGetOrDefault(path);
+                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+                    windy.setLatestMsg("not exist");
+                    windy.setUpdateTime(DateUtil.now());
+                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                });
+            };
+            Consumer<Void> errorCs = aVoid -> {
+                throw new WindyException(StrUtil.format("最终删除(超时)失败:[{}ms],需要手动删除", timer.intervalMs()));
+            };
+            // 执行
+            PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
+        }
     }
 }
