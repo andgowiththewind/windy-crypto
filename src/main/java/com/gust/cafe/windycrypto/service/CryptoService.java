@@ -354,6 +354,19 @@ public class CryptoService {
         Windy windyCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, afterCacheId);
         WindyException.run((Void) -> Assert.isNull(windyCache, WindyLang.msg("i18n_1828639187788763138")));
         //
+        // 登记缓存
+        Windy windyAfter = windyCacheService.lockGetOrDefault(afterPath);
+        // 更新状态信息
+        windyCacheService.lockUpdate(afterPath, (path) -> {
+            windyAfter.setCode(WindyStatusEnum.INPUTTING.getCode());
+            windyAfter.setLabel(WindyStatusEnum.INPUTTING.getLabel());
+            windyAfter.setDesc(WindyStatusEnum.INPUTTING.getRemark());
+            windyAfter.setLatestMsg("inputting");
+            windyAfter.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
+        });
+        // 记录上下文
+        cryptoContext.setAfterPath(afterPath);
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
