@@ -11,6 +11,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
@@ -261,6 +262,32 @@ public class CryptoService {
 
     private void futureCryptoFinal(CryptoContext cryptoContext) {
         // 注册最终文件信息
+        finalRegisterAfter(cryptoContext);
+    }
+
+    private void finalRegisterAfter(CryptoContext cryptoContext) {
+        Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+        if (cryptoContext.getAskEncrypt()) {
+            // 如果是加密,拼接加密后的文件名
+            // 先判断是否需要加密原文件名
+            if (cryptoContext.getBitSwitchList() != null && cryptoContext.getBitSwitchList().get(0) != null && cryptoContext.getBitSwitchList().get(0) == 1) {
+                // 在同级目录下创建一个配置文件,记录原文件名的加密信息
+                // 格式参考:`固定识别前缀`+`密码摘要算法密文`+`雪花算法ID作为文件名`+`.windycfg`
+                String cfgTxtName = StrUtil.format("{}{}{}{}{}{}.{}"
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , CommonConstants.ENCRYPTED_MARK
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , DigestUtil.sha256Hex(cryptoContext.getUserPassword())
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , windy.getId()
+                        , CommonConstants.CFG_EXT_NAME);
+                // 存储加密后的文件名
+            }
+        } else {
+            // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
+            // TODO
+            // TODO
+        }
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
