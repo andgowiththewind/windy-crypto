@@ -198,6 +198,11 @@ public class CryptoService {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             System.out.println("coverNameDTO=" + coverNameDTO);
+            cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
+            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
+            String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
+            cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
+            log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
         }
 
     }
