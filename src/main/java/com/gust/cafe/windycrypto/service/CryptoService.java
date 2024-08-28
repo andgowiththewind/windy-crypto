@@ -463,7 +463,8 @@ public class CryptoService {
         afterPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), afterName));
         String afterCacheId = windyCacheService.parseId(afterPath);
         Windy windyCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, afterCacheId);
-        WindyException.run((Void) -> Assert.isNull(windyCache, WindyLang.msg("i18n_1828639187788763138")));
+        boolean notEnabled = windyCache == null || (windyCache.getCode() != null && windyCache.getCode() == WindyStatusEnum.NOT_EXIST.getCode());
+        WindyException.run((Void) -> Assert.isTrue(notEnabled, WindyLang.msg("i18n_1828639187788763138")));
         //
         // 登记缓存
         Windy windyAfter = windyCacheService.lockGetOrDefault(afterPath);
