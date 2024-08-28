@@ -272,6 +272,11 @@ public class CryptoService {
         // 注册最终文件信息
         finalRegisterAfter(cryptoContext);
         // 处理临时文件改名
+        finalTmpRenameToAfter(cryptoContext);
+    }
+
+    private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
+        // GPT也是建议采用轮询解决"IO流未释放导致改名失败"的问题
     }
 
     private void finalRegisterAfter(CryptoContext cryptoContext) {
