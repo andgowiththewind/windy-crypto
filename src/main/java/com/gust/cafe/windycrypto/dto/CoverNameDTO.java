@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.dto;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Validator;
@@ -16,8 +17,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 已加密文件的文件名抽象为一个对象
@@ -39,7 +42,8 @@ public class CoverNameDTO {
     private Boolean passwordCorrect;// 密码是否正确
     private List<Integer> intSaltList;// 解密后整数盐值列表
     private String intSaltListStr;// 已加密整数盐值列表字符串
-
+    //
+    private List<Integer> bitSwitchList;// 比特位列表
 
     /**
      * 解析加密文件名
@@ -85,7 +89,8 @@ public class CoverNameDTO {
         String inputPasswordDigest = DigestUtil.sha256Hex(inputUserPassword);
         boolean passwordCorrect = StrUtil.equals(inputPasswordDigest, passwordDigest);
         WindyException.run((Void) -> Assert.isTrue(passwordCorrect, "用户输入的密码摘要算法值与文件名记录的不一致,不能使用当前密码解密"));
-        coverNameDTO.setPasswordCorrect(true);// 密码正确
+        // TODO 密码正确
+        coverNameDTO.setPasswordCorrect(true);
         coverNameDTO.setUserPassword(inputUserPassword);
         //
         // 密码正确则将整数盐数组解密
@@ -120,6 +125,22 @@ public class CoverNameDTO {
         File ghostFile = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), sourceName);
         coverNameDTO.setSourceMainName(FileUtil.mainName(ghostFile));
         coverNameDTO.setSourceExtName(FileUtil.extName(ghostFile));
+        //
+        // 收集bitSwitchList
+        String bitSwitchStr = parts.get(4);
+        WindyException.run((Void) -> Assert.notBlank(bitSwitchStr, "文件名格式不正确,无法解密 (四位比特位为空)"));
+        // 四个位子
+        bitSwitchStr.chars().forEach(bit -> {
+            WindyException.run((Void) -> Assert.isTrue(Validator.isNumber(String.valueOf((char) bit)), "四位比特位中存在非数字"));
+        });
+        // 字符串转char数组
+        List<Integer> bitSwitchList = new ArrayList<>();
+        char[] bitSwitchChars = bitSwitchStr.toCharArray();
+        for (char bitSwitchChar : bitSwitchChars) {
+            int bitSwitch = Integer.parseInt(String.valueOf(bitSwitchChar));
+            bitSwitchList.add(bitSwitch);
+        }
+        coverNameDTO.setBitSwitchList(bitSwitchList);
         //
         return coverNameDTO;
     }
