@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.dto;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,5 +41,6 @@ public class CryptoContext {
     private String intSaltStr;// 字符串盐值
     private String intSaltStrEncryptHex;// 字符串盐值加密后的十六进制字符串
     private List<Integer> bitSwitchList;// 比特位列表,已设计:[index=0代表是否加密了原文件名,index=1预留未分配,index=2预留未分配,index=3预留未分配]
-
+    //
+    private Boolean ignoreMissingCfgTxt;// 当加密文件源文件名为加密形式且缺失配置文件时,是否忽略
 }
