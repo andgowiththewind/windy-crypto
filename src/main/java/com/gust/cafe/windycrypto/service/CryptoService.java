@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -404,7 +405,7 @@ public class CryptoService {
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
-            String expectSourceName = null;
+            AtomicReference<String> expectSourceName = new AtomicReference<>();
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             String sourceName = coverNameDTO.getSourceName();
             String sourceMainName = coverNameDTO.getSourceMainName();
@@ -414,7 +415,7 @@ public class CryptoService {
             boolean isCoverName = CollectionUtil.isNotEmpty(bitSwitchList) && bitSwitchList.size() > 0 && bitSwitchList.get(0) != null && bitSwitchList.get(0).intValue() == 1;
             if (!isCoverName) {
                 // 如果文件名不是加密形式,则直接提取
-                expectSourceName = sourceName;
+                expectSourceName.set(sourceName);
             } else {
                 // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
                 File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
@@ -427,14 +428,29 @@ public class CryptoService {
                         // 查询记录
                         String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);// 注意这里从加密文件名中提取ID
                         String lineStr = FileUtil.readUtf8Lines(windycfg).stream().filter(StrUtil::isNotBlank).filter(row -> StrUtil.startWith(row, k)).findFirst().orElseThrow(() -> new WindyException(WindyLang.msg("i18n_1828820333835194368")));
-
-                        // TODO
-                        // TODO
-                        // TODO
-                        // TODO
+                        List<String> split = StrUtil.split(lineStr, "=");
+                        Assert.isTrue(CollectionUtil.isNotEmpty(split) && split.size() == 2, WindyLang.msg("i18n_1828820333835194369"));
+                        String coverName = split.get(1);
+                        String decryptStr = AesUtils.getAes(cryptoContext.getUserPassword()).decryptStr(coverName);
+                        expectSourceName.set(decryptStr);
                     }
                 });
             }
+            //
+            // 确认源文件名后,需要考虑多个加密文件解密出同名文件的场景,需要增加区别码
+            File file = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), expectSourceName.get());
+            boolean notExist = !FileUtil.exist(file);
+            String parseId = windyCacheService.parseId(file.getAbsolutePath());
+            Windy expectCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId);
+            boolean cacheNotEnabled = expectCache == null || (expectCache.getCode() != null && expectCache.getCode() == WindyStatusEnum.NOT_EXIST.getCode());
+            // 当实际文件不存在且缓存中不存在时,使用处理后的文件名
+            if (notExist && cacheNotEnabled) {
+                afterName = expectSourceName.get();
+            } else {
+                // 当实际文件存在或者缓存中存在时,需要增加区别码
+                afterName = StrUtil.format("repeated_name_mark_{}_{}", IdUtil.getSnowflakeNextIdStr(), expectSourceName.get());
+            }
+
         }
 
         // 如果是WIN系统,对文件名长度有要求

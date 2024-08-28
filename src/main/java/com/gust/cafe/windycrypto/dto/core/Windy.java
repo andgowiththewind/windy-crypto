@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.dto.core;
 
+import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,9 +28,13 @@ public class Windy implements Serializable {
     private String mainName;// 文件名
     private String extName;// 扩展名
     private String name;// 文件名
+    /**
+     * @see {@link  WindyStatusEnum}
+     */
     private Integer code;// 状态码
     private String label;// 状态码标签
     private String desc;//  状态码描述
+    //
     private String latestMsg;// 最近消息
     private Integer percentage;// 文件加解密进度百分百
     private String percentageLabel;// 文件加解密进度百分百标签
