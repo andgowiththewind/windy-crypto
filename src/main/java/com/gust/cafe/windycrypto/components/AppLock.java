@@ -1,6 +1,7 @@
 package com.gust.cafe.windycrypto.components;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.Console;
 import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,8 +31,11 @@ public class AppLock {
         fileLock = fileChannel.tryLock();
 
         if (fileLock == null) {
-            log.error("Unable to acquire lock on app.lock file. Another instance might be running.");
-            System.exit(1);
+            Console.error("====================================================================================================");
+            Console.error("Unable to acquire lock on app.lock file. Another instance might be running.");
+            Console.error("无法在app.lock文件上获取锁。 另一个实例可能正在运行。请不必重复允许当前应用程序。");
+            Console.error("====================================================================================================");
+            throw new IllegalStateException("Unable to acquire lock on app.lock file. Another instance might be running.");
         }
 
         System.out.println("Lock acquired on app.lock file.");
