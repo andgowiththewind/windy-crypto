@@ -490,6 +490,7 @@ public class CryptoService {
         return throwable -> {
             if (throwable == null) return null;
             try {
+                log.debug("=================== 触发全局回滚 ===================");
                 // 处理文件回滚等
                 globalWindyRollback(cryptoContext, throwable);
             } catch (Exception e) {
