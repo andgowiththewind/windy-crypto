@@ -140,38 +140,4 @@ public class WindyCacheService {
         redisMasterCache.setCacheMapValue(CacheConstants.PATH_ID_MAP, absPath, nextIdStr);
         return nextIdStr;
     }
-
-
-    @SneakyThrows
-    public void lockUpdate(String absPath, Consumer<String> consumer, Long waitTime, Long leaseTime, TimeUnit unit) {
-        waitTime = Optional.ofNullable(waitTime).orElse(5L);
-        leaseTime = Optional.ofNullable(leaseTime).orElse(15L);
-        unit = Optional.ofNullable(unit).orElse(TimeUnit.SECONDS);
-        //
-        WindyException.run((Void) -> Assert.isTrue(StrUtil.isNotBlank(absPath), "绝对路径不能为空"));
-        String id = parseId(absPath);
-        Windy currentCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, id);// 需要通过`redisMasterCache`来查
-        WindyException.run((Void) -> Assert.notNull(currentCache, "当前缓存对象不能为空,不能执行更新"));
-        // 拼接分布式锁KEY
-        String lockKey = StrUtil.format("{}:{}", CacheConstants.WINDY_UPDATE_LOCK, id);
-        // 定义锁对象
-        RLock lock = redissonClient.getLock(lockKey);
-        // 5, 15, TimeUnit.SECONDS
-        if (lock.tryLock(waitTime, leaseTime, unit)) {
-            // 当前线程加锁成功,执行业务操作
-            try {
-                consumer.accept(absPath);
-            } finally {
-                // 确保释放锁
-                lock.unlock();
-            }
-        } else {
-            // 没抢到锁就不要更新
-            throw new WindyException("获取锁失败,无法更新");
-        }
-    }
-
-    public void lockUpdate(String absPath, Consumer<String> consumer) {
-        lockUpdate(absPath, consumer, null, null, null);
-    }
 }

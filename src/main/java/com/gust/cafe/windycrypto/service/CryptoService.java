@@ -99,33 +99,30 @@ public class CryptoService {
             Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), WindyLang.msg("i18n_1828354895519027200"));
         });
 
-        // 满足条件则将状态更新为排队中,加锁处理
-        windyCacheService.lockUpdate(beforePath, (path) -> {
-            Windy windy = windyCacheService.lockGetOrDefault(beforePath);
-            windy.setCode(WindyStatusEnum.WAITING.getCode());
-            windy.setLabel(WindyStatusEnum.WAITING.getLabel());
-            windy.setDesc(WindyStatusEnum.WAITING.getRemark());
-            windy.setLatestMsg("queued");
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        });
+        // 满足条件则将状态更新为排队中
+        Windy windy = windyCacheService.lockGetOrDefault(beforePath);
+        windy.setCode(WindyStatusEnum.WAITING.getCode());
+        windy.setLabel(WindyStatusEnum.WAITING.getLabel());
+        windy.setDesc(WindyStatusEnum.WAITING.getRemark());
+        windy.setLatestMsg("queued");
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
     }
 
     // 异步加解密阶段
     private void futureCrypto(CryptoContext cryptoContext) {
         String beforePath = cryptoContext.getBeforePath();
-        // 成功进入加解密阶段,更新状态,加锁处理
-        windyCacheService.lockUpdate(beforePath, (path) -> {
-            Windy windy = windyCacheService.lockGetOrDefault(beforePath);
-            WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
-            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.WAITING), "状态码应该为WAITING,请检查代码");
-            windy.setCode(WindyStatusEnum.OUTPUTTING.getCode());
-            windy.setLabel(WindyStatusEnum.OUTPUTTING.getLabel());
-            windy.setDesc(WindyStatusEnum.OUTPUTTING.getRemark());
-            windy.setLatestMsg("outputting");
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        });
+        // 成功进入加解密阶段,更新状态
+        Windy windy = windyCacheService.lockGetOrDefault(beforePath);
+        WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
+        Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.WAITING), "状态码应该为WAITING,请检查代码");
+        windy.setCode(WindyStatusEnum.OUTPUTTING.getCode());
+        windy.setLabel(WindyStatusEnum.OUTPUTTING.getLabel());
+        windy.setDesc(WindyStatusEnum.OUTPUTTING.getRemark());
+        windy.setLatestMsg("outputting");
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        //
         // [FUTURE_CRYPTO]:处理临时文件,注册入缓存,记录上下文
         futureCryptoRegisterTmp(cryptoContext);
 
@@ -304,33 +301,30 @@ public class CryptoService {
         Consumer<Void> successCs = aVoid -> {
             log.debug("改名成功,耗时[{}]ms", timer.intervalMs());
             // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
-            windyCacheService.lockUpdate(cryptoContext.getBeforePath(), (path) -> {
-                Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-                windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
-                windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
-                windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
-                windyBefore.setLatestMsg("almost");
-                windyBefore.setUpdateTime(DateUtil.now());
-                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
-            });
-            windyCacheService.lockUpdate(cryptoContext.getTmpPath(), (path) -> {
-                Windy windyTmp = windyCacheService.lockGetOrDefault(cryptoContext.getTmpPath());
-                windyTmp.setCode(WindyStatusEnum.ALMOST.getCode());
-                windyTmp.setLabel(WindyStatusEnum.ALMOST.getLabel());
-                windyTmp.setDesc(WindyStatusEnum.ALMOST.getRemark());
-                windyTmp.setLatestMsg("almost");
-                windyTmp.setUpdateTime(DateUtil.now());
-                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
-            });
-            windyCacheService.lockUpdate(cryptoContext.getAfterPath(), (path) -> {
-                Windy windyAfter = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
-                windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
-                windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
-                windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
-                windyAfter.setLatestMsg("almost");
-                windyAfter.setUpdateTime(DateUtil.now());
-                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
-            });
+            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
+            windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
+            windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
+            windyBefore.setLatestMsg("almost");
+            windyBefore.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
+            //
+            Windy windyTmp = windyCacheService.lockGetOrDefault(cryptoContext.getTmpPath());
+            windyTmp.setCode(WindyStatusEnum.ALMOST.getCode());
+            windyTmp.setLabel(WindyStatusEnum.ALMOST.getLabel());
+            windyTmp.setDesc(WindyStatusEnum.ALMOST.getRemark());
+            windyTmp.setLatestMsg("almost");
+            windyTmp.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
+            //
+            Windy windyAfter = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+            windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
+            windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
+            windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
+            windyAfter.setLatestMsg("almost");
+            windyAfter.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
+            //
         };
         // 失败回调
         Consumer<Void> errorCs = aVoid -> {
@@ -425,14 +419,13 @@ public class CryptoService {
         // 登记缓存
         Windy windyAfter = windyCacheService.lockGetOrDefault(afterPath);
         // 更新状态信息
-        windyCacheService.lockUpdate(afterPath, (path) -> {
-            windyAfter.setCode(WindyStatusEnum.INPUTTING.getCode());
-            windyAfter.setLabel(WindyStatusEnum.INPUTTING.getLabel());
-            windyAfter.setDesc(WindyStatusEnum.INPUTTING.getRemark());
-            windyAfter.setLatestMsg("inputting");
-            windyAfter.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
-        });
+        windyAfter.setCode(WindyStatusEnum.INPUTTING.getCode());
+        windyAfter.setLabel(WindyStatusEnum.INPUTTING.getLabel());
+        windyAfter.setDesc(WindyStatusEnum.INPUTTING.getRemark());
+        windyAfter.setLatestMsg("inputting");
+        windyAfter.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
+        //
         // 记录上下文
         cryptoContext.setAfterPath(afterPath);
     }
@@ -450,15 +443,13 @@ public class CryptoService {
             };
             Consumer<Void> successCs = aVoid -> {
                 log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
-                windyCacheService.lockUpdate(path, (p) -> {
-                    Windy windy = windyCacheService.lockGetOrDefault(path);
-                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
-                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
-                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg("not exist");
-                    windy.setUpdateTime(DateUtil.now());
-                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-                });
+                Windy windy = windyCacheService.lockGetOrDefault(path);
+                windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+                windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+                windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+                windy.setLatestMsg("not exist");
+                windy.setUpdateTime(DateUtil.now());
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("删除(超时)失败:[{}ms]", timer.intervalMs()));
@@ -470,17 +461,16 @@ public class CryptoService {
         //  开放最终文件状态
         long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
         String sizeLabel = FileUtil.readableFileSize(size);
-        windyCacheService.lockUpdate(cryptoContext.getAfterPath(), (p) -> {
-            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
-            windy.setCode(WindyStatusEnum.FREE.getCode());
-            windy.setLabel(WindyStatusEnum.FREE.getLabel());
-            windy.setDesc(WindyStatusEnum.FREE.getRemark());
-            windy.setLatestMsg("free");
-            windy.setSize(size);
-            windy.setSizeLabel(sizeLabel);
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        });
+        Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+        windy.setCode(WindyStatusEnum.FREE.getCode());
+        windy.setLabel(WindyStatusEnum.FREE.getLabel());
+        windy.setDesc(WindyStatusEnum.FREE.getRemark());
+        windy.setLatestMsg("free");
+        windy.setSize(size);
+        windy.setSizeLabel(sizeLabel);
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        //
     }
 
     /**
@@ -530,15 +520,14 @@ public class CryptoService {
             };
             Consumer<Void> successCs = aVoid -> {
                 log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
-                windyCacheService.lockUpdate(path, (p) -> {
-                    Windy windy = windyCacheService.lockGetOrDefault(path);
-                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
-                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
-                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg("not exist");
-                    windy.setUpdateTime(DateUtil.now());
-                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-                });
+                Windy windy = windyCacheService.lockGetOrDefault(path);
+                windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+                windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+                windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+                windy.setLatestMsg("not exist");
+                windy.setUpdateTime(DateUtil.now());
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                //
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("最终删除(超时)失败:[{}ms],需要手动删除", timer.intervalMs()));
@@ -548,14 +537,13 @@ public class CryptoService {
         }
 
         // 2.0 重新开放源文件
-        windyCacheService.lockUpdate(cryptoContext.getBeforePath(), (path) -> {
-            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-            windy.setCode(WindyStatusEnum.FREE.getCode());
-            windy.setLabel(WindyStatusEnum.FREE.getLabel());
-            windy.setDesc(WindyStatusEnum.FREE.getRemark());
-            windy.setLatestMsg("free");
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        });
+        Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+        windy.setCode(WindyStatusEnum.FREE.getCode());
+        windy.setLabel(WindyStatusEnum.FREE.getLabel());
+        windy.setDesc(WindyStatusEnum.FREE.getRemark());
+        windy.setLatestMsg("free");
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        //
     }
 }
