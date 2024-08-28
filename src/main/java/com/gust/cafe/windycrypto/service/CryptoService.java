@@ -77,6 +77,7 @@ public class CryptoService {
                     .userPassword(reqVo.getUserPassword())
                     .userPasswordSha256Hex(DigestUtil.sha256Hex(reqVo.getUserPassword()))
                     .beforePath(beforePath)
+                    .beforeCacheId(windyCacheService.parseId(beforePath))
                     .bitSwitchList(ListUtil.toList(0, 0, 0, 0))
                     .build();
             // 处理排队
