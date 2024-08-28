@@ -515,7 +515,40 @@ public class CryptoService {
 
     private void finalDel(CryptoContext cryptoContext) {
         // 源文件与临时文件都需要删除,注意顺序,安全起见最后才能删除源文件
-        LinkedList<String> pathList = ListUtil.toLinkedList(cryptoContext.getTmpPath(), cryptoContext.getBeforePath());
+        physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getTmpPath()));
+        //
+
+        if (!cryptoContext.getAskEncrypt()) {
+            List<Integer> bitSwitchList = cryptoContext.getBitSwitchList();
+            if (bitSwitchList != null && bitSwitchList.get(0) != null && bitSwitchList.get(0) == 1) {
+                // 删除cfg中可能存在的记录
+                String cfgTxtPath = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME).getAbsolutePath();
+                CoverNameDTO analyse = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), analyse.getSourceMainName());
+                lockDeleteCfgLineByKey(cfgTxtPath, k);
+            }
+        }
+
+
+        //
+        //  开放最终文件状态
+        long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
+        String sizeLabel = FileUtil.readableFileSize(size);
+        Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+        windy.setCode(WindyStatusEnum.FREE.getCode());
+        windy.setLabel(WindyStatusEnum.FREE.getLabel());
+        windy.setDesc(WindyStatusEnum.FREE.getRemark());
+        windy.setLatestMsg("free");
+        windy.setSize(size);
+        windy.setSizeLabel(sizeLabel);
+        windy.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+
+        // 最后的最后才删除源文件
+        physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getBeforePath()));
+    }
+
+    private void physicalDelete(CryptoContext cryptoContext, LinkedList<String> pathList) {
         for (String path : pathList) {
             TimeInterval timer = DateUtil.timer();
             long intervalMs = 2_000L;
@@ -539,39 +572,6 @@ public class CryptoService {
             };
             PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
         }
-        //
-
-        if (!cryptoContext.getAskEncrypt()) {
-            List<Integer> bitSwitchList = cryptoContext.getBitSwitchList();
-            if (bitSwitchList != null && bitSwitchList.get(0) != null && bitSwitchList.get(0) == 1) {
-                // 删除cfg中可能存在的记录
-                String cfgTxtPath = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME).getAbsolutePath();
-                // TODO
-                // TODO
-                // TODO
-                // TODO
-                // TODO ID有问题
-                CoverNameDTO analyse = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
-                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), analyse.getSourceMainName());
-                lockDeleteCfgLineByKey(cfgTxtPath, k);
-            }
-        }
-
-
-        //
-        //  开放最终文件状态
-        long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
-        String sizeLabel = FileUtil.readableFileSize(size);
-        Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
-        windy.setCode(WindyStatusEnum.FREE.getCode());
-        windy.setLabel(WindyStatusEnum.FREE.getLabel());
-        windy.setDesc(WindyStatusEnum.FREE.getRemark());
-        windy.setLatestMsg("free");
-        windy.setSize(size);
-        windy.setSizeLabel(sizeLabel);
-        windy.setUpdateTime(DateUtil.now());
-        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        //
     }
 
     @SneakyThrows
