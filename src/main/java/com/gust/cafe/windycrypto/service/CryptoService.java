@@ -279,7 +279,9 @@ public class CryptoService {
         if (cryptoContext.getAskEncrypt()) {
             // 如果是加密,拼接加密后的文件名
             // 先判断是否需要加密原文件名
-            boolean isRequireCoverName = cryptoContext.getBitSwitchList() != null && cryptoContext.getBitSwitchList().get(0) != null && cryptoContext.getBitSwitchList().get(0) == 1;
+            boolean isRequireCoverName = cryptoContext.getBitSwitchList() != null
+                    && cryptoContext.getBitSwitchList().get(0) != null
+                    && cryptoContext.getBitSwitchList().get(0) == 1;
             if (isRequireCoverName) {
                 // 在同级目录下创建一个配置文件,记录原文件名的加密信息
                 // 格式参考:`固定识别前缀`+`密码摘要算法密文`+`雪花算法ID作为文件名`+`.windycfg`
