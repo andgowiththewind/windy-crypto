@@ -192,7 +192,7 @@ public class CryptoService {
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
             //
-            log.debug("[]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
+            log.debug("[{}]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
@@ -308,7 +308,12 @@ public class CryptoService {
         // 成功回调
         TimeInterval timer = DateUtil.timer();
         Consumer<Void> successCs = aVoid -> {
-            log.debug("改名成功,耗时[{}]ms", timer.intervalMs());
+            log.debug("[{}]-临时文件改名成功,耗时[{}]ms,[tmp={}]>>[after={}]",
+                    cryptoContext.getBeforeCacheId(),
+                    timer.intervalMs(),
+                    cryptoContext.getTmpCacheId()
+                    , cryptoContext.getAfterPath()
+            );
             // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
             Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
             windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
