@@ -271,6 +271,7 @@ public class CryptoService {
     private void futureCryptoFinal(CryptoContext cryptoContext) {
         // 注册最终文件信息
         finalRegisterAfter(cryptoContext);
+        // 处理临时文件改名
     }
 
     private void finalRegisterAfter(CryptoContext cryptoContext) {
