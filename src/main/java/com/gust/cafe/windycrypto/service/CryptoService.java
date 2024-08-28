@@ -365,7 +365,7 @@ public class CryptoService {
              */
             if (isRequireCoverName) {
                 String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windy.getId());
-                String v = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(k);
+                String v = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(windy.getName());
                 //
                 // 如果本次要求加密文件名,则在同级目录下创建一个配置文件,记录原文件名的加密信息
                 File cfg = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME);
