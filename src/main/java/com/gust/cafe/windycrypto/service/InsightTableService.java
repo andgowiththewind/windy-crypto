@@ -105,6 +105,10 @@ public class InsightTableService {
             if (FileUtil.isDirectory(f)) return null;
             // 排除自定义的临时文件,不需要在table中展示
             if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return null;
+
+            // 排除自定义的配置文件,不需要在table中展示
+            if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.CFG_EXT_NAME)) return null;
+
             // 根据期望搜索范围结合是否加密过滤
             if (scopeEnum.equals(InsightTableReqVo.ScopeEnum.ALL)) {
                 // 期望查看所有文件,无需过滤
