@@ -12,16 +12,19 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
+import com.gust.cafe.windycrypto.dto.CfgTxtContentDTO;
 import com.gust.cafe.windycrypto.dto.CoverNameDTO;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
+import com.gust.cafe.windycrypto.util.AesUtils;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -282,6 +285,20 @@ public class CryptoService {
                         , windy.getId()
                         , CommonConstants.CFG_EXT_NAME);
                 // 存储加密后的文件名
+                CfgTxtContentDTO contentDTO = CfgTxtContentDTO.builder()
+                        .sourceName(windy.getName())
+                        .createTime(DateUtil.now())
+                        .updateTime(DateUtil.now())
+                        .build();
+                // 转JSON字符串
+                String contentJson = JSONUtil.toJsonStr(contentDTO);
+                // 加密正文内容
+                String contentCover = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(contentJson);
+                // 写文件
+                File cfgTxt = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), cfgTxtName);
+                FileUtil.writeUtf8String(contentCover, cfgTxt);
+                // 记录上下文
+                cryptoContext.setCfgTxtPath(cfgTxt.getAbsolutePath());
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
