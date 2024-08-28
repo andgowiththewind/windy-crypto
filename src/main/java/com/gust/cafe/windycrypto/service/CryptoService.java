@@ -484,7 +484,7 @@ public class CryptoService {
     @SneakyThrows
     private void lockUpdateCfg(File cfg, String key, String val) {
         String id = DigestUtil.sha256Hex(FileUtil.getAbsolutePath(cfg));
-        String lockKey = StrUtil.format("{}:{}", CacheConstants.CFG_UPDATE_LOCK, id);
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.CFG_CRUD_LOCK, id);
         RLock lock = redissonClient.getLock(lockKey);
         // tryLock(最多等待锁的时间,获取锁成功后锁的过期时间,时间单位)
         if (lock.tryLock(10, 15, TimeUnit.SECONDS)) {
@@ -540,6 +540,18 @@ public class CryptoService {
             PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
         }
         //
+
+        if (!cryptoContext.getAskEncrypt()) {
+            List<Integer> bitSwitchList = cryptoContext.getBitSwitchList();
+            if (bitSwitchList != null && bitSwitchList.get(0) != null && bitSwitchList.get(0) == 1) {
+                // 删除cfg中可能存在的记录
+                String cfgTxtPath = cryptoContext.getCfgTxtPath();
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
+                lockDeleteCfgLineByKey(cfgTxtPath, k);
+            }
+        }
+
+
         //
         //  开放最终文件状态
         long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
@@ -554,6 +566,34 @@ public class CryptoService {
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
         //
+    }
+
+    @SneakyThrows
+    private void lockDeleteCfgLineByKey(String cfgTxtPath, String k) {
+        String id = DigestUtil.sha256Hex(cfgTxtPath);
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.CFG_CRUD_LOCK, id);
+        RLock lock = redissonClient.getLock(lockKey);
+        // tryLock(最多等待锁的时间,获取锁成功后锁的过期时间,时间单位)
+        if (lock.tryLock(10, 15, TimeUnit.SECONDS)) {
+            // 当前线程加锁成功,执行业务操作
+            try {
+                if (!FileUtil.exist(cfgTxtPath)) {
+                    return;
+                }
+                List<String> lines = FileUtil.readUtf8Lines(cfgTxtPath);
+                // 排除空行,排除以k开头的行
+                List<String> collect = lines.stream().filter(r -> StrUtil.isNotBlank(r)).filter(row -> !row.startsWith(k)).collect(Collectors.toList());
+                // 写入文件
+                FileUtil.writeUtf8Lines(collect, cfgTxtPath);
+            } finally {
+                // 确保释放锁
+                lock.unlock();
+            }
+        } else {
+            // 如果当前线程获取锁失败,说明有其他线程正在处理相同的绝对路径,但是耗时过长
+            log.debug("[{}]被长时间占用,无法更新", cfgTxtPath);
+            throw new WindyException("获取锁失败");
+        }
     }
 
     /**

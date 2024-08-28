@@ -10,5 +10,5 @@ public class CacheConstants {
     // 加锁,当通过绝对路径获取Windy对象时
     public static final String WINDY_GET_OR_DEFAULT_LOCK = "windyGetOrDefaultLock";
     // 配置更新锁
-    public static final String CFG_UPDATE_LOCK = "cfgUpdateLock";
+    public static final String CFG_CRUD_LOCK = "cfgCrudLock";
 }
