@@ -22,6 +22,7 @@ import java.util.List;
 public class CryptoContext {
     private Boolean askEncrypt; // 本次操作是否为加密
     private String userPassword;// 用户密码
+    private String userPasswordSha256Hex;// 用户密码摘要算法密文,计算一次即可
     private String beforePath;// 原文件路径
     private String tmpPath;// 临时文件路径
     private String afterPath;// 目标文件路
