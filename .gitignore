@@ -53,3 +53,4 @@ attachments/redis
 
 ### log ###
 logs/
+app.lock
