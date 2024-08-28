@@ -342,12 +342,18 @@ public class CryptoService {
             // TODO
         }
 
-        // 如果是WIN系统
+        // 如果是WIN系统,对文件名长度有要求
         if (SystemUtil.getOsInfo().isWindows()) {
             String finalAfterName = afterName;
             WindyException.run((Void) -> Assert.isTrue(finalAfterName.length() < 255, WindyLang.msg("i18n_1828639187784568832")));
         }
-
+        //
+        // 基本不会发生重复(盐值和文件名ID保证),但是还是要做一次校验
+        afterPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), afterName));
+        String afterCacheId = windyCacheService.parseId(afterPath);
+        Windy windyCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, afterCacheId);
+        WindyException.run((Void) -> Assert.isNull(windyCache, WindyLang.msg("i18n_1828639187788763138")));
+        //
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
