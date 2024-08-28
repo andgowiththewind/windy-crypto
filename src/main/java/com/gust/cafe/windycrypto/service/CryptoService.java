@@ -78,7 +78,7 @@ public class CryptoService {
                     .userPasswordSha256Hex(DigestUtil.sha256Hex(reqVo.getUserPassword()))
                     .beforePath(beforePath)
                     .beforeCacheId(windyCacheService.parseId(beforePath))
-                    .bitSwitchList(ListUtil.toList(0, 0, 0, 0))
+                    .bitSwitchList(ListUtil.toList(1, 0, 0, 0))
                     .build();
             // 处理排队
             CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureQueue(cryptoContext), dispatchTaskExecutor);
@@ -147,21 +147,24 @@ public class CryptoService {
     }
 
     private void futureCryptoRegisterTmp(CryptoContext cryptoContext) {
+        log.debug("[{}]-成功进入临时文件注册线程", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
         // 临时文件名
         String tmpName = StrUtil.format("0000000000-{}-{}.{}", DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss"), IdUtil.getSnowflakeNextIdStr(), CommonConstants.TMP_EXT_NAME);
         // 在源文件的同级目录下创建临时文件
         String tmpAbsPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(beforePath, 1), tmpName));
-        Windy windy = windyCacheService.lockGetOrDefault(tmpAbsPath);
+        Windy windyTmp = windyCacheService.lockGetOrDefault(tmpAbsPath);
         // 更新缓存状态信息
-        windy.setCode(WindyStatusEnum.INPUTTING.getCode());
-        windy.setLabel(WindyStatusEnum.INPUTTING.getLabel());
-        windy.setDesc(WindyStatusEnum.INPUTTING.getRemark());
-        windy.setLatestMsg("inputting");
-        windy.setUpdateTime(DateUtil.now());
-        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        windyTmp.setCode(WindyStatusEnum.INPUTTING.getCode());
+        windyTmp.setLabel(WindyStatusEnum.INPUTTING.getLabel());
+        windyTmp.setDesc(WindyStatusEnum.INPUTTING.getRemark());
+        windyTmp.setLatestMsg("inputting");
+        windyTmp.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
         // 记录上下文
         cryptoContext.setTmpPath(tmpAbsPath);
+        cryptoContext.setTmpCacheId(windyTmp.getId());
+        log.debug("[{}]-临时文件注册成功:windyTmpId=[{}]", cryptoContext.getBeforeCacheId(), windyTmp.getId());
     }
 
     private void futureCryptoStream(CryptoContext cryptoContext) {
@@ -188,6 +191,8 @@ public class CryptoService {
             cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
+            //
+            log.debug("[]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
@@ -197,11 +202,6 @@ public class CryptoService {
     }
 
     private void futureCryptoCoreIO(CryptoContext cryptoContext) {
-        // TODO
-        // TODO
-        // TODO
-        // TODO
-        // TODO
         // 缓冲区大小
         try {
             // 读取源文件的缓存对象
@@ -255,6 +255,7 @@ public class CryptoService {
                 if (timer.intervalMs() > 800L) {
                     // 计算当前百分比
                     Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
+                    log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
                     // TODO 更新缓存状态信息
                     // TODO 更新缓存状态信息
                     // TODO 更新缓存状态信息
@@ -265,6 +266,7 @@ public class CryptoService {
 
             // 防止最后一次结果丢失,循环结束后指定百分比更新一次
             // TODO 直接更新100%
+            log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), 100);
 
             // 清除计时器
             timer.clear();

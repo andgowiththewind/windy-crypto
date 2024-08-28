@@ -21,8 +21,8 @@ public class NameConcatDTO {
      * @param extName
      */
     public NameConcatDTO(String mainName, String extName) {
-        if (StrUtil.isNotBlank(mainName) && StrUtil.isNotBlank(extName)) {
-            throw new IllegalArgumentException("mainName and extName cannot be both not blank");
+        if (StrUtil.isBlank(mainName) && StrUtil.isBlank(extName)) {
+            throw new IllegalArgumentException("mainName and extName cannot be empty at the same time");
         }
         this.mainName = mainName;
         this.extName = extName;
