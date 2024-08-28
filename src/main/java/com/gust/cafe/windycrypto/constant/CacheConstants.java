@@ -9,6 +9,6 @@ public class CacheConstants {
     public static final String WINDY_MAP = "windyMap";
     // 加锁,当通过绝对路径获取Windy对象时
     public static final String WINDY_GET_OR_DEFAULT_LOCK = "windyGetOrDefaultLock";
-    // 加锁,当通过绝对路径更新Windy对象时,一般在关键状态变更时使用,同一状态下频繁更新信息时不建议使用
-    public static final String WINDY_UPDATE_LOCK = "windyUpdateLock";
+    // 配置更新锁
+    public static final String CFG_UPDATE_LOCK = "cfgUpdateLock";
 }

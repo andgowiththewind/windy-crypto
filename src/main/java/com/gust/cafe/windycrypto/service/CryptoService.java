@@ -14,14 +14,13 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.CryptoException;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.json.JSONUtil;
 import cn.hutool.system.SystemUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
-import com.gust.cafe.windycrypto.dto.CfgTxtContentDTO;
+import com.gust.cafe.windycrypto.dto.CfgJsonContentDTO;
 import com.gust.cafe.windycrypto.dto.CoverNameDTO;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
 import com.gust.cafe.windycrypto.dto.NameConcatDTO;
@@ -31,7 +30,10 @@ import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.util.AesUtils;
 import com.gust.cafe.windycrypto.util.PollUtils;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -63,6 +66,8 @@ public class CryptoService {
     private WindyCacheService windyCacheService;
     @Autowired
     private RedisMasterCache redisMasterCache;
+    @Autowired
+    private RedissonClient redissonClient;
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
@@ -356,32 +361,22 @@ public class CryptoService {
             boolean isRequireCoverName = cryptoContext.getBitSwitchList() != null
                     && cryptoContext.getBitSwitchList().get(0) != null
                     && cryptoContext.getBitSwitchList().get(0) == 1;
+            /**
+             * @see {@link CommonConstants#CFG_NAME}
+             */
             if (isRequireCoverName) {
-                // 在同级目录下创建一个配置文件,记录原文件名的加密信息
-                // 格式参考:`固定识别前缀`+`密码摘要算法密文`+`雪花算法ID作为文件名`+`.windycfg`
-                String cfgTxtName = StrUtil.format("{}{}{}{}.{}"
-                        , CommonConstants.ENCRYPTED_PREFIX
-                        , cryptoContext.getUserPasswordSha256Hex()
-                        , CommonConstants.ENCRYPTED_SEPARATOR
-                        , windy.getId()
-                        , CommonConstants.CFG_NAME);
-                // 存储加密后的文件名
-                CfgTxtContentDTO contentDTO = CfgTxtContentDTO.builder()
-                        .sourceName(windy.getName())
-                        .sourceMainName(windy.getMainName())
-                        .sourceExtName(windy.getExtName())
-                        .createTime(DateUtil.now())
-                        .updateTime(DateUtil.now())
-                        .build();
-                // 转JSON字符串
-                String contentJson = JSONUtil.toJsonStr(contentDTO);
-                // 加密正文内容
-                String contentCover = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(contentJson);
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windy.getId());
+                String v = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(k);
+                //
+                // 如果本次要求加密文件名,则在同级目录下创建一个配置文件,记录原文件名的加密信息
+                File cfg = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME);
+                // 需要加锁确保创建和写入
+                lockUpdateCfg(cfg, k, v);
+
+
                 // 写文件
-                File cfgTxt = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), cfgTxtName);
-                FileUtil.writeUtf8String(contentCover, cfgTxt);
                 // 记录上下文
-                cryptoContext.setCfgTxtPath(cfgTxt.getAbsolutePath());
+                cryptoContext.setCfgTxtPath(cfgJson.getAbsolutePath());
                 //
                 // 此时的加密文件名拼接,eg:$safeLockedV2$ 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92 $ 0019930b8e4466ef1157919ad97ddf64 $ 1000 $ 123123123123.txt
                 String concatName = new NameConcatDTO(windy.getId(), windy.getExtName()).getConcatName();
@@ -440,6 +435,40 @@ public class CryptoService {
         // 记录上下文
         cryptoContext.setAfterPath(afterPath);
         cryptoContext.setAfterCacheId(windyAfter.getId());
+    }
+
+    @SneakyThrows
+    private void lockUpdateCfg(File cfg, String key, String val) {
+        String id = DigestUtil.sha256Hex(FileUtil.getAbsolutePath(cfg));
+        String lockKey = StrUtil.format("{}:{}", CacheConstants.CFG_UPDATE_LOCK, id);
+        RLock lock = redissonClient.getLock(lockKey);
+        // tryLock(最多等待锁的时间,获取锁成功后锁的过期时间,时间单位)
+        if (lock.tryLock(10, 15, TimeUnit.SECONDS)) {
+            // 当前线程加锁成功,执行业务操作
+            try {
+                if (!FileUtil.exist(cfg)) {
+                    FileUtil.touch(cfg);
+                }
+                List<String> lines = FileUtil.readUtf8Lines(cfg);
+                // 增加一行
+                boolean anyMatch = lines.stream().filter(r -> StrUtil.isNotBlank(r)).anyMatch(row -> row.startsWith(key));
+                WindyException.run((Void) -> Assert.isFalse(anyMatch, WindyLang.msg("i18n_1828802439705399296")));// 配置文件中不应该存在相同KEY
+
+
+                // TODO
+                // TODO
+                // TODO
+                // TODO
+            } finally {
+                // 确保释放锁
+                lock.unlock();
+            }
+        } else {
+            // 如果当前线程获取锁失败,说明有其他线程正在处理相同的绝对路径,但是耗时过长
+            log.debug("[{}]被长时间占用,无法更新", cfg.getAbsolutePath());
+            throw new WindyException("获取锁失败");
+        }
+
     }
 
     private void finalDel(CryptoContext cryptoContext) {
