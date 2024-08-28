@@ -505,6 +505,12 @@ public class CryptoService {
     }
 
     private void globalWindyRollback(CryptoContext cryptoContext, Throwable throwable) {
+        // 如果是自定义异常
+        if (throwable instanceof WindyException) {
+            log.debug("自定义异常", throwable);
+        } else {
+            log.error(StrUtil.format("[{}]-发生未知异常", Thread.currentThread().getName()), throwable);
+        }
         if (cryptoContext == null) return;
         // 1.0 删除可能存在的临时文件以及最终文件
         List<String> pathList = ListUtil.toLinkedList(cryptoContext.getTmpPath(), cryptoContext.getAfterPath());
@@ -540,5 +546,16 @@ public class CryptoService {
             // 执行
             PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
         }
+
+        // 2.0 重新开放源文件
+        windyCacheService.lockUpdate(cryptoContext.getBeforePath(), (path) -> {
+            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            windy.setCode(WindyStatusEnum.FREE.getCode());
+            windy.setLabel(WindyStatusEnum.FREE.getLabel());
+            windy.setDesc(WindyStatusEnum.FREE.getRemark());
+            windy.setLatestMsg("free");
+            windy.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        });
     }
 }
