@@ -13,6 +13,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.system.SystemUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
@@ -334,9 +335,19 @@ public class CryptoService {
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
+            CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
+            // TODO
+            // TODO
             // TODO
             // TODO
         }
+
+        // 如果是WIN系统
+        if (SystemUtil.getOsInfo().isWindows()) {
+            String finalAfterName = afterName;
+            WindyException.run((Void) -> Assert.isTrue(finalAfterName.length() < 255, WindyLang.msg("i18n_1828639187784568832")));
+        }
+
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
