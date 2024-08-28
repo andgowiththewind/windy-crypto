@@ -551,7 +551,8 @@ public class CryptoService {
                 // TODO
                 // TODO
                 // TODO ID有问题
-                // String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
+                // String mainName = FileUtil.mainName(cryptoContext.getBeforePath());
+                // String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), mainName);
                 // lockDeleteCfgLineByKey(cfgTxtPath, k);
             }
         }
