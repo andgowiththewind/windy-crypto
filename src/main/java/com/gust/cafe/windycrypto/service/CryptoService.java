@@ -42,6 +42,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -276,6 +277,8 @@ public class CryptoService {
         finalRegisterAfter(cryptoContext);
         // 处理临时文件改名
         finalTmpRenameToAfter(cryptoContext);
+        // 处理临时文件删除、原始文件删除、最终文件开放状态等操作
+        finalDel(cryptoContext);
     }
 
     private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
@@ -431,6 +434,52 @@ public class CryptoService {
         });
         // 记录上下文
         cryptoContext.setAfterPath(afterPath);
+    }
+
+    private void finalDel(CryptoContext cryptoContext) {
+        // 源文件与临时文件都需要删除,注意顺序,安全起见最后才能删除源文件
+        LinkedList<String> pathList = ListUtil.toLinkedList(cryptoContext.getTmpPath(), cryptoContext.getBeforePath());
+        for (String path : pathList) {
+            TimeInterval timer = DateUtil.timer();
+            long intervalMs = 2_000L;
+            long maxMs = 60_000L;
+            Consumer<Void> actionCs = aVoid -> {
+                FileUtil.del(path);
+                if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败"));
+            };
+            Consumer<Void> successCs = aVoid -> {
+                log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
+                windyCacheService.lockUpdate(path, (p) -> {
+                    Windy windy = windyCacheService.lockGetOrDefault(path);
+                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+                    windy.setLatestMsg("not exist");
+                    windy.setUpdateTime(DateUtil.now());
+                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                });
+            };
+            Consumer<Void> errorCs = aVoid -> {
+                throw new WindyException(StrUtil.format("删除(超时)失败:[{}ms]", timer.intervalMs()));
+            };
+            PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
+        }
+        //
+        //
+        //  开放最终文件状态
+        long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
+        String sizeLabel = FileUtil.readableFileSize(size);
+        windyCacheService.lockUpdate(cryptoContext.getAfterPath(), (p) -> {
+            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+            windy.setCode(WindyStatusEnum.FREE.getCode());
+            windy.setLabel(WindyStatusEnum.FREE.getLabel());
+            windy.setDesc(WindyStatusEnum.FREE.getRemark());
+            windy.setLatestMsg("free");
+            windy.setSize(size);
+            windy.setSizeLabel(sizeLabel);
+            windy.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        });
     }
 
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
