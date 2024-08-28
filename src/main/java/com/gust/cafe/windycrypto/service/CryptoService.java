@@ -418,7 +418,16 @@ public class CryptoService {
             } else {
                 // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
                 File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
-                WindyException.run((Void) -> Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604")));
+                WindyException.run((Void) -> {
+                    Boolean ignoreMissingCfgTxt = cryptoContext.getIgnoreMissingCfgTxt();
+                    boolean differentialIgnoring = ignoreMissingCfgTxt != null && ignoreMissingCfgTxt == true;
+                    if (!differentialIgnoring) {
+                        // 如果没有明确表名忽略,则要求文件必须存在
+                        Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604"));
+                        // 查询记录
+                        String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);
+                    }
+                });
             }
         }
 
