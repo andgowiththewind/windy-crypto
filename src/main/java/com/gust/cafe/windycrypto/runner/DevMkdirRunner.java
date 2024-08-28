@@ -35,12 +35,12 @@ public class DevMkdirRunner implements ApplicationRunner {
         if (StrUtil.equalsIgnoreCase(springProfilesActive, "dev")) {
             String currentDir = SystemUtil.getUserInfo().getCurrentDir();
             File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 1; i++) {
                 int numI = i + 1;
                 String nameI = StrUtil.fillAfter(Convert.toStr(numI), '0', 4);
                 File levelOne = FileUtil.file(file, nameI);
                 FileUtil.mkdir(levelOne);
-                for (int j = 0; j < 10; j++) {
+                for (int j = 0; j < 100; j++) {
                     int numJ = j + 1;
                     String nameJ = StrUtil.fillAfter(Convert.toStr(numJ), '0', 4);
                     String levelTwoName = StrUtil.format("{}-{}", nameI, nameJ);
