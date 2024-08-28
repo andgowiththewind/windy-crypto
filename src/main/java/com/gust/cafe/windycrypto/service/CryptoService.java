@@ -545,9 +545,14 @@ public class CryptoService {
             List<Integer> bitSwitchList = cryptoContext.getBitSwitchList();
             if (bitSwitchList != null && bitSwitchList.get(0) != null && bitSwitchList.get(0) == 1) {
                 // 删除cfg中可能存在的记录
-                String cfgTxtPath = cryptoContext.getCfgTxtPath();
-                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
-                lockDeleteCfgLineByKey(cfgTxtPath, k);
+                String cfgTxtPath = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME).getAbsolutePath();
+                // TODO
+                // TODO
+                // TODO
+                // TODO
+                // TODO ID有问题
+                // String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
+                // lockDeleteCfgLineByKey(cfgTxtPath, k);
             }
         }
 
