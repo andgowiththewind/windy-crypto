@@ -21,6 +21,7 @@ import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.CfgTxtContentDTO;
 import com.gust.cafe.windycrypto.dto.CoverNameDTO;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
+import com.gust.cafe.windycrypto.dto.NameConcatDTO;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
@@ -175,6 +176,8 @@ public class CryptoService {
             }
             cryptoContext.setIntSaltList(list);
             cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
+            String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
+            cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
@@ -304,12 +307,28 @@ public class CryptoService {
                 // 记录上下文
                 cryptoContext.setCfgTxtPath(cfgTxt.getAbsolutePath());
                 //
-                // 此时的加密文件名拼接,eg:$safeLockedV2$8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92$0019930b8e4466ef1157919ad97ddf64$1000$123123123123.txt
-                String windyId = windy.getId();
+                // 此时的加密文件名拼接,eg:$safeLockedV2$ 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92 $ 0019930b8e4466ef1157919ad97ddf64 $ 1000 $ 123123123123.txt
+                String concatName = new NameConcatDTO(windy.getId(), windy.getExtName()).getConcatName();
                 afterName = StrUtil.format("{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
-                        , DigestUtil.sha256Hex(cryptoContext.getUserPassword())
-                );
+                        , cryptoContext.getUserPasswordSha256Hex()
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , cryptoContext.getIntSaltStrEncryptHex()
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , cryptoContext.getBitSwitchList().stream().map(String::valueOf).collect(Collectors.joining())
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , concatName);
+            } else {
+                // 不要求加密源文件名,直接拼接加密后的文件名
+                afterName = StrUtil.format("{}{}{}{}{}{}{}{}"
+                        , CommonConstants.ENCRYPTED_PREFIX
+                        , cryptoContext.getUserPasswordSha256Hex()
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , cryptoContext.getIntSaltStrEncryptHex()
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , cryptoContext.getBitSwitchList().stream().map(String::valueOf).collect(Collectors.joining())
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , windy.getName());
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理

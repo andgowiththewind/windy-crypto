@@ -31,6 +31,7 @@ public class CryptoContext {
     private BufferedOutputStream bos;// 输出流,临时文件写入流
     private List<Integer> intSaltList;// 整数盐值列表
     private String intSaltStr;// 字符串盐值
+    private String intSaltStrEncryptHex;// 字符串盐值加密后的十六进制字符串
     //
     private String thread;// 线程信息
     //

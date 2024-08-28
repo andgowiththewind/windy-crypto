@@ -14,6 +14,12 @@ public class NameConcatDTO {
     private String extName;
     private String concatName;// 计算后
 
+    /**
+     * 通过mainName和扩展名构造,考虑`NULL-NULL`各种组合
+     *
+     * @param mainName
+     * @param extName
+     */
     public NameConcatDTO(String mainName, String extName) {
         if (StrUtil.isNotBlank(mainName) && StrUtil.isNotBlank(extName)) {
             throw new IllegalArgumentException("mainName and extName cannot be both not blank");
