@@ -107,7 +107,7 @@ public class InsightTableService {
             if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return null;
 
             // 排除自定义的配置文件,不需要在table中展示
-            if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.CFG_EXT_NAME)) return null;
+            if (StrUtil.equalsIgnoreCase(name, CommonConstants.CFG_NAME)) return null;
 
             // 根据期望搜索范围结合是否加密过滤
             if (scopeEnum.equals(InsightTableReqVo.ScopeEnum.ALL)) {

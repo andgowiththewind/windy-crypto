@@ -32,8 +32,6 @@ import com.gust.cafe.windycrypto.util.AesUtils;
 import com.gust.cafe.windycrypto.util.PollUtils;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -46,7 +44,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -367,7 +364,7 @@ public class CryptoService {
                         , cryptoContext.getUserPasswordSha256Hex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , windy.getId()
-                        , CommonConstants.CFG_EXT_NAME);
+                        , CommonConstants.CFG_NAME);
                 // 存储加密后的文件名
                 CfgTxtContentDTO contentDTO = CfgTxtContentDTO.builder()
                         .sourceName(windy.getName())
