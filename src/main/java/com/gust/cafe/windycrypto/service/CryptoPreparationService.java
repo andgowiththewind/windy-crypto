@@ -49,11 +49,11 @@ public class CryptoPreparationService {
 
     private static void preVerify(CryptoSubmitReqVo reqVo) {
         WindyException.run((Void -> {
-            Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));
+            Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));// 必须指定加解密操作类型
             String userPassword = reqVo.getUserPassword();
-            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));
-            // 8~32位限制
-            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32, WindyLang.msg("i18n_1828312465394503680"));
+            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));// 密码不能为空
+            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32,
+                    WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
         }));
     }
 
@@ -88,9 +88,9 @@ public class CryptoPreparationService {
         //
         TimeInterval timer = DateUtil.timer();
         if (CollectionUtil.isNotEmpty(reqVo.getWindyPathList())) {
-            // 创建多个 CompletableFuture 任务,每个任务都使用独立的线程
+            // 创建多个 CompletableFuture 任务,每个任务都使用同一个线程池的线程
             List<CompletableFuture<Windy>> futureList = reqVo.getWindyPathList().stream()
-                    .map(path -> CompletableFuture.supplyAsync(() -> windyCacheService.lockGetOrDefault(path)))
+                    .map(path -> CompletableFuture.supplyAsync(() -> windyCacheService.lockGetOrDefault(path), dispatchTaskExecutor))
                     .collect(Collectors.toList());
             // 使用 CompletableFuture.allOf 等待所有任务完成
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));// 0是惯用写法
