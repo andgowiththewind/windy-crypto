@@ -77,6 +77,7 @@ public class CryptoService {
                     .userPassword(reqVo.getUserPassword())
                     .userPasswordSha256Hex(DigestUtil.sha256Hex(reqVo.getUserPassword()))
                     .beforePath(beforePath)
+                    .bitSwitchList(ListUtil.toList(0, 0, 0, 0))
                     .build();
             // 处理排队
             CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureQueue(cryptoContext), dispatchTaskExecutor);
