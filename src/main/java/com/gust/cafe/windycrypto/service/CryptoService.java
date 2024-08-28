@@ -425,7 +425,9 @@ public class CryptoService {
                         // 如果没有明确表名忽略,则要求文件必须存在
                         Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604"));
                         // 查询记录
-                        String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);
+                        String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);// 注意这里从加密文件名中提取ID
+                        String lineStr = FileUtil.readUtf8Lines(windycfg).stream().filter(StrUtil::isNotBlank).filter(row -> StrUtil.startWith(row, k)).findFirst().orElseThrow(() -> new WindyException(WindyLang.msg("i18n_1828820333835194368")));
+
                         // TODO
                         // TODO
                         // TODO
