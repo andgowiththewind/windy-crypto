@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.service;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
@@ -197,7 +198,6 @@ public class CryptoService {
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
-            System.out.println("coverNameDTO=" + coverNameDTO);
             cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
             cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
@@ -404,11 +404,22 @@ public class CryptoService {
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
+            String expectSourceName = null;
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
-            // TODO
-            // TODO
-            // TODO
-            // TODO
+            String sourceName = coverNameDTO.getSourceName();
+            String sourceMainName = coverNameDTO.getSourceMainName();
+            String sourceExtName = coverNameDTO.getSourceExtName();
+            //
+            List<Integer> bitSwitchList = coverNameDTO.getBitSwitchList();
+            boolean isCoverName = CollectionUtil.isNotEmpty(bitSwitchList) && bitSwitchList.size() > 0 && bitSwitchList.get(0) != null && bitSwitchList.get(0).intValue() == 1;
+            if (!isCoverName) {
+                // 如果文件名不是加密形式,则直接提取
+                expectSourceName = sourceName;
+            } else {
+                // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
+                File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
+                WindyException.run((Void) -> Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604")));
+            }
         }
 
         // 如果是WIN系统,对文件名长度有要求
