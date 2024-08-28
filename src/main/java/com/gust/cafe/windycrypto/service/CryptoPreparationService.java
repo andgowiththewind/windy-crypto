@@ -103,7 +103,7 @@ public class CryptoPreparationService {
             // 收集所有任务的结果
             List<Windy> byWindyPath = allResults.get();
             windyList.addAll(byWindyPath);
-            log.debug("根据windy路径获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
+            log.debug("根据文件路径获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         }
 
         if (CollectionUtil.isNotEmpty(reqVo.getDirPathList())) {
@@ -129,7 +129,7 @@ public class CryptoPreparationService {
             // 收集所有任务的结果
             List<Windy> byDirPath = allResults.get();
             windyList.addAll(byDirPath);
-            log.debug("根据目录路径获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
+            log.debug("根据目录路径递归获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         }
 
         // 根据ID去重
