@@ -372,11 +372,8 @@ public class CryptoService {
                 File cfg = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME);
                 // 需要加锁确保创建和写入
                 lockUpdateCfg(cfg, k, v);
-
-
-                // 写文件
                 // 记录上下文
-                cryptoContext.setCfgTxtPath(cfgJson.getAbsolutePath());
+                cryptoContext.setCfgTxtPath(cfg.getAbsolutePath());
                 //
                 // 此时的加密文件名拼接,eg:$safeLockedV2$ 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92 $ 0019930b8e4466ef1157919ad97ddf64 $ 1000 $ 123123123123.txt
                 String concatName = new NameConcatDTO(windy.getId(), windy.getExtName()).getConcatName();
@@ -450,15 +447,13 @@ public class CryptoService {
                     FileUtil.touch(cfg);
                 }
                 List<String> lines = FileUtil.readUtf8Lines(cfg);
-                // 增加一行
+                // 配置文件中不应该存在相同KEY
                 boolean anyMatch = lines.stream().filter(r -> StrUtil.isNotBlank(r)).anyMatch(row -> row.startsWith(key));
-                WindyException.run((Void) -> Assert.isFalse(anyMatch, WindyLang.msg("i18n_1828802439705399296")));// 配置文件中不应该存在相同KEY
-
-
-                // TODO
-                // TODO
-                // TODO
-                // TODO
+                WindyException.run((Void) -> Assert.isFalse(anyMatch, WindyLang.msg("i18n_1828802439705399296")));
+                // 增加一行
+                lines.add(StrUtil.format("{}={}", key, val));
+                // 写入文件
+                FileUtil.writeUtf8Lines(lines, cfg);
             } finally {
                 // 确保释放锁
                 lock.unlock();
