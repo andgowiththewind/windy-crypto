@@ -91,14 +91,17 @@ public class CryptoService {
     }
 
     private void futureQueue(CryptoContext cryptoContext) {
+        log.debug("[{}]-成功进入排队线程", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
         WindyException.run((Void) -> {
-            Assert.isTrue(FileUtil.exist(beforePath), WindyLang.msg("i18n_1828354895514832896"));
+            Assert.isTrue(FileUtil.exist(beforePath),
+                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895514832896"));// 文件已经不存在,当前任务终止
             // 实时查询缓存
             Windy windy = windyCacheService.lockGetOrDefault(beforePath);
             // 状态要求FREE
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
-            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), WindyLang.msg("i18n_1828354895519027200"));
+            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE),
+                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 空闲状态,已有其他任务在处理,当前任务终止
         });
 
         // 满足条件则将状态更新为排队中
@@ -109,6 +112,7 @@ public class CryptoService {
         windy.setLatestMsg("queued");
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+        log.debug("[{}]-更新状态为WAITING", cryptoContext.getBeforeCacheId());
     }
 
     // 异步加解密阶段
