@@ -59,7 +59,7 @@ public class CoverNameDTO {
      *
      * </p>
      *
-     * @param coverName         已加密文件名
+     * @param coverName         已加密文件名(FileUtil.getName)
      * @param inputUserPassword 用户输入的密码
      * @return 解析结果
      */

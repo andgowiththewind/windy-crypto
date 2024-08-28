@@ -551,9 +551,9 @@ public class CryptoService {
                 // TODO
                 // TODO
                 // TODO ID有问题
-                // String mainName = FileUtil.mainName(cryptoContext.getBeforePath());
-                // String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), mainName);
-                // lockDeleteCfgLineByKey(cfgTxtPath, k);
+                CoverNameDTO analyse = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), analyse.getSourceMainName());
+                lockDeleteCfgLineByKey(cfgTxtPath, k);
             }
         }
 
