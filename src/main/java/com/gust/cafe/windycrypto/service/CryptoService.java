@@ -7,6 +7,7 @@ import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -482,10 +483,25 @@ public class CryptoService {
         });
     }
 
+    /**
+     * 设计上,任何一个中间线程的任何一个步骤发生未知异常,都会导致文件回滚,确保原始文件安全
+     */
     private Function<Throwable, Void> captureUnknownExceptions(CryptoContext cryptoContext) {
         return throwable -> {
-            log.error("加解密异常,文件回滚,异常信息:{}", throwable.getMessage());
-            return null;
+            if (throwable == null) return null;
+            try {
+                globalWindyRollback(cryptoContext, throwable);
+            } catch (Exception e) {
+                // 如果在全局异常处理时发生未知异常,那么就是极其严重的异常,需要打印日志,及时修复
+                Console.error("======================================================================================");
+                log.error(WindyLang.msg("i18n_1828691686704943113"), e);
+                Console.error("======================================================================================");
+                throw new RuntimeException(e);
+            }
+            return null;// 无后续线程
         };
+    }
+
+    private void globalWindyRollback(CryptoContext cryptoContext, Throwable throwable) {
     }
 }
