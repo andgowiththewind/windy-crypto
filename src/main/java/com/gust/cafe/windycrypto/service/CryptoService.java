@@ -11,6 +11,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.CryptoException;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.SystemUtil;
@@ -27,6 +28,7 @@ import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
 import com.gust.cafe.windycrypto.util.AesUtils;
+import com.gust.cafe.windycrypto.util.PollUtils;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -43,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -277,6 +280,61 @@ public class CryptoService {
 
     private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
         // GPT也是建议采用轮询解决"IO流未释放导致改名失败"的问题
+        long intervalMs = 2_000L;
+        long maxMs = 60_000L;
+        // 业务操作回调
+        Consumer<Void> actionCs = aVoid -> {
+            IoUtil.close(cryptoContext.getBis());
+            IoUtil.close(cryptoContext.getBos());
+            File tmp = FileUtil.file(cryptoContext.getTmpPath());
+            String afterName = FileUtil.getName(cryptoContext.getAfterPath());
+            FileUtil.rename(tmp, afterName, false, true);
+            // 健壮
+            if (!FileUtil.exist(cryptoContext.getAfterPath())) {
+                // 说明改名失败,抛出异常触发进入下一循环
+                throw new CryptoException("改名失败");
+            }
+        };
+        // 成功回调
+        TimeInterval timer = DateUtil.timer();
+        Consumer<Void> successCs = aVoid -> {
+            log.debug("改名成功,耗时[{}]ms", timer.intervalMs());
+            // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
+            windyCacheService.lockUpdate(cryptoContext.getBeforePath(), (path) -> {
+                Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+                windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
+                windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
+                windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
+                windyBefore.setLatestMsg("almost");
+                windyBefore.setUpdateTime(DateUtil.now());
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
+            });
+            windyCacheService.lockUpdate(cryptoContext.getTmpPath(), (path) -> {
+                Windy windyTmp = windyCacheService.lockGetOrDefault(cryptoContext.getTmpPath());
+                windyTmp.setCode(WindyStatusEnum.ALMOST.getCode());
+                windyTmp.setLabel(WindyStatusEnum.ALMOST.getLabel());
+                windyTmp.setDesc(WindyStatusEnum.ALMOST.getRemark());
+                windyTmp.setLatestMsg("almost");
+                windyTmp.setUpdateTime(DateUtil.now());
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
+            });
+            windyCacheService.lockUpdate(cryptoContext.getAfterPath(), (path) -> {
+                Windy windyAfter = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+                windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
+                windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
+                windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
+                windyAfter.setLatestMsg("almost");
+                windyAfter.setUpdateTime(DateUtil.now());
+                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
+            });
+        };
+        // 失败回调
+        Consumer<Void> errorCs = aVoid -> {
+            // 临时文件改名失败,抛异常
+            throw new WindyException(StrUtil.format("改名(超时)失败:[{}ms]", timer.intervalMs()));
+        };
+        // 执行
+        PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
     }
 
     private void finalRegisterAfter(CryptoContext cryptoContext) {
