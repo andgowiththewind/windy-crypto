@@ -2,6 +2,7 @@ package com.gust.cafe.windycrypto.components;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.system.SystemUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -11,6 +12,7 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
+@Slf4j
 @Component
 public class AppLock {
 
@@ -28,7 +30,8 @@ public class AppLock {
         fileLock = fileChannel.tryLock();
 
         if (fileLock == null) {
-            throw new IllegalStateException("Unable to acquire lock on app.lock file. Another instance might be running.");
+            log.error("Unable to acquire lock on app.lock file. Another instance might be running.");
+            System.exit(1);
         }
 
         System.out.println("Lock acquired on app.lock file.");

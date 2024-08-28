@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="app_dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <envs>
-      <env name="spring.profiles.active" value="dev" />
       <env name="MY_DEV_LOG_HOME" value="$PROJECT_DIR$/../../../../../manylogs/windy-crypto-logs" />
+      <env name="spring.profiles.active" value="dev" />
+      <env name="server.port" value="8877" />
     </envs>
     <module name="windy-crypto" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.gust.cafe.windycrypto.WindyCryptoApplication" />
