@@ -14,7 +14,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
 @Slf4j
-@Component
+// @Component
 public class AppLock {
 
     private FileLock fileLock;
