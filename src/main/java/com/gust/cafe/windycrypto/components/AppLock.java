@@ -24,6 +24,7 @@ public class AppLock {
     public void lockFile() throws Exception {
         File file = FileUtil.file(SystemUtil.getUserInfo().getHomeDir(), "windy-crypto-app.lock");
         if (!FileUtil.exist(file)) {
+            FileUtil.touch(file);
             FileUtil.writeUtf8String("make sure only one windy-crypto app allows it", file);
         }
         //
