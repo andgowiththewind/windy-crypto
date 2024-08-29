@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
@@ -119,17 +120,17 @@ public class WindyCacheService {
      * 根据绝对路径获取全局ID,缓存此对应关系
      *
      * @param absPath 绝对路径
-     * @return 简化, 雪花算法生成的ID
      */
     public String parseId(String absPath) {
         Assert.notBlank(absPath);
+        // 统一转正斜杠"/"
         absPath = getPositiveSlashPath(absPath);
         // 先查缓存
         String id = redisMasterCache.getCacheMapValue(CacheConstants.PATH_ID_MAP, absPath);
         if (StrUtil.isNotBlank(id)) return id;
         // 如果缓存中没有,新生成并缓存
-        // 使用雪花算法生成ID
-        String nextIdStr = IdUtil.getSnowflakeNextIdStr();
+        // 使用摘要算法生成ID
+        String nextIdStr = DigestUtil.sha256Hex(absPath);
         // 缓存
         redisMasterCache.setCacheMapValue(CacheConstants.PATH_ID_MAP, absPath, nextIdStr);
         return nextIdStr;
