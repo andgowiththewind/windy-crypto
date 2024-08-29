@@ -72,6 +72,7 @@ public class CryptoService {
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
+        Integer val = (reqVo.getIsRequireCoverName() != null && reqVo.getIsRequireCoverName() == true) ? 1 : 0;
         TimeInterval timer = DateUtil.timer();
         for (String beforePath : absPathList) {
             // 上下文对象记录必要信息,异步线程采用thenRunAsync,确保按顺序执行
@@ -81,7 +82,7 @@ public class CryptoService {
                     .userPasswordSha256Hex(DigestUtil.sha256Hex(reqVo.getUserPassword()))
                     .beforePath(beforePath)
                     .beforeCacheId(windyCacheService.parseId(beforePath))
-                    .bitSwitchList(ListUtil.toList(1, 0, 0, 0))
+                    .bitSwitchList(ListUtil.toList(val, 0, 0, 0))
                     .build();
             // 处理排队
             CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureQueue(cryptoContext), dispatchTaskExecutor);
