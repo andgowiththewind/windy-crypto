@@ -174,6 +174,7 @@ public class CryptoService {
     }
 
     private void futureCryptoStream(CryptoContext cryptoContext) {
+        TimeInterval timer = DateUtil.timer();
         String beforePath = cryptoContext.getBeforePath();
         String tmpPath = cryptoContext.getTmpPath();
         Assert.notBlank(beforePath, "beforePath不能为空");
@@ -184,6 +185,7 @@ public class CryptoService {
         // 记录上下文
         cryptoContext.setBis(bis);
         cryptoContext.setBos(bos);
+        log.debug("[{}]-处理加解密操作对应输入输出流成功,耗时[{}]ms", cryptoContext.getBeforeCacheId(), timer.intervalMs());
     }
 
     private void futureCryptoSalt(CryptoContext cryptoContext) {
@@ -270,8 +272,13 @@ public class CryptoService {
                     Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
                     log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
                     // TODO 更新缓存状态信息
-                    // TODO 更新缓存状态信息
-                    // TODO 更新缓存状态信息
+                    Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+                    windy.setLatestMsg("processing");
+                    windy.setPercentage(percentage);
+                    windy.setPercentageLabel(StrUtil.format("{}%", percentage));
+                    windy.setUpdateTime(DateUtil.now());
+                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                    //
                     // 重置计时器,重新计时直至下一次周期
                     timer.restart();
                 }
@@ -279,6 +286,12 @@ public class CryptoService {
 
             // 防止最后一次结果丢失,循环结束后指定百分比更新一次
             // TODO 直接更新100%
+            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            windy.setLatestMsg("IO done");
+            windy.setPercentage(100);
+            windy.setPercentageLabel("100%");
+            windy.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
             log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), 100);
 
             // 清除计时器
