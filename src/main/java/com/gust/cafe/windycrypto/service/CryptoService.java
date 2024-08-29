@@ -587,13 +587,15 @@ public class CryptoService {
         // 最后的最后才删除源文件
         physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getBeforePath()));
         // 物理文件删除后更新缓存
-        Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+        /*Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
         windyBefore.setCode(WindyStatusEnum.NOT_EXIST.getCode());
         windyBefore.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
         windyBefore.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
         windyBefore.setLatestMsg("not exist");
         windyBefore.setUpdateTime(DateUtil.now());
-        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);*/
+        String parseIdBefore = windyCacheService.parseId(cryptoContext.getBeforePath());
+        redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdBefore);
     }
 
     private void physicalDelete(CryptoContext cryptoContext, LinkedList<String> pathList) {
