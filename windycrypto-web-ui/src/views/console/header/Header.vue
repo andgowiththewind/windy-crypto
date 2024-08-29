@@ -13,6 +13,7 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from '@/utils/commonUtils';
+import {FN_CONTRACT_HANDLE_TOP_FOLDER_ENTER} from "@/config/Methods";
 
 export default {
   name: "Header",
@@ -64,6 +65,7 @@ export default {
     this.$bus.$on(Methods.FN_UPDATE_TOP_FOLDER_PATH, (_topFolderPath) => this.topFolderPath = _topFolderPath);
     this.$bus.$on(Methods.FN_CONTRACT_PAYLOAD, () => this.contractPayload());
     this.$bus.$on(Methods.FN_CONTRACT_TOP_FOLDER_PATH_COPY, () => this.contractTopFolderPathCopy());
+    this.$bus.$on(Methods.FN_CONTRACT_HANDLE_TOP_FOLDER_ENTER, () => this.handleTopFolderEnter());
     // 从`localStorage`中读取上次设置的语言
     this.langInit();
   },// mounted

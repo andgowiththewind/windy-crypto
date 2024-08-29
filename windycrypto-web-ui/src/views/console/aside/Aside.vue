@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading">
-    <el-button type="warning" size="mini" style="width: 100%;height: 50px;" @click="dialogVo.show=true">
+    <el-button type="warning" size="mini" style="width: 100%;height: 50px;" @click="askContractHandleTopFolderEnter">
       <i>{{ $t('i18n_1826858923819405312') }}</i>
     </el-button>
     <el-tree
@@ -25,9 +25,6 @@ export default {
   data() {
     return {
       loading: false,
-      dialogVo: {
-        show: false,
-      },
       treeVo: {
         data: [],
         defaultExpandedKeys: [1, 2],
@@ -49,6 +46,9 @@ export default {
       getTreeData({path: topFolderPath}).then(res => {
         this.treeVo.data = res.data;
       }).finally(() => this.loading = false).catch();
+    },
+    askContractHandleTopFolderEnter() {
+      this.$bus.$emit(Methods.FN_CONTRACT_HANDLE_TOP_FOLDER_ENTER);
     },
   },// methods
   watch: {
