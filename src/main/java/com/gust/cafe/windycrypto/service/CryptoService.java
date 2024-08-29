@@ -491,7 +491,7 @@ public class CryptoService {
         boolean notEnabled = windyCache == null || (windyCache.getCode() != null && windyCache.getCode() == WindyStatusEnum.NOT_EXIST.getCode());
         WindyException.run((Void) -> Assert.isTrue(notEnabled, WindyLang.msg("i18n_1828639187788763138")));
         //
-        // 登记缓存
+        // 登记缓存,占位
         Windy windyAfter = windyCacheService.lockGetOrDefault(afterPath);
         // 更新状态信息
         windyAfter.setCode(WindyStatusEnum.INPUTTING.getCode());
