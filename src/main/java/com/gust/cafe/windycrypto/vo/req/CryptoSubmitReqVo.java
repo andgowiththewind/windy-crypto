@@ -19,4 +19,5 @@ public class CryptoSubmitReqVo {
     private List<String> dirPathList;
     private Boolean askEncrypt;
     private String userPassword;
+    private Boolean isRequireCoverName;
 }

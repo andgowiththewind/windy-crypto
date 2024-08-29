@@ -48,6 +48,7 @@ export default {
         dirPathList: [this.topFolderPathCopy],
         askEncrypt: true,
         userPassword: this.userPassword,
+        isRequireCoverName: this.isRequireCoverName === 'hide',
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
@@ -62,6 +63,7 @@ export default {
         dirPathList: [this.topFolderPathCopy],
         askEncrypt: false,
         userPassword: this.userPassword,
+        isRequireCoverName: this.isRequireCoverName === 'hide',
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
