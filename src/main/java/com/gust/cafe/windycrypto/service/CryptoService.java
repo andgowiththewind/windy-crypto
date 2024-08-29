@@ -540,21 +540,23 @@ public class CryptoService {
 
     private void finalDel(CryptoContext cryptoContext) {
         // 源文件与临时文件都需要删除,注意顺序,安全起见最后才能删除源文件
+        // 先删除临时文件
         physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getTmpPath()));
+        // 物理文件删除后删除缓存
+        String parseIdTmp = windyCacheService.parseId(cryptoContext.getTmpPath());
+        redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdTmp);
         //
-
+        // 删除cfg中可能存在的记录
         if (!cryptoContext.getAskEncrypt()) {
             List<Integer> bitSwitchList = cryptoContext.getBitSwitchList();
             if (bitSwitchList != null && bitSwitchList.get(0) != null && bitSwitchList.get(0) == 1) {
-                // 删除cfg中可能存在的记录
                 String cfgTxtPath = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME).getAbsolutePath();
                 CoverNameDTO analyse = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
                 String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), analyse.getSourceMainName());
                 lockDeleteCfgLineByKey(cfgTxtPath, k);
             }
         }
-
-
+        //
         //
         //  开放最终文件状态
         long size = FileUtil.size(FileUtil.file(cryptoContext.getAfterPath()));
@@ -568,9 +570,12 @@ public class CryptoService {
         windy.setSizeLabel(sizeLabel);
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-
+        //
         // 最后的最后才删除源文件
         physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getBeforePath()));
+        // 物理文件删除后删除缓存
+        String parseIdBefore = windyCacheService.parseId(cryptoContext.getBeforePath());
+        redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdBefore);
     }
 
     private void physicalDelete(CryptoContext cryptoContext, LinkedList<String> pathList) {
