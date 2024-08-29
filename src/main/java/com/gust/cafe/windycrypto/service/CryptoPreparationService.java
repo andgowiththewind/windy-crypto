@@ -48,7 +48,7 @@ public class CryptoPreparationService {
             int max = 32;
             Assert.isTrue(userPassword.length() >= min && userPassword.length() <= max, StrUtil.format("{} {}-{}", WindyLang.msg("i18n_1828312465394503680"), min, max));// 密码限制长度min-max
         }));
-        // 创建AES可能比较耗时
+        // 密码校验通过。创建AES可能比较耗时，提前创建。
         CompletableFuture.runAsync(() -> AesUtils.getAes(reqVo.getUserPassword()), dispatchTaskExecutor);
     }
 
