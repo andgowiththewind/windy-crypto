@@ -5,11 +5,9 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,10 +19,13 @@ import java.io.IOException;
  * @date 2024-08-23 10:40
  */
 @Slf4j
-@Component
+// @Component
 public class DevMkdirRunner implements ApplicationRunner {
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+
+    public DevMkdirRunner(Environment environment) {
+        this.environment = environment;
+    }
 
     private static void type01(File file) throws IOException {
         for (int i = 0; i < 1; i++) {
