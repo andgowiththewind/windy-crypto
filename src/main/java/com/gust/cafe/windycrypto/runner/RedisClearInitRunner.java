@@ -42,6 +42,7 @@ public class RedisClearInitRunner implements ApplicationRunner {
     private void deleteByExactMatch() {
         List<String> exactList = ListUtil.toList(
                 CacheConstants.WINDY_MAP
+                , CacheConstants.PATH_ID_MAP
         );
         exactList.forEach(key -> {
             redisMasterCache.deleteObject(key);
