@@ -391,26 +391,33 @@ public class CryptoService {
                 // 记录上下文
                 cryptoContext.setCfgTxtPath(cfg.getAbsolutePath());
                 //
-                // 此时的加密文件名拼接,eg:$safeLockedV2$ 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92 $ 0019930b8e4466ef1157919ad97ddf64 $ 1000 $ 123123123123.txt
-                String concatName = new NameConcatDTO(windy.getId(), windy.getExtName()).getConcatName();
-                afterName = StrUtil.format("{}{}{}{}{}{}{}{}"
+                // 此时的加密文件名拼接,eg:
+                // 源文件名:password.txt
+                // 如果不加密:$safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708  $    0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              password.txt
+                // 如果加密:  $safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708   $   0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              1829136955162628096.txt
+                String concatName = new NameConcatDTO(IdUtil.getSnowflakeNextIdStr(), windy.getExtName()).getConcatName();
+                afterName = StrUtil.format("{}{}{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
                         , cryptoContext.getUserPasswordSha256Hex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , cryptoContext.getIntSaltStrEncryptHex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , cryptoContext.getBitSwitchList().stream().map(String::valueOf).collect(Collectors.joining())
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , IdUtil.getSnowflakeNextIdStr() // 随机码
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , concatName);
             } else {
                 // 不要求加密源文件名,直接拼接加密后的文件名
-                afterName = StrUtil.format("{}{}{}{}{}{}{}{}"
+                afterName = StrUtil.format("{}{}{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
                         , cryptoContext.getUserPasswordSha256Hex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , cryptoContext.getIntSaltStrEncryptHex()
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , cryptoContext.getBitSwitchList().stream().map(String::valueOf).collect(Collectors.joining())
+                        , CommonConstants.ENCRYPTED_SEPARATOR
+                        , IdUtil.getSnowflakeNextIdStr() // 随机码
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , windy.getName());
             }
@@ -420,7 +427,6 @@ public class CryptoService {
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             String sourceName = coverNameDTO.getSourceName();
             String sourceMainName = coverNameDTO.getSourceMainName();
-            String sourceExtName = coverNameDTO.getSourceExtName();
             //
             List<Integer> bitSwitchList = coverNameDTO.getBitSwitchList();
             boolean isCoverName = CollectionUtil.isNotEmpty(bitSwitchList) && bitSwitchList.size() > 0 && bitSwitchList.get(0) != null && bitSwitchList.get(0).intValue() == 1;
