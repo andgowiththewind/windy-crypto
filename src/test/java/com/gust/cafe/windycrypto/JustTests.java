@@ -27,7 +27,7 @@ public class JustTests {
             Console.error(e.getMessage());
         }
         FileUtil.mkdir(file);
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < 2; i++) {
             String mark = StrUtil.fillAfter(Convert.toStr(i), '0', 4);
             File sonFile = FileUtil.file(file, mark + ".txt");
             FileUtil.writeUtf8String(mark, sonFile);

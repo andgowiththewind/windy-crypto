@@ -430,7 +430,7 @@ public class CryptoService {
             }
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
-            AtomicReference<String> expectSourceName = new AtomicReference<>();
+            AtomicReference<String> expectSourceNameAtomic = new AtomicReference<>();
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             String sourceName = coverNameDTO.getSourceName();
             String sourceMainName = coverNameDTO.getSourceMainName();
@@ -440,7 +440,7 @@ public class CryptoService {
             boolean isCoverName = CollectionUtil.isNotEmpty(bitSwitchList) && bitSwitchList.size() > 0 && bitSwitchList.get(0) != null && bitSwitchList.get(0).intValue() == 1;
             if (!isCoverName) {
                 // 如果文件名不是加密形式,则直接提取
-                expectSourceName.set(sourceName);
+                expectSourceNameAtomic.set(sourceName);
             } else {
                 // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
                 File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
@@ -457,23 +457,27 @@ public class CryptoService {
                         Assert.isTrue(CollectionUtil.isNotEmpty(split) && split.size() == 2, WindyLang.msg("i18n_1828820333835194369"));
                         String coverName = split.get(1);
                         String decryptStr = AesUtils.getAes(cryptoContext.getUserPassword()).decryptStr(coverName);
-                        expectSourceName.set(decryptStr);
+                        expectSourceNameAtomic.set(decryptStr);
                     }
                 });
             }
             //
             // 确认源文件名后,需要考虑多个加密文件解密出同名文件的场景,需要增加区别码
-            File file = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), expectSourceName.get());
+            File file = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), expectSourceNameAtomic.get());
             boolean notExist = !FileUtil.exist(file);
             String parseId = windyCacheService.parseId(file.getAbsolutePath());
             Windy expectCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId);
             boolean cacheNotEnabled = expectCache == null || (expectCache.getCode() != null && expectCache.getCode() == WindyStatusEnum.NOT_EXIST.getCode());
             // 当实际文件不存在且缓存中不存在时,使用处理后的文件名
             if (notExist && cacheNotEnabled) {
-                afterName = expectSourceName.get();
+                afterName = expectSourceNameAtomic.get();
             } else {
                 // 当实际文件存在或者缓存中存在时,需要增加区别码
-                afterName = StrUtil.format("repeated_name_mark_{}_{}", IdUtil.getSnowflakeNextIdStr(), expectSourceName.get());
+                String expectSourceName = expectSourceNameAtomic.get();
+                File ghost = FileUtil.file(SystemUtil.getUserInfo().getHomeDir(), expectSourceName);
+                String ghostMainName = FileUtil.mainName(ghost);
+                String newGhostMainName = StrUtil.format("{}(repeated-{})", ghostMainName, IdUtil.getSnowflakeNextIdStr());
+                afterName = new NameConcatDTO(newGhostMainName, FileUtil.extName(ghost)).getConcatName();
             }
 
         }
