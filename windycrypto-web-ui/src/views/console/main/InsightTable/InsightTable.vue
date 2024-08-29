@@ -24,14 +24,17 @@
       <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
       <!--操作-->
-      <el-table-column :label="$t('i18n_1827946899051778052')" width="120" prop="_operation">
+      <el-table-column :label="$t('i18n_1827946899051778052')" width="250" prop="_operation">
         <template v-slot="scope">
           <div v-if="scope.row.code==-1">
             <span>{{ $t('i18n_1827950850597851137') }}</span>
           </div>
           <div v-else-if="scope.row.code==0">
             <el-button v-if="scope.row.hadEncrypted" type="danger" plain size="mini" @click="decryptOne(scope.row)">{{ $t('i18n_1827961313217875969') }}</el-button>
-            <el-button v-else type="success" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1827961313217875968') }}</el-button>
+            <el-button-group v-else>
+              <el-button type="success" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1827961313217875968') }}</el-button>
+              <el-button type="warning" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1828969678349930496') }}</el-button>
+            </el-button-group>
           </div>
           <div v-else-if="scope.row.code==10">
             <span>{{ $t('i18n_1827950850597851138') }}</span>
