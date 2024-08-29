@@ -64,7 +64,7 @@ public class DevMkdirRunner implements ApplicationRunner {
     }
 
     private void type02(File file) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             File tmp = FileUtil.file(file, (i + 1) + ".txt");
             FileUtil.writeUtf8String((i + 1) + "", tmp);
         }
