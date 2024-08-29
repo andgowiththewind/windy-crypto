@@ -72,9 +72,12 @@ public class CryptoService {
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
-        // 加密时是否隐藏原文件名
-        Integer val = (reqVo.getIsRequireCoverName() != null && reqVo.getIsRequireCoverName() == true) ? 1 : 0;
         TimeInterval timer = DateUtil.timer();
+        //
+        // 记录前端传递的要求:加密时是否隐藏原文件名
+        Integer val = (reqVo.getIsRequireCoverName() != null && reqVo.getIsRequireCoverName() == true) ? 1 : 0;
+        //
+        //
         for (String beforePath : absPathList) {
             // 上下文对象记录必要信息,异步线程采用thenRunAsync,确保按顺序执行
             CryptoContext cryptoContext = CryptoContext.builder()
@@ -93,6 +96,7 @@ public class CryptoService {
             // 异常处理,处理文件回滚
             future02.exceptionally(captureUnknownExceptions(cryptoContext));
         }
+
         log.debug("耗时[{}]ms指定异步任务[{}]个", timer.intervalMs(), absPathList.size());
     }
 
@@ -100,14 +104,10 @@ public class CryptoService {
         log.debug("[{}]-成功进入排队线程", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
         WindyException.run((Void) -> {
-            Assert.isTrue(FileUtil.exist(beforePath),
-                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895514832896"));// 文件已经不存在,当前任务终止
-            // 实时查询缓存
-            Windy windy = windyCacheService.lockGetOrDefault(beforePath);
-            // 状态要求FREE
-            WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
-            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE),
-                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 非空闲状态,已有其他任务在处理,当前任务终止
+            Assert.isTrue(FileUtil.exist(beforePath), "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895514832896"));// 文件已经不存在,当前任务终止
+            Windy windy = windyCacheService.lockGetOrDefault(beforePath);// 实时查询缓存
+            WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());// 状态要求FREE
+            Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 非空闲状态,已有其他任务在处理,当前任务终止
         });
 
         // 满足条件则将状态更新为排队中
@@ -155,22 +155,14 @@ public class CryptoService {
     private void futureCryptoRegisterTmp(CryptoContext cryptoContext) {
         log.debug("[{}]-处理临时文件注册", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
-        // 临时文件名
-        String tmpName = StrUtil.format("0000000000-{}-{}.{}", DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss"), IdUtil.getSnowflakeNextIdStr(), CommonConstants.TMP_EXT_NAME);
-        // 在源文件的同级目录下创建临时文件
+        // 临时文件名,双雪花,绝不重复
+        String tmpName = StrUtil.format("0000000000-{}-{}.{}", IdUtil.getSnowflakeNextIdStr(), IdUtil.getSnowflakeNextIdStr(), CommonConstants.TMP_EXT_NAME);
+        // 临时文件的位置位于:源文件的同级目录下
         String tmpAbsPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(beforePath, 1), tmpName));
-        Windy windyTmp = windyCacheService.lockGetOrDefault(tmpAbsPath);
-        // 更新缓存状态信息
-        windyTmp.setCode(WindyStatusEnum.INPUTTING.getCode());
-        windyTmp.setLabel(WindyStatusEnum.INPUTTING.getLabel());
-        windyTmp.setDesc(WindyStatusEnum.INPUTTING.getRemark());
-        windyTmp.setLatestMsg("inputting");
-        windyTmp.setUpdateTime(DateUtil.now());
-        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
+        // 临时文件不需要记录缓存
         // 记录上下文
         cryptoContext.setTmpPath(tmpAbsPath);
-        cryptoContext.setTmpCacheId(windyTmp.getId());
-        log.debug("[{}]-临时文件注册成功:windyTmpId=[{}]", cryptoContext.getBeforeCacheId(), windyTmp.getId());
+        log.debug("[{}]-临时文件注册成功:[{}]", cryptoContext.getBeforeCacheId(), tmpName);
     }
 
     private void futureCryptoStream(CryptoContext cryptoContext) {
@@ -190,24 +182,19 @@ public class CryptoService {
 
     private void futureCryptoSalt(CryptoContext cryptoContext) {
         if (cryptoContext.getAskEncrypt()) {
-            // 如果是加密操作,则生成盐值数组,三位大于0小于256的随机数
+            // 如果是加密操作,则生成盐值数组,三个大于0小于256的随机数
             List<Integer> list = new ArrayList<>();
-            for (int i = 0; i < 3; i++) {
-                list.add(RandomUtil.randomInt(0, 256));
-            }
-            cryptoContext.setIntSaltList(list);
-            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
-            String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
-            cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
-            //
+            for (int i = 0; i < 3; i++) list.add(RandomUtil.randomInt(0, 256));
+            cryptoContext.setIntSaltList(list);// 集合
+            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));// 字符串拼接
+            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));// 字符串拼接加密
             log.debug("[{}]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
         } else {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
             cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
-            String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
-            cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
+            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));
             log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
         }
 
@@ -342,8 +329,8 @@ public class CryptoService {
             log.debug("[{}]-临时文件改名成功,耗时[{}]ms,[tmp={}]>>[after={}]",
                     cryptoContext.getBeforeCacheId(),
                     timer.intervalMs(),
-                    cryptoContext.getTmpCacheId()
-                    , cryptoContext.getAfterCacheId()
+                    FileUtil.getName(cryptoContext.getTmpPath()),
+                    cryptoContext.getAfterCacheId()
             );
             // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
             Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());

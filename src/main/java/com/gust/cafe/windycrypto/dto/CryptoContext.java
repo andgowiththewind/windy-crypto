@@ -28,7 +28,7 @@ public class CryptoContext {
     private String beforeCacheId;// 原文件缓存ID
     //
     private String tmpPath;// 临时文件路径
-    private String tmpCacheId;// 临时文件缓存ID
+    // 临时文件不记录缓存
     //
     private String afterPath;// 目标文件路
     private String afterCacheId;// 目标文件缓存ID
