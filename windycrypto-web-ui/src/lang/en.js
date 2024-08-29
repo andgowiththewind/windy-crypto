@@ -27,4 +27,5 @@ export default {
     i18n_1828969678349930496: 'hide filename encrypt',
     i18n_1828973612548362240: 'encrypt all',
     i18n_1828973612548362241: 'decrypt all',
+    i18n_1828973612548362244: 'please enter the password...',
 }
