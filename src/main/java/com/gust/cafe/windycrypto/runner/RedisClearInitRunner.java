@@ -53,6 +53,7 @@ public class RedisClearInitRunner implements ApplicationRunner {
         List<String> prefixList = ListUtil.toList(
                 CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK
                 , CacheConstants.WINDY_GET_OR_DEFAULT_LOCK
+                , CacheConstants.CFG_CRUD_LOCK
         );
         prefixList.forEach(prefix -> {
             Collection<String> keys = redisMasterCache.keys(prefix + "*");
