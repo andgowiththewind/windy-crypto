@@ -1,13 +1,19 @@
 <template>
   <div v-loading="loading">
     <div class="business-btn-zone">
-      <el-form @submit.native.prevent :inline="true" size="small">
+      <el-form @submit.native.prevent :inline="true" size="mini">
         <el-form-item label="">
-          <el-input v-model="userPassword" placeholder="请输入密码" show-password></el-input>
+          <el-input v-model="userPassword" placeholder="请输入密码" show-password :style="{minWidth:'25vw'}"></el-input>
+        </el-form-item>
+        <el-form-item label="" prop="isRequireCoverName">
+          <el-radio-group v-model="isRequireCoverName" size="mini">
+            <el-radio-button label="hide">{{ $t('i18n_1828966632739966976') }}</el-radio-button>
+            <el-radio-button label="notHide">{{ $t('i18n_1828966632739966977') }}</el-radio-button>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="">
           <el-button-group>
-            <el-button size="mini" type="info" @click="encryptAll" :style="{minWidth:'25vw'}"><span><i class="fa fa-lock"></i>&nbsp;目录下全部加密</span></el-button>
+            <el-button size="mini" type="info" @click="encryptAll" :style="{minWidth:'25vw'}"><span><i class="fa fa-lock"></i>&nbsp;全部加密</span></el-button>
             <el-button size="mini" type="danger" plain @click="decryptAll"><span>全部解密&nbsp;<i class="fa fa-wrench"></i></span></el-button>
           </el-button-group>
         </el-form-item>
@@ -28,6 +34,7 @@ export default {
     return {
       loading: false,
       userPassword: process.env.VUE_APP_DEV_TEST_PASSWORD || '',
+      isRequireCoverName: 'notHide',
       topFolderPathCopy: '',
     }
   },// data

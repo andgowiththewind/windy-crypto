@@ -22,4 +22,6 @@ export default {
     i18n_1827950850597851139: 'converting',
     i18n_1827961313217875968: 'encrypt',
     i18n_1827961313217875969: 'decrypt',
+    i18n_1828966632739966976: 'hide filename when encrypting',
+    i18n_1828966632739966977: 'do not hide',
 }
