@@ -32,8 +32,8 @@
           <div v-else-if="scope.row.code==0">
             <el-button v-if="scope.row.hadEncrypted" type="danger" plain size="mini" @click="decryptOne(scope.row)">{{ $t('i18n_1827961313217875969') }}</el-button>
             <el-button-group v-else>
-              <el-button type="success" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1827961313217875968') }}</el-button>
-              <el-button type="warning" plain size="mini" @click="encryptOne(scope.row)">{{ $t('i18n_1828969678349930496') }}</el-button>
+              <el-button type="success" plain size="mini" @click="encryptOne(scope.row,false)">{{ $t('i18n_1827961313217875968') }}</el-button>
+              <el-button type="warning" plain size="mini" @click="encryptOne(scope.row,true)">{{ $t('i18n_1828969678349930496') }}</el-button>
             </el-button-group>
           </div>
           <div v-else-if="scope.row.code==10">
@@ -132,7 +132,7 @@ export default {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
       });
     },
-    encryptOne(row) {
+    encryptOne(row, isRequireCoverName) {
       // 要求更新密码
       this.$bus.$emit(Methods.FN_CONTRACT_USER_PASSWORD);
       // 提交加密请求
@@ -141,6 +141,7 @@ export default {
         dirPathList: [],
         askEncrypt: true,
         userPassword: this.userPasswordCopy,
+        isRequireCoverName: isRequireCoverName,
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});

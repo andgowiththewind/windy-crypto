@@ -63,7 +63,7 @@ export default {
         dirPathList: [this.topFolderPathCopy],
         askEncrypt: false,
         userPassword: this.userPassword,
-        isRequireCoverName: this.isRequireCoverName === 'hide',
+        isRequireCoverName: this.isRequireCoverName === 'hide',// 不关注,总是还原原文件名
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
