@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.symmetric.AES;
 import com.esotericsoftware.minlog.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see DigestUtil#sha256Hex(String)
  * <p>摘要算法请使用DigestUtil</p>
  */
+@Slf4j
 public class AesUtils {
     // 明文盐值:由于当前系统业务场景下,不要求用户同时输入盐值(只需要用户输入密码,避免记忆繁琐),所以这里在系统内部使用固定盐值
     private final static String explicitSaltString = "aaa1234567890bbb";
@@ -35,7 +37,7 @@ public class AesUtils {
         String userPasswordSha256Hex = DigestUtil.sha256Hex(userPassword);
         // 从缓存中获取,如果不存在则创建并放入缓存
         AesWrapper aesWrapper = aesCache.computeIfAbsent(userPasswordSha256Hex, k -> createAes(userPassword));
-        Log.debug(StrUtil.format("耗时[{}]ms为[{}](摘要值)创建AES", timer.intervalMs(), userPasswordSha256Hex));
+        log.debug(StrUtil.format("耗时[{}]ms为[{}](摘要值)创建AES", timer.intervalMs(), userPasswordSha256Hex));
         return aesWrapper;
     }
 
