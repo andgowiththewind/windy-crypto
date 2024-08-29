@@ -21,7 +21,11 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('i18n_1826863045788438528')" width="150" prop="name" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1826863045788438528')" width="150" prop="name" :show-overflow-tooltip="true">
+        <template v-slot="scope">
+          <span :id="getFilenameCellId(scope.row)" :data-clipboard-text="scope.row.name" @click="filenameClickCopy(scope.row)">{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
       <!--操作-->
       <el-table-column :label="$t('i18n_1827946899051778052')" width="380" prop="_operation">
@@ -110,6 +114,9 @@ export default {
     getIdCellId(row) {
       return 'idCellId_' + row.id;
     },
+    getFilenameCellId(row) {
+      return 'filenameCellId_' + row.id;
+    },
     idClickCopy(row) {
       let idCellClipboard = new this.clipboard("#" + this.getIdCellId(row));
       idCellClipboard.on('success', () => {
@@ -119,6 +126,17 @@ export default {
       idCellClipboard.on('error', () => {
         Message.error("ID " + this.$t('i18n_1827946899051778049'));
         idCellClipboard.destroy();
+      });
+    },
+    filenameClickCopy(row) {
+      let filenameCellClipboard = new this.clipboard("#" + this.getFilenameCellId(row));
+      filenameCellClipboard.on('success', () => {
+        Message.success(this.$t('i18n_1826863045788438528') + " " + this.$t('i18n_1827946899051778048'));
+        filenameCellClipboard.destroy();
+      });
+      filenameCellClipboard.on('error', () => {
+        Message.error(this.$t('i18n_1826863045788438528') + " " + this.$t('i18n_1827946899051778049'));
+        filenameCellClipboard.destroy();
       });
     },
     decryptOne(row, ignoreMissingHiddenFilename) {
