@@ -5,7 +5,9 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import com.gust.cafe.windycrypto.components.WindyLang;
+import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
@@ -68,6 +70,14 @@ public class CryptoPreparationService {
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(cache.getCode());
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
             if (!statusMatch) return false;
+
+            // 排除自定义的临时文件
+            String extName = cache.getExtName();
+            if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return false;
+
+            // 排除自定义的配置文件,不参与文件级别的加解密
+            String name = cache.getName();
+            if (StrUtil.isNotBlank(name) && StrUtil.equalsIgnoreCase(name, CommonConstants.CFG_NAME)) return false;
 
             // 文件大小不能为零
             Long size = cache.getSize();

@@ -72,6 +72,7 @@ public class CryptoService {
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
+        // 加密时是否隐藏原文件名
         Integer val = (reqVo.getIsRequireCoverName() != null && reqVo.getIsRequireCoverName() == true) ? 1 : 0;
         TimeInterval timer = DateUtil.timer();
         for (String beforePath : absPathList) {
@@ -192,7 +193,10 @@ public class CryptoService {
                 list.add(RandomUtil.randomInt(0, 256));
             }
             cryptoContext.setIntSaltList(list);
-            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
+            cryptoContext.setIntSaltStr(list.stream()
+                    // 为了整齐
+                    .map(i -> StrUtil.fillBefore(String.valueOf(i), '0', 3))
+                    .collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
             //
@@ -201,7 +205,7 @@ public class CryptoService {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
-            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
+            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(i -> StrUtil.fillBefore(String.valueOf(i), '0', 3)).collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
             log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
