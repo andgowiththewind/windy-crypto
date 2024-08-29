@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,32 +20,12 @@ import java.io.IOException;
  * @date 2024-08-23 10:40
  */
 @Slf4j
-// @Component
+@Component
 public class DevMkdirRunner implements ApplicationRunner {
     private final Environment environment;
 
     public DevMkdirRunner(Environment environment) {
         this.environment = environment;
-    }
-
-    private static void type01(File file) throws IOException {
-        for (int i = 0; i < 1; i++) {
-            int numI = i + 1;
-            String nameI = StrUtil.fillAfter(Convert.toStr(numI), '0', 4);
-            File levelOne = FileUtil.file(file, nameI);
-            FileUtil.mkdir(levelOne);
-            for (int j = 0; j < 100; j++) {
-                int numJ = j + 1;
-                String nameJ = StrUtil.fillAfter(Convert.toStr(numJ), '0', 4);
-                String levelTwoName = StrUtil.format("{}-{}", nameI, nameJ);
-                File levelTwo = FileUtil.file(levelOne, levelTwoName);
-                FileUtil.mkdir(levelTwo);
-                // 写入一个文件
-                File txt = FileUtil.file(levelTwo, StrUtil.format("{}.txt", levelTwoName));
-                txt.createNewFile();
-                FileUtil.writeUtf8String(levelTwoName, txt);
-            }
-        }
     }
 
     @Override
@@ -58,10 +39,30 @@ public class DevMkdirRunner implements ApplicationRunner {
             String currentDir = SystemUtil.getUserInfo().getCurrentDir();
             File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
             FileUtil.del(file);
-            // type01(file);
-            type02(file);
+            type01(file);
+            // type02(file);
         }
 
+    }
+
+    private static void type01(File file) throws IOException {
+        for (int i = 0; i < 1; i++) {
+            int numI = i + 1;
+            String nameI = StrUtil.fillAfter(Convert.toStr(numI), '0', 4);
+            File levelOne = FileUtil.file(file, nameI);
+            FileUtil.mkdir(levelOne);
+            for (int j = 0; j < 10; j++) {
+                int numJ = j + 1;
+                String nameJ = StrUtil.fillAfter(Convert.toStr(numJ), '0', 4);
+                String levelTwoName = StrUtil.format("{}-{}", nameI, nameJ);
+                File levelTwo = FileUtil.file(levelOne, levelTwoName);
+                FileUtil.mkdir(levelTwo);
+                // 写入一个文件
+                File txt = FileUtil.file(levelTwo, StrUtil.format("{}.txt", levelTwoName));
+                txt.createNewFile();
+                FileUtil.writeUtf8String(levelTwoName, txt);
+            }
+        }
     }
 
     private void type02(File file) {
