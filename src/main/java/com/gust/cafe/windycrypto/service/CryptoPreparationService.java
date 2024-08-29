@@ -56,10 +56,13 @@ public class CryptoPreparationService {
     public List<String> prepare(CryptoSubmitReqVo reqVo) {
         // 一些判断不需要放在加解密阶段
         preVerify(reqVo);
+
         // 根据传参将所有的文件转为Windy缓存对象
-        List<Windy> windyCache = getWindyCache(reqVo);
+        List<Windy> windyCache = convertWindyCache(reqVo);
+
         // 一些筛选判断不需要放在加解密阶段
         List<Windy> windyFilter = filterWindyCache(windyCache, reqVo);
+
         // 传递绝对路径即可
         List<String> absPathList = windyFilter.stream().map(Windy::getAbsPath).collect(Collectors.toList());
         return absPathList;
@@ -68,7 +71,7 @@ public class CryptoPreparationService {
     private List<Windy> filterWindyCache(List<Windy> windyCache, CryptoSubmitReqVo reqVo) {
         Boolean askEncrypt = reqVo.getAskEncrypt();
         List<Windy> collect = windyCache.stream().filter(cache -> {
-            // 仅支持文件不支持文件夹
+            // 加解密仅支持文件不支持文件夹
             File file = FileUtil.file(cache.getAbsPath());
             if (file.isDirectory()) return false;
 
@@ -77,7 +80,7 @@ public class CryptoPreparationService {
             boolean statusMatch = anEnum != null && anEnum.equals(WindyStatusEnum.FREE);
             if (!statusMatch) return false;
 
-            // 排除自定义的临时文件
+            // 临时文件不能被加密或者解密
             String extName = cache.getExtName();
             if (StrUtil.isNotBlank(extName) && StrUtil.equalsIgnoreCase(extName, CommonConstants.TMP_EXT_NAME)) return false;
 
@@ -98,7 +101,7 @@ public class CryptoPreparationService {
         return collect;
     }
 
-    private List<Windy> getWindyCache(CryptoSubmitReqVo reqVo) throws InterruptedException, ExecutionException {
+    private List<Windy> convertWindyCache(CryptoSubmitReqVo reqVo) throws InterruptedException, ExecutionException {
         //
         List<Windy> windyList = new ArrayList<>();
         //
