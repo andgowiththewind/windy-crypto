@@ -107,7 +107,7 @@ public class CryptoService {
             // 状态要求FREE
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());
             Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE),
-                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 空闲状态,已有其他任务在处理,当前任务终止
+                    "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 非空闲状态,已有其他任务在处理,当前任务终止
         });
 
         // 满足条件则将状态更新为排队中
