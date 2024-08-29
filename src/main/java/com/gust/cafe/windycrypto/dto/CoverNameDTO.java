@@ -70,19 +70,19 @@ public class CoverNameDTO {
         coverNameDTO.setCoverName(coverName);
         coverNameDTO.setPasswordCorrect(false);// 默认密码错误
         // 拆分
-        // [, safeLockedV2, 8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92, 0019930b8e4466ef1157919ad97ddf64, 1000, test.txt]
+        // [, safeLockedV2, bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708, 0a7450f53a28da82d8c7497278d953cd, 0000, 1829102994264821760, password.txt]
         // 第[0]个元素: []
         // 第[1]个元素: [safeLockedV2]
-        // 第[2]个元素: [8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92]
-        // 第[3]个元素: [0019930b8e4466ef1157919ad97ddf64]
-        // 第[4]个元素: [1000]
-        // 第[5]个元素: [test.txt]
+        // 第[2]个元素: [bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708]
+        // 第[3]个元素: [0a7450f53a28da82d8c7497278d953cd]
+        // 第[4]个元素: [0000]
+        // 第[5]个元素: [1829102994264821760]
+        // 第[6]个元素: [password.txt]
         List<String> parts = StrUtil.split(coverName, CommonConstants.ENCRYPTED_SEPARATOR);
-        WindyException.run((Void) -> Assert.isTrue(parts.size() >= 6, "文件名格式不正确,无法解密 (不是当前系统标致加密文件)"));
+        WindyException.run((Void) -> Assert.isTrue(parts.size() >= 7, "文件名格式不正确,无法解密 (require:parts>=7)"));
         // 摘要算法部分
         String passwordDigest = parts.get(2);
-        // Assert.notBlank(passwordDigest, "passwordDigest must not be blank");
-        WindyException.run((Void) -> Assert.notBlank(passwordDigest, "文件名格式不正确,无法解密 (密码摘要算法密文为空)"));
+        WindyException.run((Void) -> Assert.notBlank(passwordDigest, "文件名格式不正确,无法解密 (密码摘要算法密文不能为空)"));
 
         // 将用户本次输入的密码进行同样的摘要算法,与文件名中的摘要算法密文进行比对
         String inputPasswordDigest = DigestUtil.sha256Hex(inputUserPassword);
@@ -116,8 +116,8 @@ public class CoverNameDTO {
         coverNameDTO.setIntSaltList(intSaltList);
         coverNameDTO.setIntSaltListStr(saltStr);
         //
-        // 考虑到原文件名也可能存在分隔符$,因此不能单纯地取index=5的内容,应该取第五个$符号之后的内容
-        String sourceName = StrUtil.subSuf(coverName, StrUtil.ordinalIndexOf(coverName, CommonConstants.ENCRYPTED_SEPARATOR, 5) + 1);
+        // 考虑到原文件名也可能存在分隔符$,因此不能单纯地取index=6的内容,应该取第六个$符号之后的内容
+        String sourceName = StrUtil.subSuf(coverName, StrUtil.ordinalIndexOf(coverName, CommonConstants.ENCRYPTED_SEPARATOR, 6) + 1);
         coverNameDTO.setSourceName(sourceName);
 
         // 取巧:通过文件系统获取扩展名和主文件名
