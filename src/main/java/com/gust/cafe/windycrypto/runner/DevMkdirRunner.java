@@ -37,6 +37,7 @@ public class DevMkdirRunner implements ApplicationRunner {
         if (StrUtil.equalsIgnoreCase(springProfilesActive, "dev")) {
             String currentDir = SystemUtil.getUserInfo().getCurrentDir();
             File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
+            FileUtil.del(file);
             // type01(file);
             type02(file);
         }
@@ -65,8 +66,10 @@ public class DevMkdirRunner implements ApplicationRunner {
 
     private void type02(File file) {
         for (int i = 0; i < 10; i++) {
-            File tmp = FileUtil.file(file, (i + 1) + ".txt");
-            FileUtil.writeUtf8String((i + 1) + "", tmp);
+            int numI = i + 1;
+            String mark = StrUtil.fillAfter(Convert.toStr(numI), '0', 3);
+            File tmp = FileUtil.file(file, mark + ".txt");
+            FileUtil.writeUtf8String(mark, tmp);
         }
     }
 }
