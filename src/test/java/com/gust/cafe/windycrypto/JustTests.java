@@ -3,8 +3,10 @@ package com.gust.cafe.windycrypto;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
+import org.apache.ibatis.logging.LogException;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,7 +24,7 @@ public class JustTests {
         try {
             FileUtil.del(file);
         } catch (IORuntimeException e) {
-            e.printStackTrace();
+            Console.error(e.getMessage());
         }
         FileUtil.mkdir(file);
         for (int i = 1; i < 10; i++) {
