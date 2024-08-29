@@ -44,8 +44,9 @@ public class CryptoPreparationService {
             Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));// 必须指定加解密操作类型
             String userPassword = reqVo.getUserPassword();
             Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));// 密码不能为空
-            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32,
-                    WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
+            int min = 8;
+            int max = 32;
+            Assert.isTrue(userPassword.length() >= min && userPassword.length() <= max, StrUtil.format("{} {}-{}", WindyLang.msg("i18n_1828312465394503680"), min, max));// 密码限制长度min-max
         }));
         // 创建AES可能比较耗时
         CompletableFuture.runAsync(() -> AesUtils.getAes(reqVo.getUserPassword()), dispatchTaskExecutor);
