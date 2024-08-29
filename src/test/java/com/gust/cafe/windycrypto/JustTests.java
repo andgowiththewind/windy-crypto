@@ -2,6 +2,7 @@ package com.gust.cafe.windycrypto;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,11 @@ public class JustTests {
     public void mkdirTest() {
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
-        FileUtil.del(file);
+        try {
+            FileUtil.del(file);
+        } catch (IORuntimeException e) {
+            e.printStackTrace();
+        }
         FileUtil.mkdir(file);
         for (int i = 1; i < 10; i++) {
             String mark = StrUtil.fillAfter(Convert.toStr(i), '0', 4);

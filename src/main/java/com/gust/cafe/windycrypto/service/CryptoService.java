@@ -214,6 +214,7 @@ public class CryptoService {
     }
 
     private void futureCryptoCoreIO(CryptoContext cryptoContext) {
+        log.debug("[{}]-处理核心IO操作", cryptoContext.getBeforeCacheId());
         // 缓冲区大小
         try {
             // 读取源文件的缓存对象
@@ -267,7 +268,7 @@ public class CryptoService {
                 if (timer.intervalMs() > 800L) {
                     // 计算当前百分比
                     Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
-                    log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
+                    log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
                     // TODO 更新缓存状态信息
                     Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
                     windy.setLatestMsg("processing");
