@@ -130,10 +130,10 @@ public class WindyCacheService {
         if (StrUtil.isNotBlank(id)) return id;
         // 如果缓存中没有,新生成并缓存
         // 使用摘要算法生成ID
-        String nextIdStr = DigestUtil.sha256Hex(absPath);
+        String digestVal = DigestUtil.sha256Hex(absPath);
         // 缓存
-        redisMasterCache.setCacheMapValue(CacheConstants.PATH_ID_MAP, absPath, nextIdStr);
-        return nextIdStr;
+        redisMasterCache.setCacheMapValue(CacheConstants.PATH_ID_MAP, absPath, digestVal);
+        return digestVal;
     }
 
     // 统一转正斜杠"/"
