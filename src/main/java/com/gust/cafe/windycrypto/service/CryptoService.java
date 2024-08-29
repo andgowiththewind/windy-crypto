@@ -185,7 +185,7 @@ public class CryptoService {
         // 记录上下文
         cryptoContext.setBis(bis);
         cryptoContext.setBos(bos);
-        log.debug("[{}]-处理加解密操作对应输入输出流成功,耗时[{}]ms", cryptoContext.getBeforeCacheId(), timer.intervalMs());
+        log.debug("[{}]-处理创建加解密操作对应输入输出流成功,耗时[{}]ms", cryptoContext.getBeforeCacheId(), timer.intervalMs());
     }
 
     private void futureCryptoSalt(CryptoContext cryptoContext) {
@@ -196,10 +196,7 @@ public class CryptoService {
                 list.add(RandomUtil.randomInt(0, 256));
             }
             cryptoContext.setIntSaltList(list);
-            cryptoContext.setIntSaltStr(list.stream()
-                    // 为了整齐
-                    .map(i -> StrUtil.fillBefore(String.valueOf(i), '0', 3))
-                    .collect(Collectors.joining(StrUtil.COMMA)));
+            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
             //
@@ -208,7 +205,7 @@ public class CryptoService {
             // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
-            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(i -> StrUtil.fillBefore(String.valueOf(i), '0', 3)).collect(Collectors.joining(StrUtil.COMMA)));
+            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
             String intSaltStrEncryptHex = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr());
             cryptoContext.setIntSaltStrEncryptHex(intSaltStrEncryptHex);
             log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
@@ -312,6 +309,14 @@ public class CryptoService {
         finalTmpRenameToAfter(cryptoContext);
         // 处理临时文件删除、原始文件删除、最终文件开放状态等操作
         finalDel(cryptoContext);
+
+        // 纯打印信息
+        finalSuccess(cryptoContext);
+
+    }
+
+    private void finalSuccess(CryptoContext cryptoContext) {
+        log.debug("[{}]-加解密流程正常结束。", cryptoContext.getBeforeCacheId());
     }
 
     private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
@@ -577,7 +582,7 @@ public class CryptoService {
                 if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败,触发重试"));
             };
             Consumer<Void> successCs = aVoid -> {
-                log.debug("[{}]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), windyCacheService.parseId(path));
+                log.debug("[{}]-[收尾阶段]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), windyCacheService.parseId(path));
                 Windy windy = windyCacheService.lockGetOrDefault(path);
                 windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
                 windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
@@ -587,7 +592,7 @@ public class CryptoService {
                 redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
             };
             Consumer<Void> errorCs = aVoid -> {
-                throw new WindyException(StrUtil.format("删除(超时)失败:[{}ms]", timer.intervalMs()));
+                throw new WindyException(StrUtil.format("[{}]-[收尾阶段]-删除(超时)失败:[{}ms]", cryptoContext.getBeforeCacheId(), timer.intervalMs()));
             };
             PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
         }

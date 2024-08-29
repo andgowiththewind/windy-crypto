@@ -37,7 +37,7 @@ public class AesUtils {
         String userPasswordSha256Hex = DigestUtil.sha256Hex(userPassword);
         // 从缓存中获取,如果不存在则创建并放入缓存
         AesWrapper aesWrapper = aesCache.computeIfAbsent(userPasswordSha256Hex, k -> createAes(userPassword));
-        log.debug(StrUtil.format("耗时[{}]ms为[{}](摘要值)创建AES", timer.intervalMs(), userPasswordSha256Hex));
+        if (timer.intervalMs() > 1000) log.debug(StrUtil.format("耗时[{}]ms为[{}](摘要值)创建AES", timer.intervalMs(), userPasswordSha256Hex));
         return aesWrapper;
     }
 
