@@ -118,7 +118,7 @@ public class CryptoPreparationService {
             // 收集所有任务的结果
             List<Windy> byWindyPath = allResults.get();
             windyList.addAll(byWindyPath);
-            log.debug("根据文件路径获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
+            log.debug("收集阶段:根据文件路径获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         }
 
         if (CollectionUtil.isNotEmpty(reqVo.getDirPathList())) {
@@ -144,13 +144,13 @@ public class CryptoPreparationService {
             // 收集所有任务的结果
             List<Windy> byDirPath = allResults.get();
             windyList.addAll(byDirPath);
-            log.debug("根据目录路径递归获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
+            log.debug("收集阶段:根据目录路径递归获取或新建Windy对象,耗时[{}ms]", timer.intervalMs());
         }
 
         // 根据ID去重
         Map<String, Windy> collect = windyList.stream().collect(Collectors.toMap(Windy::getId, windy -> windy, (oldValue, newValue) -> oldValue));
         List<Windy> afterDistinct = collect.values().stream().collect(Collectors.toList());
-        log.debug("去重后的Windy对象数量[{}],耗时[{}ms]", afterDistinct.size(), timer.intervalMs());
+        log.debug("收集阶段:去重后的Windy对象数量[{}],耗时[{}ms]", afterDistinct.size(), timer.intervalMs());
         return afterDistinct;
     }
 }

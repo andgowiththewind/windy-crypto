@@ -63,10 +63,10 @@ public class InsightTableService {
     private List<Windy> handleConditional(InsightTableReqVo reqVo) {
         TimeInterval timer = DateUtil.timer();
         List<File> loopFiles = FileUtil.loopFiles(reqVo.getParams().getPath());
-        log.debug("文件遍历耗时[{}]ms", timer.intervalMs());
+        log.debug("获取文件列表:文件遍历耗时[{}]ms", timer.intervalMs());
         // 多线程处理
         List<Windy> windyList = getWindyList(loopFiles, BeanUtil.copyProperties(reqVo, InsightTableReqVo.class));
-        log.debug("处理条件查询耗时[{}]ms", timer.intervalMs());
+        log.debug("获取文件列表:处理条件查询耗时[{}]ms", timer.intervalMs());
         return windyList;
     }
 
@@ -160,7 +160,7 @@ public class InsightTableService {
                 break;
             }
         }
-        log.debug("分页处理耗时[{}]ms", timer.intervalMs());
+        log.debug("获取文件列表:分页处理耗时[{}]ms", timer.intervalMs());
         return after;
     }
 }
