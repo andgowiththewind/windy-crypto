@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="app_prod" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <envs>
+      <env name="MY_DEV_LOG_HOME" value="$PROJECT_DIR$/../../../../../manylogs/windy-crypto-logs-prod" />
+      <env name="spring.profiles.active" value="prod" />
+    </envs>
+    <module name="windy-crypto" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.gust.cafe.windycrypto.WindyCryptoApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
