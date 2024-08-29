@@ -84,6 +84,7 @@ public class CryptoService {
                     .beforePath(beforePath)
                     .beforeCacheId(windyCacheService.parseId(beforePath))
                     .bitSwitchList(ListUtil.toList(val, 0, 0, 0))
+                    .ignoreMissingHiddenFilename(reqVo.getIgnoreMissingHiddenFilename())
                     .build();
             // 处理排队
             CompletableFuture<Void> future01 = CompletableFuture.runAsync(() -> futureQueue(cryptoContext), dispatchTaskExecutor);
@@ -425,8 +426,8 @@ public class CryptoService {
                 // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
                 File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
                 WindyException.run((Void) -> {
-                    Boolean ignoreMissingCfgTxt = cryptoContext.getIgnoreMissingCfgTxt();
-                    boolean differentialIgnoring = ignoreMissingCfgTxt != null && ignoreMissingCfgTxt == true;
+                    Boolean ignoreMissingHiddenFilename = cryptoContext.getIgnoreMissingHiddenFilename();
+                    boolean differentialIgnoring = ignoreMissingHiddenFilename != null && ignoreMissingHiddenFilename == true;
                     if (!differentialIgnoring) {
                         // 如果没有明确表名忽略,则要求文件必须存在
                         Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604"));

@@ -20,4 +20,5 @@ public class CryptoSubmitReqVo {
     private Boolean askEncrypt;
     private String userPassword;
     private Boolean isRequireCoverName;
+    private Boolean ignoreMissingHiddenFilename;
 }
