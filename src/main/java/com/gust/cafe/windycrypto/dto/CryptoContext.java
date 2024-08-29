@@ -33,7 +33,6 @@ public class CryptoContext {
     private String afterPath;// 目标文件路
     private String afterCacheId;// 目标文件缓存ID
     //
-    private String cfgTxtPath;// 配置文件路径,当有附加信息时,存储附加信息并加密
     private BufferedInputStream bis;// 输入流,被加解密的文件读取流
     private BufferedOutputStream bos;// 输出流,临时文件写入流
     private List<Integer> intSaltList;// 整数盐值列表

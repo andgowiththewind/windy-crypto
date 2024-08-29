@@ -394,8 +394,6 @@ public class CryptoService {
                 File cfg = FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME);
                 // 需要加锁确保创建和写入
                 lockUpdateCfg(cfg, k, v);
-                // 记录上下文
-                cryptoContext.setCfgTxtPath(cfg.getAbsolutePath());
                 //
                 // 此时的期望加密之后的文件名,拼接,eg:
                 // 源文件名:password.txt
@@ -569,7 +567,8 @@ public class CryptoService {
             String nameBefore = FileUtil.getName(cryptoContext.getBeforePath());
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(nameBefore, cryptoContext.getUserPassword());
             String sourceMainName = coverNameDTO.getSourceMainName();
-            lockDeleteCfgLineByKey(cryptoContext.getCfgTxtPath(), StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName));
+            String cfgTxtPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), CommonConstants.CFG_NAME));
+            lockDeleteCfgLineByKey(cfgTxtPath, StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName));
         }
         //
         //
