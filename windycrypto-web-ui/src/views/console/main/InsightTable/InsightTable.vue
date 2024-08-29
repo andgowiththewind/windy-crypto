@@ -21,16 +21,19 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('i18n_1826863045788438528')" width="222" prop="name" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1826863045788438528')" width="150" prop="name" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column :label="$t('i18n_1827913996976656384')" width="100" prop="sizeLabel" :show-overflow-tooltip="true"></el-table-column>
       <!--操作-->
-      <el-table-column :label="$t('i18n_1827946899051778052')" width="250" prop="_operation">
+      <el-table-column :label="$t('i18n_1827946899051778052')" width="380" prop="_operation">
         <template v-slot="scope">
           <div v-if="scope.row.code==-1">
             <span>{{ $t('i18n_1827950850597851137') }}</span>
           </div>
           <div v-else-if="scope.row.code==0">
-            <el-button v-if="scope.row.hadEncrypted" type="danger" plain size="mini" @click="decryptOne(scope.row)">{{ $t('i18n_1827961313217875969') }}</el-button>
+            <el-button-group v-if="scope.row.hadEncrypted">
+              <el-button type="warning" plain size="mini" @click="decryptOne(scope.row,false)">{{ $t('i18n_1827961313217875969') }}</el-button>
+              <el-button type="danger" plain size="mini" @click="decryptOne(scope.row,true)">{{ $t('i18n_1828982632629800960') }}&nbsp;{{ $t('i18n_1827961313217875969') }}</el-button>
+            </el-button-group>
             <el-button-group v-else>
               <el-button type="success" plain size="mini" @click="encryptOne(scope.row,false)">{{ $t('i18n_1827961313217875968') }}</el-button>
               <el-button type="warning" plain size="mini" @click="encryptOne(scope.row,true)">{{ $t('i18n_1828969678349930496') }}</el-button>
@@ -47,7 +50,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('i18n_1827913996976656385')" width="250" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1827913996976656385')" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
       <!--进度-->
       <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
         <template v-slot="scope">
@@ -118,7 +121,7 @@ export default {
         idCellClipboard.destroy();
       });
     },
-    decryptOne(row) {
+    decryptOne(row, ignoreMissingHiddenFilename) {
       // 要求更新密码
       this.$bus.$emit(Methods.FN_CONTRACT_USER_PASSWORD);
       // 提交解密请求
@@ -127,6 +130,7 @@ export default {
         dirPathList: [],
         askEncrypt: false,
         userPassword: this.userPasswordCopy,
+        ignoreMissingHiddenFilename: ignoreMissingHiddenFilename,
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});
