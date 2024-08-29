@@ -1,8 +1,12 @@
 package com.gust.cafe.windycrypto.util;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.symmetric.AES;
+import com.esotericsoftware.minlog.Log;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -25,11 +29,14 @@ public class AesUtils {
     private static final ConcurrentHashMap<String, AesWrapper> aesCache = new ConcurrentHashMap<>();
 
     public static AesWrapper getAes(String userPassword) {
+        TimeInterval timer = DateUtil.timer();
         Assert.notBlank(userPassword, "userPassword must not be blank");
         // 不明文存`userPassword`,转摘要算法
         String userPasswordSha256Hex = DigestUtil.sha256Hex(userPassword);
         // 从缓存中获取,如果不存在则创建并放入缓存
-        return aesCache.computeIfAbsent(userPasswordSha256Hex, k -> createAes(userPassword));
+        AesWrapper aesWrapper = aesCache.computeIfAbsent(userPasswordSha256Hex, k -> createAes(userPassword));
+        Log.debug(StrUtil.format("耗时[{}]ms为[{}](摘要值)创建AES", timer.intervalMs(), userPasswordSha256Hex));
+        return aesWrapper;
     }
 
     private static AesWrapper createAes(String userPassword) {

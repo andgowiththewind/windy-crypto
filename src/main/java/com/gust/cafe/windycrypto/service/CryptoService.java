@@ -153,7 +153,7 @@ public class CryptoService {
     }
 
     private void futureCryptoRegisterTmp(CryptoContext cryptoContext) {
-        log.debug("[{}]-成功进入临时文件注册线程", cryptoContext.getBeforeCacheId());
+        log.debug("[{}]-处理临时文件注册", cryptoContext.getBeforeCacheId());
         String beforePath = cryptoContext.getBeforePath();
         // 临时文件名
         String tmpName = StrUtil.format("0000000000-{}-{}.{}", DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss"), IdUtil.getSnowflakeNextIdStr(), CommonConstants.TMP_EXT_NAME);

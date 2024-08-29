@@ -12,6 +12,7 @@ import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
 import com.gust.cafe.windycrypto.exception.WindyException;
+import com.gust.cafe.windycrypto.util.AesUtils;
 import com.gust.cafe.windycrypto.vo.req.CryptoSubmitReqVo;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,8 @@ public class CryptoPreparationService {
             Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32,
                     WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
         }));
+        // 创建AES可能比较耗时
+        AesUtils.getAes(reqVo.getUserPassword());
     }
 
     @SneakyThrows
