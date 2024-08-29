@@ -678,16 +678,10 @@ public class CryptoService {
                 if (FileUtil.exist(path)) throw new WindyException(StrUtil.format("本次删除失败,触发重试"));
             };
             Consumer<Void> successCs = aVoid -> {
-                // log.debug("删除成功,耗时[{}]ms", timer.intervalMs());
                 log.debug("[{}]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), windyCacheService.parseId(path));
-                Windy windy = windyCacheService.lockGetOrDefault(path);
-                windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
-                windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
-                windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                windy.setLatestMsg("not exist");
-                windy.setUpdateTime(DateUtil.now());
-                redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-                //
+                // 删除可能存在的缓存
+                String parseId = windyCacheService.parseId(path);
+                redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseId);                //
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("最终删除(超时)失败:[{}ms],需要手动删除", timer.intervalMs()));
