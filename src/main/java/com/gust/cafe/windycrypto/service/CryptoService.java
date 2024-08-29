@@ -566,7 +566,10 @@ public class CryptoService {
         //
         // 如果本次是解密操作且并没有忽略"cfg缺失对应文件名加密信息"的情况,说明正常解密成功,此时cfg中记录的信息行可以被删除
         if (!cryptoContext.getAskEncrypt() && (cryptoContext.getIgnoreMissingHiddenFilename() == null || cryptoContext.getIgnoreMissingHiddenFilename() == false)) {
-            lockDeleteCfgLineByKey(cryptoContext.getCfgTxtPath(), StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), FileUtil.mainName(FileUtil.file(cryptoContext.getBeforePath()))));
+            String nameBefore = FileUtil.getName(cryptoContext.getBeforePath());
+            CoverNameDTO coverNameDTO = CoverNameDTO.analyse(nameBefore, cryptoContext.getUserPassword());
+            String sourceMainName = coverNameDTO.getSourceMainName();
+            lockDeleteCfgLineByKey(cryptoContext.getCfgTxtPath(), StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName));
         }
         //
         //
