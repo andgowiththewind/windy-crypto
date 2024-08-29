@@ -629,6 +629,7 @@ public class CryptoService {
 
     @SneakyThrows
     private void lockDeleteCfgLineByKey(String cfgTxtPath, String k) {
+        TimeInterval timer = DateUtil.timer();
         String id = DigestUtil.sha256Hex(cfgTxtPath);
         String lockKey = StrUtil.format("{}:{}", CacheConstants.CFG_CRUD_LOCK, id);
         RLock lock = redissonClient.getLock(lockKey);
@@ -644,6 +645,7 @@ public class CryptoService {
                 List<String> collect = lines.stream().filter(r -> StrUtil.isNotBlank(r)).filter(row -> !row.startsWith(k)).collect(Collectors.toList());
                 // 写入文件
                 FileUtil.writeUtf8Lines(collect, cfgTxtPath);
+                log.debug("配置文件删除可能存在的信息行成功,耗时[{}]ms,[{}]", timer.intervalMs(), cfgTxtPath);
             } finally {
                 // 确保释放锁
                 lock.unlock();
