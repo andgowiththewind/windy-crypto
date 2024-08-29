@@ -102,6 +102,7 @@ public class CryptoService {
 
     private void futureQueue(CryptoContext cryptoContext) {
         log.debug("[{}]-成功进入排队线程", cryptoContext.getBeforeCacheId());
+        log.debug("[{}]-记录一次ID与绝对路径对照:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getBeforePath());
         String beforePath = cryptoContext.getBeforePath();
         WindyException.run((Void) -> {
             Assert.isTrue(FileUtil.exist(beforePath), "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895514832896"));// 文件已经不存在,当前任务终止
@@ -163,6 +164,7 @@ public class CryptoService {
         // 记录上下文
         cryptoContext.setTmpPath(tmpAbsPath);
         log.debug("[{}]-临时文件注册成功:[{}]", cryptoContext.getBeforeCacheId(), tmpName);
+        log.debug("[{}]-记录一次临时文件ID与绝对路径对照:[{}]----[{}]", cryptoContext.getBeforeCacheId(), windyCacheService.parseId(tmpAbsPath), tmpAbsPath);
     }
 
     private void futureCryptoStream(CryptoContext cryptoContext) {
@@ -201,10 +203,10 @@ public class CryptoService {
     }
 
     private void futureCryptoCoreIO(CryptoContext cryptoContext) {
-        log.debug("[{}]-处理核心IO操作", cryptoContext.getBeforeCacheId());
+        log.debug("[{}]-开始处理核心IO操作!", cryptoContext.getBeforeCacheId());
         // 缓冲区大小
         try {
-            // 读取源文件的缓存对象
+            // 读取源文件的缓存对象,一些数据已经记录,无需重复查询
             Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
 
             // 每次读取的字节数
@@ -213,19 +215,21 @@ public class CryptoService {
             // 每次实际读取到字节数
             int len;
 
-            // 已经读取的字节数
+            // 已经读取的字节总数
             long total = 0;
 
             // 缓冲区
             byte[] buffer = new byte[bufferSize];
 
-            // 计时器,控制打印频率
-            TimeInterval timer = DateUtil.timer();
+            // 计时器,控制打印频率,一定频率会重置
+            TimeInterval frequencyTimer = DateUtil.timer();
+            // 计时器,记录全局耗时
+            TimeInterval globalTimer = DateUtil.timer();
 
             // 源文件大小,用于计算百分比
             long windyBeforeSize = windyBefore.getSize();
 
-            // 记录所有字节的位置
+            // 记录所有字节的位置,计算整数盐值时使用,加解密阶段,相同的位置对应相同的整数盐值
             long position = 0;
 
             // 整数盐值列表
@@ -242,6 +246,7 @@ public class CryptoService {
                 for (int i = 0; i < len; i++) {
                     position = position + 1;
                     // 位置数值与整数盐值列表长度取余,得到当前位置对应的整数盐值
+                    // 此步骤确保了所有的字节不会是同样的加盐值,即便破解者强行破解,每个字节都有-128到127共256种可能,即便是8个字节也有组合数为256^8,即便是最简单的暴力破解,也已经超过了`SHA-256`的安全性,唯一的不足之处是被加密的文件不能太小,两三个字节还是会被暴力破解;
                     int salt = intSaltList.get((int) (position % intSaltList.size()));
                     // 加密时,增加整数盐;解密时,减去整数盐
                     newBuffer[i] = (byte) (buffer[i] + (askEncrypt ? salt : -salt));
@@ -252,7 +257,7 @@ public class CryptoService {
                 total += len;
                 //
                 // 流读取的频率是非常快的,如果每次都更新缓存和发布消息,会导致卡死,所以需要通过间隔时间控制频率
-                if (timer.intervalMs() > 800L) {
+                if (frequencyTimer.intervalMs() > 800L) {
                     // 计算当前百分比
                     Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
                     log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
@@ -265,7 +270,7 @@ public class CryptoService {
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                     //
                     // 重置计时器,重新计时直至下一次周期
-                    timer.restart();
+                    frequencyTimer.restart();
                 }
             }
 
@@ -277,11 +282,13 @@ public class CryptoService {
             windy.setPercentageLabel("100%");
             windy.setUpdateTime(DateUtil.now());
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-            log.debug("[{}]-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), 100);
+            log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
 
             // 清除计时器
-            timer.clear();
-            timer = null;
+            frequencyTimer.clear();
+            frequencyTimer = null;
+            globalTimer.clear();
+            globalTimer = null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -330,7 +337,7 @@ public class CryptoService {
                     cryptoContext.getBeforeCacheId(),
                     timer.intervalMs(),
                     FileUtil.getName(cryptoContext.getTmpPath()),
-                    cryptoContext.getAfterCacheId()
+                    cryptoContext.getAfterPath()
             );
             // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
             Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
