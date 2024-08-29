@@ -385,8 +385,9 @@ public class CryptoService {
              * @see {@link CommonConstants#CFG_NAME}
              */
             if (isRequireCoverName) {
-                // 关于KEY的设计:`密码摘要算法值-源文件绝对路径摘要算法`,前者能定位到用哪个密码解密,后者确保同样的绝对路径,必然名称一致(注意是源文件绝对路径)
-                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
+                // 关于KEY的设计:`密码摘要算法值-雪花算法ID`,前者能定位到用哪个密码解密,后者除了在这里使用,在拼接文件名时也会使用,目的是解密时能在cfg中定位到信息行
+                String keyPartAndAfterNamePart = IdUtil.getSnowflakeNextIdStr();
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), keyPartAndAfterNamePart);
                 String v = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(windy.getName());
                 //
                 // 如果本次要求加密文件名,则在同级目录下创建一个配置文件,记录原文件名的加密信息
@@ -401,7 +402,10 @@ public class CryptoService {
                 // 如果不加密:$safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708  $    0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              password.txt
                 // 如果加密:  $safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708   $   0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              1829136955162628096.txt
                 // 这里采用的是加密源文件名记录在配置文件中,源文件名用一个雪花ID代替
-                String concatName = new NameConcatDTO(IdUtil.getSnowflakeNextIdStr(), windy.getExtName()).getConcatName();// 同样需要考虑是否有扩展名的问题
+                String concatName = new NameConcatDTO(
+                        keyPartAndAfterNamePart,// 与记录在cfg中的雪花ID一样
+                        windy.getExtName()
+                ).getConcatName();// 同样需要考虑是否有扩展名的问题
                 // 拼接加密后的文件名
                 afterName = StrUtil.format("{}{}{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
@@ -450,10 +454,10 @@ public class CryptoService {
                     Boolean ignoreMissingHiddenFilename = cryptoContext.getIgnoreMissingHiddenFilename();
                     boolean differentialIgnoring = ignoreMissingHiddenFilename != null && ignoreMissingHiddenFilename == true;
                     if (!differentialIgnoring) {
-                        // 如果没有明确表名忽略,则要求文件必须存在
+                        // 如果没有明确表名忽略,则要求文件必须存在,且对应记录也必须存在
                         Assert.isTrue(FileUtil.exist(windycfg), WindyLang.msg("i18n_1828802439709593604"));
                         // 查询记录
-                        String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);// 注意这里从加密文件名中提取ID
+                        String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), sourceMainName);// 加密时`sourceMainName`记录在cfg中所以解密时也要用
                         String lineStr = FileUtil.readUtf8Lines(windycfg).stream().filter(StrUtil::isNotBlank).filter(row -> StrUtil.startWith(row, k)).findFirst().orElseThrow(() -> new WindyException(WindyLang.msg("i18n_1828820333835194368")));
                         List<String> split = StrUtil.split(lineStr, "=");
                         Assert.isTrue(CollectionUtil.isNotEmpty(split) && split.size() == 2, WindyLang.msg("i18n_1828820333835194369"));
