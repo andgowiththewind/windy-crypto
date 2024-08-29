@@ -35,8 +35,13 @@ export default {
       this.$i18n.locale = expectLang // 设置给本地的i18n插件
       // 存储在localStorage
       localStorage.setItem('lang', expectLang);
-      Notification({title: '提示', message: expectLang === 'zh' ? '切换中文成功' : 'Switch English successfully', type: 'success', duration: 2000, position: 'bottom-right'});
-
+      Notification({
+        title: expectLang === 'zh' ? '切换语言' : 'Switch Language',
+        message: expectLang === 'zh' ? '切换中文成功' : 'Switch English successfully',
+        type: 'success',
+        duration: 2000,
+        position: 'bottom-right'
+      });
     },
     handleTopFolderEnter() {
       devConsoleLog('目录地址框回车事件EMIT:', this.topFolderPath);
