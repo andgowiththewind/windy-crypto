@@ -136,15 +136,18 @@ public class CryptoService {
         windy.setLatestMsg("outputting");
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-        //
+
         // [FUTURE_CRYPTO]:处理临时文件,注册入缓存,记录上下文
         futureCryptoRegisterTmp(cryptoContext);
 
-        // [FUTURE_CRYPTO]:处理加解密操作对应输入输出流
-        futureCryptoStream(cryptoContext);
-
         // [FUTURE_CRYPTO]:处理盐值数组
         futureCryptoSalt(cryptoContext);
+
+        // [FUTURE_CRYPTO]:处理最终文件信息,注册入缓存,记录上下文
+        futureCryptoRegisterAfter(cryptoContext);
+
+        // [FUTURE_CRYPTO]:处理加解密操作对应输入输出流
+        futureCryptoStream(cryptoContext);
 
         // [FUTURE_CRYPTO]:处理核心IO操作
         futureCryptoCoreIO(cryptoContext);
@@ -167,211 +170,8 @@ public class CryptoService {
         log.debug("[{}]-记录一次临时文件ID与绝对路径对照:[{}]----[{}]", cryptoContext.getBeforeCacheId(), windyCacheService.parseId(tmpAbsPath), tmpAbsPath);
     }
 
-    private void futureCryptoStream(CryptoContext cryptoContext) {
-        TimeInterval timer = DateUtil.timer();
-        String beforePath = cryptoContext.getBeforePath();
-        String tmpPath = cryptoContext.getTmpPath();
-        Assert.notBlank(beforePath, "beforePath不能为空");
-        Assert.notBlank(tmpPath, "tmpPath不能为空");
-        // 准备输入输出流
-        BufferedInputStream bis = FileUtil.getInputStream(FileUtil.file(beforePath));
-        BufferedOutputStream bos = FileUtil.getOutputStream(FileUtil.file(tmpPath));
-        // 记录上下文
-        cryptoContext.setBis(bis);
-        cryptoContext.setBos(bos);
-        log.debug("[{}]-处理创建加解密操作对应输入输出流成功,耗时[{}]ms", cryptoContext.getBeforeCacheId(), timer.intervalMs());
-    }
-
-    private void futureCryptoSalt(CryptoContext cryptoContext) {
-        if (cryptoContext.getAskEncrypt()) {
-            // 如果是加密操作,则生成盐值数组,三个大于0小于256的随机数
-            List<Integer> list = new ArrayList<>();
-            for (int i = 0; i < 3; i++) list.add(RandomUtil.randomInt(0, 256));
-            cryptoContext.setIntSaltList(list);// 集合
-            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));// 字符串拼接
-            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));// 字符串拼接加密
-            log.debug("[{}]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
-        } else {
-            // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
-            CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
-            cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
-            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
-            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));
-            log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
-        }
-
-    }
-
-    private void futureCryptoCoreIO(CryptoContext cryptoContext) {
-        log.debug("[{}]-开始处理核心IO操作!", cryptoContext.getBeforeCacheId());
-        // 缓冲区大小
-        try {
-            // 读取源文件的缓存对象,一些数据已经记录,无需重复查询
-            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-
-            // 每次读取的字节数
-            Integer bufferSize = 1024;
-
-            // 每次实际读取到字节数
-            int len;
-
-            // 已经读取的字节总数
-            long total = 0;
-
-            // 缓冲区
-            byte[] buffer = new byte[bufferSize];
-
-            // 计时器,控制打印频率,一定频率会重置
-            TimeInterval frequencyTimer = DateUtil.timer();
-            // 计时器,记录全局耗时
-            TimeInterval globalTimer = DateUtil.timer();
-
-            // 源文件大小,用于计算百分比
-            long windyBeforeSize = windyBefore.getSize();
-
-            // 记录所有字节的位置,计算整数盐值时使用,加解密阶段,相同的位置对应相同的整数盐值
-            long position = 0;
-
-            // 整数盐值列表
-            List<Integer> intSaltList = cryptoContext.getIntSaltList();
-
-            // 本次操作是否为加密
-            Boolean askEncrypt = cryptoContext.getAskEncrypt();
-
-            // 循环读取源文件的输入流,写入到临时文件的输出流
-            while ((len = cryptoContext.getBis().read(buffer)) != -1) {
-                // 此处已经将字节读取到缓冲区,不能在此缓冲区中直接修改,应该用一个新的字节数组来接收加盐后的字节,定义临时缓冲区副本
-                byte[] newBuffer = new byte[len];
-                // 对每个字节加减整数盐后重新收集:(1)加密时,增加整数盐;(2)解密时,减去整数盐
-                for (int i = 0; i < len; i++) {
-                    position = position + 1;
-                    // 位置数值与整数盐值列表长度取余,得到当前位置对应的整数盐值
-                    // 此步骤确保了所有的字节不会是同样的加盐值,即便破解者强行破解,每个字节都有-128到127共256种可能,即便是8个字节也有组合数为256^8,即便是最简单的暴力破解,也已经超过了`SHA-256`的安全性,唯一的不足之处是被加密的文件不能太小,两三个字节还是会被暴力破解;
-                    int salt = intSaltList.get((int) (position % intSaltList.size()));
-                    // 加密时,增加整数盐;解密时,减去整数盐
-                    newBuffer[i] = (byte) (buffer[i] + (askEncrypt ? salt : -salt));
-                }
-                // 加盐后的字节写入到临时文件的输出流
-                cryptoContext.getBos().write(newBuffer);
-                // 更新已经读取的字节数
-                total += len;
-                //
-                // 流读取的频率是非常快的,如果每次都更新缓存和发布消息,会导致卡死,所以需要通过间隔时间控制频率
-                if (frequencyTimer.intervalMs() > 800L) {
-                    // 计算当前百分比
-                    Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
-                    log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
-                    // TODO 更新缓存状态信息
-                    Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-                    windy.setLatestMsg("processing");
-                    windy.setPercentage(percentage);
-                    windy.setPercentageLabel(StrUtil.format("{}%", percentage));
-                    windy.setUpdateTime(DateUtil.now());
-                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-                    //
-                    // 重置计时器,重新计时直至下一次周期
-                    frequencyTimer.restart();
-                }
-            }
-
-            // 防止最后一次结果丢失,循环结束后指定百分比更新一次
-            // TODO 直接更新100%
-            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-            windy.setLatestMsg("IO done");
-            windy.setPercentage(100);
-            windy.setPercentageLabel("100%");
-            windy.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-            log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
-
-            // 清除计时器
-            frequencyTimer.clear();
-            frequencyTimer = null;
-            globalTimer.clear();
-            globalTimer = null;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            IoUtil.close(cryptoContext.getBis());
-            IoUtil.close(cryptoContext.getBos());
-        }
-    }
-
-    private void futureCryptoFinal(CryptoContext cryptoContext) {
-        // 注册最终文件信息
-        finalRegisterAfter(cryptoContext);
-        // 处理临时文件改名
-        finalTmpRenameToAfter(cryptoContext);
-        // 处理临时文件删除、原始文件删除、最终文件开放状态等操作
-        finalDel(cryptoContext);
-        // 纯打印信息
-        finalSuccess(cryptoContext);
-
-    }
-
-    private void finalSuccess(CryptoContext cryptoContext) {
-        log.debug("[{}]-加解密流程正常结束。", cryptoContext.getBeforeCacheId());
-    }
-
-    private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
-        // GPT也是建议采用轮询解决"IO流未释放导致改名失败"的问题
-        long intervalMs = 2_000L;
-        long maxMs = 60_000L;
-        // 业务操作回调
-        Consumer<Void> actionCs = aVoid -> {
-            IoUtil.close(cryptoContext.getBis());
-            IoUtil.close(cryptoContext.getBos());
-            File tmp = FileUtil.file(cryptoContext.getTmpPath());
-            String afterName = FileUtil.getName(cryptoContext.getAfterPath());
-            FileUtil.rename(tmp, afterName, false, true);
-            // 健壮
-            if (!FileUtil.exist(cryptoContext.getAfterPath())) {
-                // 说明改名失败,抛出异常触发进入下一循环
-                throw new CryptoException("本次改名失败,触发重试");
-            }
-        };
-        // 成功回调
-        TimeInterval timer = DateUtil.timer();
-        Consumer<Void> successCs = aVoid -> {
-            log.debug("[{}]-临时文件改名成功,耗时[{}]ms,[tmp={}]>>[after={}]",
-                    cryptoContext.getBeforeCacheId(),
-                    timer.intervalMs(),
-                    FileUtil.getName(cryptoContext.getTmpPath()),
-                    cryptoContext.getAfterPath()
-            );
-            // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
-            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-            windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
-            windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
-            windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
-            windyBefore.setLatestMsg("almost");
-            windyBefore.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
-            //
-            // 临时文件无缓存
-            //
-            // 最终文件
-            Windy windyAfter = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
-            windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
-            windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
-            windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
-            windyAfter.setLatestMsg("almost");
-            windyAfter.setUpdateTime(DateUtil.now());
-            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
-            //
-        };
-        // 失败回调
-        Consumer<Void> errorCs = aVoid -> {
-            // 临时文件改名失败,抛异常
-            throw new WindyException(StrUtil.format("改名(超时)失败:[{}ms]", timer.intervalMs()));
-        };
-        // 执行
-        PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
-    }
-
-
     // 主要任务是确定最终文件的名称
-    private void finalRegisterAfter(CryptoContext cryptoContext) {
+    private void futureCryptoRegisterAfter(CryptoContext cryptoContext) {
         String afterName = null;
         String afterPath = null;
         Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
@@ -517,6 +317,206 @@ public class CryptoService {
         // 记录上下文
         cryptoContext.setAfterPath(afterPath);
         cryptoContext.setAfterCacheId(windyAfter.getId());
+    }
+
+    private void futureCryptoStream(CryptoContext cryptoContext) {
+        TimeInterval timer = DateUtil.timer();
+        String beforePath = cryptoContext.getBeforePath();
+        String tmpPath = cryptoContext.getTmpPath();
+        Assert.notBlank(beforePath, "beforePath不能为空");
+        Assert.notBlank(tmpPath, "tmpPath不能为空");
+        // 准备输入输出流
+        BufferedInputStream bis = FileUtil.getInputStream(FileUtil.file(beforePath));
+        BufferedOutputStream bos = FileUtil.getOutputStream(FileUtil.file(tmpPath));
+        // 记录上下文
+        cryptoContext.setBis(bis);
+        cryptoContext.setBos(bos);
+        log.debug("[{}]-处理创建加解密操作对应输入输出流成功,耗时[{}]ms", cryptoContext.getBeforeCacheId(), timer.intervalMs());
+    }
+
+    private void futureCryptoSalt(CryptoContext cryptoContext) {
+        if (cryptoContext.getAskEncrypt()) {
+            // 如果是加密操作,则生成盐值数组,三个大于0小于256的随机数
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < 3; i++) list.add(RandomUtil.randomInt(0, 256));
+            cryptoContext.setIntSaltList(list);// 集合
+            cryptoContext.setIntSaltStr(list.stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));// 字符串拼接
+            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));// 字符串拼接加密
+            log.debug("[{}]-本次请求加密,新生成盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
+        } else {
+            // 如果是解密操作,则从文件名中解析盐值数组,此时需要校验密码是否正确
+            CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
+            cryptoContext.setIntSaltList(coverNameDTO.getIntSaltList());
+            cryptoContext.setIntSaltStr(coverNameDTO.getIntSaltList().stream().map(String::valueOf).collect(Collectors.joining(StrUtil.COMMA)));
+            cryptoContext.setIntSaltStrEncryptHex(AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(cryptoContext.getIntSaltStr()));
+            log.debug("[{}]-本次请求解密,解析盐值数组:[{}]", cryptoContext.getBeforeCacheId(), cryptoContext.getIntSaltStr());
+        }
+
+    }
+
+    private void futureCryptoCoreIO(CryptoContext cryptoContext) {
+        log.debug("[{}]-开始处理核心IO操作!", cryptoContext.getBeforeCacheId());
+        // 缓冲区大小
+        try {
+            // 读取源文件的缓存对象,一些数据已经记录,无需重复查询
+            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+
+            // 每次读取的字节数
+            Integer bufferSize = 1024;
+
+            // 每次实际读取到字节数
+            int len;
+
+            // 已经读取的字节总数
+            long total = 0;
+
+            // 缓冲区
+            byte[] buffer = new byte[bufferSize];
+
+            // 计时器,控制打印频率,一定频率会重置
+            TimeInterval frequencyTimer = DateUtil.timer();
+            // 计时器,记录全局耗时
+            TimeInterval globalTimer = DateUtil.timer();
+
+            // 源文件大小,用于计算百分比
+            long windyBeforeSize = windyBefore.getSize();
+
+            // 记录所有字节的位置,计算整数盐值时使用,加解密阶段,相同的位置对应相同的整数盐值
+            long position = 0;
+
+            // 整数盐值列表
+            List<Integer> intSaltList = cryptoContext.getIntSaltList();
+
+            // 本次操作是否为加密
+            Boolean askEncrypt = cryptoContext.getAskEncrypt();
+
+            // 循环读取源文件的输入流,写入到临时文件的输出流
+            while ((len = cryptoContext.getBis().read(buffer)) != -1) {
+                // 此处已经将字节读取到缓冲区,不能在此缓冲区中直接修改,应该用一个新的字节数组来接收加盐后的字节,定义临时缓冲区副本
+                byte[] newBuffer = new byte[len];
+                // 对每个字节加减整数盐后重新收集:(1)加密时,增加整数盐;(2)解密时,减去整数盐
+                for (int i = 0; i < len; i++) {
+                    position = position + 1;
+                    // 位置数值与整数盐值列表长度取余,得到当前位置对应的整数盐值
+                    // 此步骤确保了所有的字节不会是同样的加盐值,即便破解者强行破解,每个字节都有-128到127共256种可能,即便是8个字节也有组合数为256^8,即便是最简单的暴力破解,也已经超过了`SHA-256`的安全性,唯一的不足之处是被加密的文件不能太小,两三个字节还是会被暴力破解;
+                    int salt = intSaltList.get((int) (position % intSaltList.size()));
+                    // 加密时,增加整数盐;解密时,减去整数盐
+                    newBuffer[i] = (byte) (buffer[i] + (askEncrypt ? salt : -salt));
+                }
+                // 加盐后的字节写入到临时文件的输出流
+                cryptoContext.getBos().write(newBuffer);
+                // 更新已经读取的字节数
+                total += len;
+                //
+                // 流读取的频率是非常快的,如果每次都更新缓存和发布消息,会导致卡死,所以需要通过间隔时间控制频率
+                if (frequencyTimer.intervalMs() > 800L) {
+                    // 计算当前百分比
+                    Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
+                    log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
+                    // TODO 更新缓存状态信息
+                    Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+                    windy.setLatestMsg("processing");
+                    windy.setPercentage(percentage);
+                    windy.setPercentageLabel(StrUtil.format("{}%", percentage));
+                    windy.setUpdateTime(DateUtil.now());
+                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                    //
+                    // 重置计时器,重新计时直至下一次周期
+                    frequencyTimer.restart();
+                }
+            }
+
+            // 防止最后一次结果丢失,循环结束后指定百分比更新一次
+            // TODO 直接更新100%
+            Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            windy.setLatestMsg("IO done");
+            windy.setPercentage(100);
+            windy.setPercentageLabel("100%");
+            windy.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+            log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
+
+            // 清除计时器
+            frequencyTimer.clear();
+            frequencyTimer = null;
+            globalTimer.clear();
+            globalTimer = null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            IoUtil.close(cryptoContext.getBis());
+            IoUtil.close(cryptoContext.getBos());
+        }
+    }
+
+    private void futureCryptoFinal(CryptoContext cryptoContext) {
+        // 处理临时文件改名
+        finalTmpRenameToAfter(cryptoContext);
+        // 处理临时文件删除、原始文件删除、最终文件开放状态等操作
+        finalDel(cryptoContext);
+        // 纯打印信息
+        finalSuccess(cryptoContext);
+
+    }
+
+    private void finalSuccess(CryptoContext cryptoContext) {
+        log.debug("[{}]-加解密流程正常结束。", cryptoContext.getBeforeCacheId());
+    }
+
+    private void finalTmpRenameToAfter(CryptoContext cryptoContext) {
+        // GPT也是建议采用轮询解决"IO流未释放导致改名失败"的问题
+        long intervalMs = 2_000L;
+        long maxMs = 60_000L;
+        // 业务操作回调
+        Consumer<Void> actionCs = aVoid -> {
+            IoUtil.close(cryptoContext.getBis());
+            IoUtil.close(cryptoContext.getBos());
+            File tmp = FileUtil.file(cryptoContext.getTmpPath());
+            String afterName = FileUtil.getName(cryptoContext.getAfterPath());
+            FileUtil.rename(tmp, afterName, false, true);
+            // 健壮
+            if (!FileUtil.exist(cryptoContext.getAfterPath())) {
+                // 说明改名失败,抛出异常触发进入下一循环
+                throw new CryptoException("本次改名失败,触发重试");
+            }
+        };
+        // 成功回调
+        TimeInterval timer = DateUtil.timer();
+        Consumer<Void> successCs = aVoid -> {
+            log.debug("[{}]-临时文件改名成功,耗时[{}]ms,[tmp={}]>>[after={}]",
+                    cryptoContext.getBeforeCacheId(),
+                    timer.intervalMs(),
+                    FileUtil.getName(cryptoContext.getTmpPath()),
+                    cryptoContext.getAfterPath()
+            );
+            // 三个文件都更新状态,改名成功说明临时文件已经不存在,最终文件生成成功
+            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
+            windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
+            windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
+            windyBefore.setLatestMsg("almost");
+            windyBefore.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
+            //
+            // 临时文件无缓存
+            //
+            // 最终文件
+            Windy windyAfter = windyCacheService.lockGetOrDefault(cryptoContext.getAfterPath());
+            windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
+            windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
+            windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
+            windyAfter.setLatestMsg("almost");
+            windyAfter.setUpdateTime(DateUtil.now());
+            redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
+            //
+        };
+        // 失败回调
+        Consumer<Void> errorCs = aVoid -> {
+            // 临时文件改名失败,抛异常
+            throw new WindyException(StrUtil.format("改名(超时)失败:[{}ms]", timer.intervalMs()));
+        };
+        // 执行
+        PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
     }
 
     @SneakyThrows
