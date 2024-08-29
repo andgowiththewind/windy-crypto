@@ -123,9 +123,7 @@ public class WindyCacheService {
      */
     public String parseId(String absPath) {
         Assert.notBlank(absPath);
-        // 统一转正斜杠"/"
-        absPath = FileUtil.file(absPath).getAbsolutePath();
-        absPath = absPath.replace("\\", "/");
+        absPath = getPositiveSlashPath(absPath);
         // 先查缓存
         String id = redisMasterCache.getCacheMapValue(CacheConstants.PATH_ID_MAP, absPath);
         if (StrUtil.isNotBlank(id)) return id;
@@ -135,5 +133,13 @@ public class WindyCacheService {
         // 缓存
         redisMasterCache.setCacheMapValue(CacheConstants.PATH_ID_MAP, absPath, nextIdStr);
         return nextIdStr;
+    }
+
+    // 统一转正斜杠"/"
+    public String getPositiveSlashPath(String absPath) {
+        // 统一转正斜杠"/"
+        absPath = FileUtil.file(absPath).getAbsolutePath();
+        absPath = absPath.replace("\\", "/");
+        return absPath;
     }
 }

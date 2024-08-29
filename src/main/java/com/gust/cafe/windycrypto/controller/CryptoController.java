@@ -38,10 +38,10 @@ public class CryptoController extends BaseController {
         // 计算任务量
         List<String> absPathList = cryptoPreparationService.prepare(reqVo);
         if (CollectionUtil.isEmpty(absPathList)) throw new WindyException(WindyLang.msg("i18n_1828011035181846528"));// 无符合条件任务
-
+        //
         // 异步处理长耗时任务
         super.runAsyncExceptionally((v) -> cryptoService.actionAsync(absPathList, reqVo));
-
+        //
         // 反馈
         return R.ok(WindyLang.msg("i18n_1827976801159352320") + "\tcount=" + absPathList.size());// 任务已提交
     }

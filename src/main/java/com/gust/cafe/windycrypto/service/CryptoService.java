@@ -310,7 +310,6 @@ public class CryptoService {
         finalTmpRenameToAfter(cryptoContext);
         // 处理临时文件删除、原始文件删除、最终文件开放状态等操作
         finalDel(cryptoContext);
-
         // 纯打印信息
         finalSuccess(cryptoContext);
 
@@ -549,6 +548,10 @@ public class CryptoService {
         // 物理文件删除后删除缓存
         String parseIdTmp = windyCacheService.parseId(cryptoContext.getTmpPath());
         redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdTmp);
+        // pathIdMap也删除对应的记录
+        String positiveSlashPath = windyCacheService.getPositiveSlashPath(cryptoContext.getTmpPath());
+        redisMasterCache.deleteCacheMapValue(CacheConstants.PATH_ID_MAP, positiveSlashPath);
+        //
         //
         // 删除cfg中可能存在的记录
         if (!cryptoContext.getAskEncrypt()) {
@@ -580,6 +583,9 @@ public class CryptoService {
         // 物理文件删除后删除缓存
         String parseIdBefore = windyCacheService.parseId(cryptoContext.getBeforePath());
         redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdBefore);
+        // pathIdMap也删除对应的记录
+        String positiveSlashPathBefore = windyCacheService.getPositiveSlashPath(cryptoContext.getBeforePath());
+        redisMasterCache.deleteCacheMapValue(CacheConstants.PATH_ID_MAP, positiveSlashPathBefore);
     }
 
     private void physicalDelete(CryptoContext cryptoContext, LinkedList<String> pathList) {
@@ -685,7 +691,10 @@ public class CryptoService {
                 log.debug("[{}]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), windyCacheService.parseId(path));
                 // 删除可能存在的缓存
                 String parseId = windyCacheService.parseId(path);
-                redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseId);                //
+                redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseId);
+                // pathIdMap也删除对应的记录
+                String positiveSlashPath = windyCacheService.getPositiveSlashPath(path);
+                redisMasterCache.deleteCacheMapValue(CacheConstants.PATH_ID_MAP, positiveSlashPath);
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("最终删除(超时)失败:[{}ms],需要手动删除", timer.intervalMs()));
