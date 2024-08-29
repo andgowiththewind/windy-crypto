@@ -1,6 +1,5 @@
 package com.gust.cafe.windycrypto.util;
 
-import cn.hutool.core.io.FileUtil;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Map;
 
 public class FreeMarkerUtils {

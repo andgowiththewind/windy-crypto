@@ -1,6 +1,5 @@
 package com.gust.cafe.windycrypto.components;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.gust.cafe.windycrypto.config.threadlocal.LocaleHolder;

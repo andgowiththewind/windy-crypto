@@ -23,6 +23,20 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FolderTreeService {
+    private static void recursivelyCollect(TreeLeafDTO topLeaf, AtomicInteger atomicId) {
+        List<File> sonFolders = Arrays.stream(FileUtil.ls(topLeaf.getAbsPath())).filter(FileUtil::isDirectory).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(sonFolders)) {
+            List<TreeLeafDTO> children = new ArrayList<>();
+            for (File sonFolder : sonFolders) {
+                TreeLeafDTO sonLeaf = TreeLeafDTO.builder().id(atomicId.incrementAndGet()).parentId(topLeaf.getId()).label(sonFolder.getName()).absPath(sonFolder.getPath()).build();
+                // 递归收集子节点
+                recursivelyCollect(sonLeaf, atomicId);
+                children.add(sonLeaf);
+            }
+            topLeaf.setChildren(children);
+        }
+    }
+
     // ElementUI树数据结构
     public List<TreeLeafDTO> getElementUiTreeData(FolderTreeReqVo folderTreeReqVo) {
         String path = folderTreeReqVo.getPath();
@@ -37,20 +51,6 @@ public class FolderTreeService {
         recursivelyCollect(topLeaf, atomicId);
         //
         return CollectionUtil.toList(topLeaf);
-    }
-
-    private static void recursivelyCollect(TreeLeafDTO topLeaf, AtomicInteger atomicId) {
-        List<File> sonFolders = Arrays.stream(FileUtil.ls(topLeaf.getAbsPath())).filter(FileUtil::isDirectory).collect(Collectors.toList());
-        if (CollectionUtil.isNotEmpty(sonFolders)) {
-            List<TreeLeafDTO> children = new ArrayList<>();
-            for (File sonFolder : sonFolders) {
-                TreeLeafDTO sonLeaf = TreeLeafDTO.builder().id(atomicId.incrementAndGet()).parentId(topLeaf.getId()).label(sonFolder.getName()).absPath(sonFolder.getPath()).build();
-                // 递归收集子节点
-                recursivelyCollect(sonLeaf, atomicId);
-                children.add(sonLeaf);
-            }
-            topLeaf.setChildren(children);
-        }
     }
 
 }

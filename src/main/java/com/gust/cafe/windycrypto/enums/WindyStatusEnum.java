@@ -1,6 +1,5 @@
 package com.gust.cafe.windycrypto.enums;
 
-import cn.hutool.core.lang.Assert;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

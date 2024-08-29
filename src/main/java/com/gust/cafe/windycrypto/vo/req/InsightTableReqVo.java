@@ -23,26 +23,6 @@ public class InsightTableReqVo {
     private ParamsDTO params;
 
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class PageDTO {
-        private Integer pageNum;
-        private Integer pageSize;
-        private Integer total;
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ParamsDTO {
-        private String searchScope;
-        @NotBlank(message = "路径不能为空")
-        private String path;
-    }
-
     @Getter
     @AllArgsConstructor
     public enum ScopeEnum {
@@ -65,5 +45,25 @@ public class InsightTableReqVo {
             }
             return null;
         }
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PageDTO {
+        private Integer pageNum;
+        private Integer pageSize;
+        private Integer total;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ParamsDTO {
+        private String searchScope;
+        @NotBlank(message = "路径不能为空")
+        private String path;
     }
 }

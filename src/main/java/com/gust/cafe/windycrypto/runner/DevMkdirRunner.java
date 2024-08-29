@@ -5,7 +5,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.dynamic.scaffold.TypeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -27,23 +26,6 @@ public class DevMkdirRunner implements ApplicationRunner {
     @Autowired
     private Environment environment;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        String springProfilesActive = environment.getProperty("spring.profiles.active");
-        log.debug("=====================================================================");
-        log.info("当前环境:{}", springProfilesActive);
-        log.debug("=====================================================================");
-
-        if (StrUtil.equalsIgnoreCase(springProfilesActive, "dev")) {
-            String currentDir = SystemUtil.getUserInfo().getCurrentDir();
-            File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
-            FileUtil.del(file);
-            // type01(file);
-            type02(file);
-        }
-
-    }
-
     private static void type01(File file) throws IOException {
         for (int i = 0; i < 1; i++) {
             int numI = i + 1;
@@ -62,6 +44,23 @@ public class DevMkdirRunner implements ApplicationRunner {
                 FileUtil.writeUtf8String(levelTwoName, txt);
             }
         }
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        String springProfilesActive = environment.getProperty("spring.profiles.active");
+        log.debug("=====================================================================");
+        log.info("当前环境:{}", springProfilesActive);
+        log.debug("=====================================================================");
+
+        if (StrUtil.equalsIgnoreCase(springProfilesActive, "dev")) {
+            String currentDir = SystemUtil.getUserInfo().getCurrentDir();
+            File file = FileUtil.file(currentDir, "target", "测试被加解密顶级目录");
+            FileUtil.del(file);
+            // type01(file);
+            type02(file);
+        }
+
     }
 
     private void type02(File file) {

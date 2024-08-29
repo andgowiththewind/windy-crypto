@@ -21,7 +21,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -35,6 +38,15 @@ public class CryptoPreparationService {
     @Autowired
     private WindyCacheService windyCacheService;
 
+    private static void preVerify(CryptoSubmitReqVo reqVo) {
+        WindyException.run((Void -> {
+            Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));// 必须指定加解密操作类型
+            String userPassword = reqVo.getUserPassword();
+            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));// 密码不能为空
+            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32,
+                    WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
+        }));
+    }
 
     @SneakyThrows
     public List<String> prepare(CryptoSubmitReqVo reqVo) {
@@ -47,16 +59,6 @@ public class CryptoPreparationService {
         // 传递绝对路径即可
         List<String> absPathList = windyFilter.stream().map(Windy::getAbsPath).collect(Collectors.toList());
         return absPathList;
-    }
-
-    private static void preVerify(CryptoSubmitReqVo reqVo) {
-        WindyException.run((Void -> {
-            Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));// 必须指定加解密操作类型
-            String userPassword = reqVo.getUserPassword();
-            Assert.notBlank(userPassword, WindyLang.msg("i18n_1827983611962462209", "i18n_1827983611962462210"));// 密码不能为空
-            Assert.isTrue(userPassword.length() >= 8 && userPassword.length() <= 32,
-                    WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
-        }));
     }
 
     private List<Windy> filterWindyCache(List<Windy> windyCache, CryptoSubmitReqVo reqVo) {
