@@ -39,7 +39,7 @@ public class CryptoPreparationService {
     @Autowired
     private WindyCacheService windyCacheService;
 
-    private static void preVerify(CryptoSubmitReqVo reqVo) {
+    private void preVerify(CryptoSubmitReqVo reqVo) {
         WindyException.run((Void -> {
             Assert.notNull(reqVo.getAskEncrypt(), WindyLang.msg("i18n_1827983611962462208"));// 必须指定加解密操作类型
             String userPassword = reqVo.getUserPassword();
@@ -48,7 +48,7 @@ public class CryptoPreparationService {
                     WindyLang.msg("i18n_1828312465394503680"));// 密码长度限制为8-32位
         }));
         // 创建AES可能比较耗时
-        AesUtils.getAes(reqVo.getUserPassword());
+        CompletableFuture.runAsync(() -> AesUtils.getAes(reqVo.getUserPassword()), dispatchTaskExecutor);
     }
 
     @SneakyThrows
