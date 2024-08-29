@@ -3,7 +3,7 @@
     <div class="business-btn-zone">
       <el-form @submit.native.prevent :inline="true" size="mini">
         <el-form-item label="">
-          <el-input v-model="userPassword" :placeholder="$t('i18n_1828973612548362244')" show-password :style="{minWidth:'25vw'}"></el-input>
+          <el-input v-model="userPassword" :placeholder="$t('i18n_1828973612548362244')" show-password></el-input>
         </el-form-item>
         <el-form-item label="" prop="isRequireCoverName">
           <el-radio-group v-model="isRequireCoverName" size="mini">
@@ -12,10 +12,16 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="">
-          <el-button-group>
-            <el-button size="mini" type="info" @click="encryptAll" :style="{minWidth:'25vw'}"><span><i class="fa fa-lock"></i>&nbsp;{{ $t('i18n_1828973612548362240') }}</span></el-button>
-            <el-button size="mini" type="danger" plain @click="decryptAll"><span>{{ $t('i18n_1828973612548362241') }}&nbsp;<i class="fa fa-wrench"></i></span></el-button>
-          </el-button-group>
+          <el-button size="mini" type="warning" @click="encryptAll" :style="{minWidth:'10vw'}"><span><i class="fa fa-lock"></i>&nbsp;{{ $t('i18n_1828973612548362240') }}</span></el-button>
+        </el-form-item>
+        <el-form-item label="" prop="ignoreMissingHiddenFilename">
+          <el-radio-group v-model="ignoreMissingHiddenFilename" size="mini">
+            <el-radio-button label="ignore">{{ $t('i18n_1828982632629800960') }}</el-radio-button>
+            <el-radio-button label="notIgnore">{{ $t('i18n_1828982632629800961') }}</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="">
+          <el-button size="mini" type="danger" plain @click="decryptAll"><span>{{ $t('i18n_1828973612548362241') }}&nbsp;<i class="fa fa-wrench"></i></span></el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -35,6 +41,7 @@ export default {
       loading: false,
       userPassword: process.env.VUE_APP_DEV_TEST_PASSWORD || '',
       isRequireCoverName: 'notHide',
+      ignoreMissingHiddenFilename: 'notIgnore',
       topFolderPathCopy: '',
     }
   },// data
@@ -49,6 +56,7 @@ export default {
         askEncrypt: true,
         userPassword: this.userPassword,
         isRequireCoverName: this.isRequireCoverName === 'hide',
+        ignoreMissingHiddenFilename: this.ignoreMissingHiddenFilename === 'ignore',
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
@@ -63,7 +71,8 @@ export default {
         dirPathList: [this.topFolderPathCopy],
         askEncrypt: false,
         userPassword: this.userPassword,
-        isRequireCoverName: this.isRequireCoverName === 'hide',// 不关注,总是还原原文件名
+        isRequireCoverName: this.isRequireCoverName === 'hide',
+        ignoreMissingHiddenFilename: this.ignoreMissingHiddenFilename === 'ignore',
       };
       cryptoSubmitFn(cryptoSubmitPayload).then(res => {
         Notification.success({title: this.$t('i18n_1827961313217875969'), message: res.msg, position: 'bottom-right'});

@@ -28,4 +28,6 @@ export default {
     i18n_1828973612548362240: 'encrypt all',
     i18n_1828973612548362241: 'decrypt all',
     i18n_1828973612548362244: 'please enter the password...',
+    i18n_1828982632629800960: 'ignore missing hidden filename',
+    i18n_1828982632629800961: 'do not ignore',
 }
