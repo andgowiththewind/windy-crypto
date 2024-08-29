@@ -367,6 +367,8 @@ public class CryptoService {
         PollUtils.poll(intervalMs, maxMs, actionCs, successCs, errorCs);
     }
 
+
+    // 主要任务是确定最终文件的名称
     private void finalRegisterAfter(CryptoContext cryptoContext) {
         String afterName = null;
         String afterPath = null;
@@ -381,7 +383,8 @@ public class CryptoService {
              * @see {@link CommonConstants#CFG_NAME}
              */
             if (isRequireCoverName) {
-                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windy.getId());
+                // 关于KEY的设计:`密码摘要算法值-源文件绝对路径摘要算法`,前者能定位到用哪个密码解密,后者确保同样的绝对路径,必然名称一致(注意是源文件绝对路径)
+                String k = StrUtil.format("{}-{}", cryptoContext.getUserPasswordSha256Hex(), windyCacheService.parseId(cryptoContext.getBeforePath()));
                 String v = AesUtils.getAes(cryptoContext.getUserPassword()).encryptHex(windy.getName());
                 //
                 // 如果本次要求加密文件名,则在同级目录下创建一个配置文件,记录原文件名的加密信息
@@ -391,11 +394,13 @@ public class CryptoService {
                 // 记录上下文
                 cryptoContext.setCfgTxtPath(cfg.getAbsolutePath());
                 //
-                // 此时的加密文件名拼接,eg:
+                // 此时的期望加密之后的文件名,拼接,eg:
                 // 源文件名:password.txt
                 // 如果不加密:$safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708  $    0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              password.txt
                 // 如果加密:  $safeLockedV2$    bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708   $   0a7450f53a28da82d8c7497278d953cd   $   0000  $       1829102994264821760    $              1829136955162628096.txt
-                String concatName = new NameConcatDTO(IdUtil.getSnowflakeNextIdStr(), windy.getExtName()).getConcatName();
+                // 这里采用的是加密源文件名记录在配置文件中,源文件名用一个雪花ID代替
+                String concatName = new NameConcatDTO(IdUtil.getSnowflakeNextIdStr(), windy.getExtName()).getConcatName();// 同样需要考虑是否有扩展名的问题
+                // 拼接加密后的文件名
                 afterName = StrUtil.format("{}{}{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
                         , cryptoContext.getUserPasswordSha256Hex()
@@ -408,7 +413,7 @@ public class CryptoService {
                         , CommonConstants.ENCRYPTED_SEPARATOR
                         , concatName);
             } else {
-                // 不要求加密源文件名,直接拼接加密后的文件名
+                // 不要求加密源文件名,直接拼接期望加密后的文件名
                 afterName = StrUtil.format("{}{}{}{}{}{}{}{}{}{}"
                         , CommonConstants.ENCRYPTED_PREFIX
                         , cryptoContext.getUserPasswordSha256Hex()
@@ -424,11 +429,13 @@ public class CryptoService {
         } else {
             // 如果是解密,从加密文件文件名中截取源文件名,考虑到多个加密文件可能同时解锁出同名文件的场景,需要加锁处理
             AtomicReference<String> expectSourceNameAtomic = new AtomicReference<>();
+            // 分析本次解密的文件名
             CoverNameDTO coverNameDTO = CoverNameDTO.analyse(FileUtil.getName(cryptoContext.getBeforePath()), cryptoContext.getUserPassword());
             String sourceName = coverNameDTO.getSourceName();
             String sourceMainName = coverNameDTO.getSourceMainName();
             //
             List<Integer> bitSwitchList = coverNameDTO.getBitSwitchList();
+            // 被解密的文件名上面记录了它原来的文件名是否加密,如果没有加密,则直接提取;如果加密了,则需要在同级目录下找`windycfg`文件
             boolean isCoverName = CollectionUtil.isNotEmpty(bitSwitchList) && bitSwitchList.size() > 0 && bitSwitchList.get(0) != null && bitSwitchList.get(0).intValue() == 1;
             if (!isCoverName) {
                 // 如果文件名不是加密形式,则直接提取
@@ -437,6 +444,7 @@ public class CryptoService {
                 // 如果是加密了文件名,根据设计,在同级目录下找`windycfg`文件
                 File windycfg = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), CommonConstants.CFG_NAME);
                 WindyException.run((Void) -> {
+                    // 特殊情况:源文件名确实加密了,但是如果用户觉得解密时源文件名不重要,那么可以直接跳过源文件名的解密
                     Boolean ignoreMissingHiddenFilename = cryptoContext.getIgnoreMissingHiddenFilename();
                     boolean differentialIgnoring = ignoreMissingHiddenFilename != null && ignoreMissingHiddenFilename == true;
                     if (!differentialIgnoring) {
@@ -450,26 +458,31 @@ public class CryptoService {
                         String coverName = split.get(1);
                         String decryptStr = AesUtils.getAes(cryptoContext.getUserPassword()).decryptStr(coverName);
                         expectSourceNameAtomic.set(decryptStr);
+                    } else {
+                        log.debug("[{}]-忽略源文件名解密", cryptoContext.getBeforeCacheId());
+                        expectSourceNameAtomic.set(sourceName);
                     }
                 });
             }
             //
-            // 确认源文件名后,需要考虑多个加密文件解密出同名文件的场景,需要增加区别码
-            File file = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), expectSourceNameAtomic.get());
-            boolean notExist = !FileUtil.exist(file);
-            String parseId = windyCacheService.parseId(file.getAbsolutePath());
-            Windy expectCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId);
+            // 确认源文件名,拼接路径
+            File fileAfter = FileUtil.file(FileUtil.getParent(cryptoContext.getBeforePath(), 1), expectSourceNameAtomic.get());
+            boolean notExist = !FileUtil.exist(fileAfter);
+            String parseIdAfter = windyCacheService.parseId(fileAfter.getAbsolutePath());
+            Windy expectCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseIdAfter);
             boolean cacheNotEnabled = expectCache == null || (expectCache.getCode() != null && expectCache.getCode() == WindyStatusEnum.NOT_EXIST.getCode());
-            // 当实际文件不存在且缓存中不存在时,使用处理后的文件名
+            // 场景:`$safeLockedV2$bb7f5fe493c0fe6a1c54bafc181ccb820351c1a051ac6cff78c8a22a0fd9c708$0a7450f53a28da82d8c7497278d953cd$0000$1829102994264821760$password.txt`正在解密,但是同目录下此时其他文件已经解密出一个`password.txt`文件或者直接创建了一个`password.txt`文件,此时需要区别
+            // 确保:(1)当实际文件不存在(2)且缓存中不存在时,才能使用本次处理后的文件名
             if (notExist && cacheNotEnabled) {
                 afterName = expectSourceNameAtomic.get();
             } else {
                 // 当实际文件存在或者缓存中存在时,需要增加区别码
+                // mainName增加标识
                 String expectSourceName = expectSourceNameAtomic.get();
                 File ghost = FileUtil.file(SystemUtil.getUserInfo().getHomeDir(), expectSourceName);
                 String ghostMainName = FileUtil.mainName(ghost);
-                String newGhostMainName = StrUtil.format("{}(repeated-{})", ghostMainName, IdUtil.getSnowflakeNextIdStr());
-                afterName = new NameConcatDTO(newGhostMainName, FileUtil.extName(ghost)).getConcatName();
+                String newGhostMainName = StrUtil.format("{}(repeated-{})", ghostMainName, IdUtil.getSnowflakeNextIdStr());// 雪花ID确保不会重复,一次随机码就能解决
+                afterName = new NameConcatDTO(newGhostMainName, FileUtil.extName(ghost)).getConcatName();// 同样需要考虑是否有扩展名的问题
             }
 
         }
@@ -480,7 +493,7 @@ public class CryptoService {
             WindyException.run((Void) -> Assert.isTrue(finalAfterName.length() < 255, WindyLang.msg("i18n_1828639187784568832")));
         }
         //
-        // 基本不会发生重复(盐值和文件名ID保证),但是还是要做一次校验
+        // 基本不会发生重复,但是还是要做一次校验
         afterPath = FileUtil.getAbsolutePath(FileUtil.file(FileUtil.getParent(cryptoContext.getTmpPath(), 1), afterName));
         String afterCacheId = windyCacheService.parseId(afterPath);
         Windy windyCache = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, afterCacheId);
@@ -515,12 +528,14 @@ public class CryptoService {
                     FileUtil.touch(cfg);
                 }
                 List<String> lines = FileUtil.readUtf8Lines(cfg);
-                // 配置文件中不应该存在相同KEY
+                // 配置文件如果存在相同的KEY,则不用重复录入
                 boolean anyMatch = lines.stream().filter(r -> StrUtil.isNotBlank(r)).anyMatch(row -> row.startsWith(key));
-                WindyException.run((Void) -> Assert.isFalse(anyMatch, WindyLang.msg("i18n_1828802439705399296")));
-                // 增加一行
+                if (anyMatch) {
+                    return;
+                }
+                // 如果不存在则增加一行
                 lines.add(StrUtil.format("{}={}", key, val));
-                // 写入文件
+                // 更新后的内容重新写入文件
                 FileUtil.writeUtf8Lines(lines, cfg);
             } finally {
                 // 确保释放锁
