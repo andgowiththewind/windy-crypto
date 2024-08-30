@@ -2,12 +2,15 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.components.RedisSlaveCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
 import com.gust.cafe.windycrypto.enums.WindyStatusEnum;
+import com.gust.cafe.windycrypto.websocket.WindyCryptoWebsocket;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,5 +78,11 @@ public class StatService {
         //
         //
         // (3) 合并
+        JSONObject data = JSONUtil.createObj().putOpt("insightTableData", insightTableData).putOpt("processTableData", processTableData);
+        JSONObject resVo = JSONUtil.createObj().putOpt("code", WsMessageService.CodeEnum.CODE_555.getCode()).putOpt("data", data);
+        String message = JSONUtil.toJsonStr(resVo);
+        //
+        // (4) 发生websocket消息
+        WindyCryptoWebsocket.sendMessage(sessionId, message);
     }
 }
