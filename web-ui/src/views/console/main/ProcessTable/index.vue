@@ -14,13 +14,19 @@
           :direction="drawerVo.direction">
         <div>
           <el-container v-cloak class="windy-container">
-            <el-aside width="35vw">Aside</el-aside>
+            <el-aside width="35vw">
+              <ProcessPartAside></ProcessPartAside>
+            </el-aside>
             <el-container>
-              <el-header>Header</el-header>
+              <el-header style="padding: 0px;">
+                <ProcessPartHeader></ProcessPartHeader>
+              </el-header>
               <el-main>
                 <ProcessPartMain></ProcessPartMain>
               </el-main>
-              <el-footer>Footer</el-footer>
+              <el-footer>
+                <ProcessPartFooter></ProcessPartFooter>
+              </el-footer>
             </el-container>
           </el-container>
         </div>
@@ -32,11 +38,14 @@
 <script>
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import ProcessPartMain from '@/views/console/main/ProcessTable/ProcessPartMain.vue';
+import ProcessPartHeader from '@/views/console/main/ProcessTable/ProcessPartHeader.vue';
+import ProcessPartAside from '@/views/console/main/ProcessTable/ProcessPartAside.vue';
+import ProcessPartFooter from '@/views/console/main/ProcessTable/ProcessPartFooter.vue';
 
 export default {
   name: "ProcessTable",
   components: {
-    ProcessPartMain,
+    ProcessPartMain, ProcessPartHeader, ProcessPartAside, ProcessPartFooter
   },
   data() {
     return {

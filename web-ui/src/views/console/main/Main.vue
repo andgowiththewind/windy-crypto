@@ -14,7 +14,7 @@
 import ConditionalPagination from '@/views/console/main/ConditionalPagination/ConditionalPagination.vue';
 import InsightTable from '@/views/console/main/InsightTable/InsightTable.vue';
 import Password2FA from '@/views/console/main/Password2FA/Password2FA.vue';
-import ProcessTable from '@/views/console/main/ProcessTable/ProcessTable.vue';
+import ProcessTable from '@/views/console/main/ProcessTable/index.vue';
 
 export default {
   name: "Main",
