@@ -8,7 +8,9 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import {devConsoleLog} from '@/utils/commonUtils';
 import {getWsUrlPrefix} from '@/api/windyWebsocketApi';
-import {nanoid} from 'nanoid';
+// import {nanoid} from 'nanoid';
+import {customAlphabet} from 'nanoid'
+
 
 export default {
   name: "WindyWebsocket",
@@ -48,7 +50,9 @@ export default {
       }
       // 可以构建
       // 自定义会话ID
-      let sessionId = nanoid(18);
+      // let sessionId = nanoid();
+      const nanoid = customAlphabet('1234567890', 18)
+      let sessionId = nanoid();
       const url = `${this.wsUrlPrefix}/${sessionId}`;
       // 构建Promise
       this.wsPromise = new Promise((resolve, reject) => {
