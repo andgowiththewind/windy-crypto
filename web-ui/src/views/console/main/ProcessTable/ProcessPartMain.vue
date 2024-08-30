@@ -11,16 +11,7 @@
         :max-height="350"
         :data="processTableData"
         style="width: 100%;min-height:200px;">
-      <el-table-column label="ID" width="170" :show-overflow-tooltip="true">
-        <template v-slot="scope">
-          <span
-              :id="getIdCellId(scope.row)"
-              :data-clipboard-text="scope.row.id"
-              @click="idClickCopy(scope.row)">
-            {{ scope.row.id }}
-          </span>
-        </template>
-      </el-table-column>
+      <el-table-column label="ID" prop="id" width="170" :show-overflow-tooltip="true"></el-table-column>
       <!--进度-->
       <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
         <template v-slot="scope">
