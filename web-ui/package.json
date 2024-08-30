@@ -12,6 +12,7 @@
     "clipboard": "^2.0.11",
     "core-js": "^3.8.3",
     "crypto-js": "^4.2.0",
+    "echarts": "^5.5.1",
     "element-ui": "^2.15.14",
     "font-awesome": "^4.7.0",
     "moment": "^2.30.1",
