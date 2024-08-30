@@ -583,7 +583,7 @@ public class CryptoService {
         windyAfter.setCode(WindyStatusEnum.FREE.getCode());
         windyAfter.setLabel(WindyStatusEnum.FREE.getLabel());
         windyAfter.setDesc(WindyStatusEnum.FREE.getRemark());
-        windyAfter.setLatestMsg(cryptoContext.getAskEncrypt() ? "" : "");
+        windyAfter.setLatestMsg(cryptoContext.getAskEncrypt() ? "i18n_1829609313837142016" : "i18n_1829609121201246208");
         windyAfter.setSize(size);
         windyAfter.setSizeLabel(sizeLabel);
         windyAfter.setUpdateTime(DateUtil.now());

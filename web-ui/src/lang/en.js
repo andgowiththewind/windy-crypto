@@ -40,4 +40,6 @@ export default {
     i18n_1829607775228129280: 'processing',
     i18n_1829607944266944512: 'I/O process done',
     i18n_1829608424183312384: 'will be done soon',
+    i18n_1829609121201246208: 'just decrypted from encrypted file',
+    i18n_1829609313837142016: 'just encrypted from normal file',
 }
