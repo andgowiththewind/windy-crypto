@@ -414,7 +414,7 @@ public class CryptoService {
                     log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
                     // TODO 更新缓存状态信息
                     Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-                    windy.setLatestMsg("processing");
+                    windy.setLatestMsg("i18n_1829607775228129280");
                     windy.setPercentage(percentage);
                     windy.setPercentageLabel(StrUtil.format("{}%", percentage));
                     windy.setUpdateTime(DateUtil.now());
@@ -428,7 +428,7 @@ public class CryptoService {
             // 防止最后一次结果丢失,循环结束后指定百分比更新一次
             // TODO 直接更新100%
             Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
-            windy.setLatestMsg("IO done");
+            windy.setLatestMsg("i18n_1829607944266944512");
             windy.setPercentage(100);
             windy.setPercentageLabel("100%");
             windy.setUpdateTime(DateUtil.now());

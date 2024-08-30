@@ -37,4 +37,6 @@ export default {
     i18n_1829606906281570304: 'receiving encrypted file input stream...',
     i18n_1829607020437884928: 'receiving the decryption file input stream...',
     i18n_1829607370427424768: 'just created',
+    i18n_1829607775228129280: 'processing',
+    i18n_1829607944266944512: 'I/O process done',
 }

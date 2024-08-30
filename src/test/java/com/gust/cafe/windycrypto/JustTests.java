@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "刚刚创建";
+        String zh = "IO处理完毕";
         // 纯小写
-        String en = "just created";
+        String en = "io process done";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
