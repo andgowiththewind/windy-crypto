@@ -97,7 +97,21 @@ export default {
     },
     // ws消息分发
     wsMsgDispatch(msg) {
-      devConsoleLog('WS消息分发', msg);
+      devConsoleLog('WS消息分发');
+      let res = {};
+      try {
+        res = JSON.parse(msg);
+      } catch (e) {
+        devConsoleLog('WS消息解析失败', e);
+        return false;
+      }
+      if (res && res.code) {
+        if (res.code === 555) {
+          this.updateInsightAndProcessTableData(res.data);
+        } else if (res.code === 666) {
+          // TODO
+        }
+      }
     },
     // 每隔N毫秒查询一次TABLE数据
     tableIntervalStartUp(interval) {
@@ -111,6 +125,8 @@ export default {
       this.$bus.$emit(Methods.FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY);
       let payload = {code: 555, data: this.insightTableDataIdListCopy};
       this.wsInstanceVo.send(JSON.stringify(payload));
+    },
+    updateInsightAndProcessTableData(data) {
     },
   },// methods
   watch: {
