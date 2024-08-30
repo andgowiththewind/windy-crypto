@@ -81,7 +81,7 @@ export default {
           };
           // 定义future:接收到消息时的future
           this.wsInstanceVo.onmessage = (event) => {
-            devConsoleLog(`[${sessionId}]-WS接收到消息`, event);
+            // devConsoleLog(`[${sessionId}]-WS接收到消息`, event);
             this.wsMsgDispatch(event.data);
           };
         } catch (e) {
