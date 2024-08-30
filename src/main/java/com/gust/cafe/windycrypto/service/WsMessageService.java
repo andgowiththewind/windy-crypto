@@ -2,13 +2,9 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,11 +44,11 @@ public class WsMessageService {
                 log.error("[WINDY CRYPTO WEBSOCKET]-消息格式错误:[ID={}],[消息={}]", sessionId, message, e);
             }
             if (convert != null && convert.getCode() != null) {
-                if (convert.getCode() == 555) {
+                if (convert.getCode() == CodeEnum.CODE_555.getCode()) {
                     // 当前约定555获取两个table的缓存数据
                     List<String> ids = (List<String>) convert.getData();// 约定
                     statService.onMessageUpdateTableCache(sessionId, ids);
-                } else if (convert.getCode() == 556) {
+                } else if (convert.getCode() == CodeEnum.CODE_556.getCode()) {
                     // 举例
                 } else {
                     log.error("[WINDY CRYPTO WEBSOCKET]-消息类型错误(非法code):[ID={}],[消息={}]", sessionId, message);
@@ -75,5 +71,15 @@ public class WsMessageService {
     public static class MsgPayloadDTO {
         private Integer code;
         private Object data;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum CodeEnum {
+        CODE_555(555, "更新两个表格的缓存数据"),
+        CODE_556(556, "更新两个表格的缓存数据2"),
+        ;
+        private final Integer code;
+        private final String desc;
     }
 }

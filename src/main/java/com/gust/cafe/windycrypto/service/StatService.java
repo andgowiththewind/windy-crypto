@@ -72,5 +72,8 @@ public class StatService {
             List<Windy> windyList = allResults.get();
             windyList.forEach(windy -> Optional.ofNullable(windy).filter(w -> w != null).ifPresent(processTableData::add));
         }
+        //
+        //
+        // (3) 合并
     }
 }
