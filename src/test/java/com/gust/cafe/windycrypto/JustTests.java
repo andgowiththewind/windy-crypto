@@ -45,16 +45,16 @@ public class JustTests {
         String en = "chinese";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
-        String format = StrUtil.format("{}={}", id, zh);
+        String format = StrUtil.format("i18n_{}={}", id, zh);
         ArrayList<File> list = ListUtil.toList(FileUtil.file(currentDir, "src/main/resources/messages.properties"), FileUtil.file(currentDir, "src/main/resources/messages_zh.properties"));
         list.forEach(file -> {
             FileUtil.appendUtf8Lines(ListUtil.of(format), file);
         });
         //
         File file = FileUtil.file(currentDir, "src/main/resources/messages_en.properties");
-        FileUtil.appendUtf8Lines(ListUtil.of(StrUtil.format("{}={}", id, en)), file);
+        FileUtil.appendUtf8Lines(ListUtil.of(StrUtil.format("i18n_{}={}", id, en)), file);
         //
-        String format1 = StrUtil.format("    {}: '{}',", id, zh);
+        String format1 = StrUtil.format("    i18n_{}: '{}',", id, zh);
         File file1 = FileUtil.file(currentDir, "web-ui/src/lang/zh.js");
         List<String> lines = FileUtil.readUtf8Lines(file1);
         List<String> newLines = new ArrayList<>();
@@ -68,7 +68,7 @@ public class JustTests {
         newLines.add(lines.get(lines.size() - 1));
         FileUtil.writeUtf8Lines(newLines, file1);
         //
-        String format2 = StrUtil.format("    {}: '{}',", id, en);
+        String format2 = StrUtil.format("    i18n_{}: '{}',", id, en);
         File file2 = FileUtil.file(currentDir, "web-ui/src/lang/en.js");
         List<String> lines2 = FileUtil.readUtf8Lines(file2);
         List<String> newLines2 = new ArrayList<>();
