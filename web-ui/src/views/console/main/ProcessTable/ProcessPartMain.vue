@@ -1,0 +1,76 @@
+<template>
+  <div>
+    <el-table
+        size="mini"
+        :fit="true"
+        :stripe="true"
+        :border="true"
+        :row-style="rowStyleFn"
+        :cell-style="cellStyleFn"
+        :header-cell-style="headerCellStyleFn"
+        :max-height="350"
+        :data="processTableData"
+        style="width: 100%;min-height:200px;">
+      <el-table-column label="ID" width="170" :show-overflow-tooltip="true">
+        <template v-slot="scope">
+          <span
+              :id="getIdCellId(scope.row)"
+              :data-clipboard-text="scope.row.id"
+              @click="idClickCopy(scope.row)">
+            {{ scope.row.id }}
+          </span>
+        </template>
+      </el-table-column>
+      <!--进度-->
+      <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
+        <template v-slot="scope">
+          <div v-if="scope.row.code>=20 && scope.row.code<=40">
+            <el-progress v-if="scope.row.percentage" :percentage="scope.row.percentage||0"></el-progress>
+          </div>
+          <span v-else style="opacity: 25%">/</span>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script>
+// import {Notification, MessageBox, Message, Loading} from 'element-ui';
+// import request from '@/utils/request';
+// import * as CommonConsts from '@/config/CommonConsts';
+
+export default {
+  name: "ProcessPartMain",
+  components: {},
+  data() {
+    return {
+      processTableData: [],
+    }
+  },// data
+  methods: {
+    rowStyleFn({row, rowIndex}) {
+      return {backgroundColor: (rowIndex % 2 === 0 ? '#f0f9eb' : '#b7a476'), color: 'black'};
+    },
+    cellStyleFn({row, column, rowIndex, columnIndex}) {
+      if (['name', 'absPath'].includes(column.property)) {
+        return {textAlign: 'left'};
+      }
+      if (['status', 'percentage', 'readableFileSize', 'extName'].includes(column.property)) {
+        return {textAlign: 'center'};
+      }
+    },
+    headerCellStyleFn({row, column, rowIndex, columnIndex}) {
+      return {backgroundColor: '#01847f', textAlign: 'center', color: 'yellow', fontSize: '10px'};
+    },
+  },// methods
+  watch: {
+    // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
+  },// watch
+  mounted() {
+    // this.init();
+  },// mounted
+}
+</script>
+
+<style scoped>
+</style>
