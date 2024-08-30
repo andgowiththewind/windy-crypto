@@ -84,12 +84,9 @@ export default {
         }
       });
       this.wsPromise.then(() => {
-        this.wsPromise = null;
       }).catch((error) => {
         this.wsPromise = null;
       });
-
-
     },
     // ws消息分发
     wsMsgDispatch(msg) {
