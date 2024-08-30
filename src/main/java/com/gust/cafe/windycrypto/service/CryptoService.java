@@ -556,9 +556,14 @@ public class CryptoService {
         // 源文件与临时文件都需要删除,注意顺序,安全起见最后才能删除源文件
         // 先删除临时文件
         physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getTmpPath()));
-        // 临时文件在`pathIdMap`中也能删除
-        String positiveSlashPath = windyCacheService.getPositiveSlashPath(cryptoContext.getTmpPath());
-        redisMasterCache.deleteCacheMapValue(CacheConstants.PATH_ID_MAP, positiveSlashPath);
+        // 缓存更新为删除状态
+        Windy windyTmp = windyCacheService.lockGetOrDefault(cryptoContext.getTmpPath());
+        windyTmp.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+        windyTmp.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+        windyTmp.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+        windyTmp.setLatestMsg("not exist");
+        windyTmp.setUpdateTime(DateUtil.now());
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyTmp.getId(), windyTmp);
         //
         //
         // 如果本次是解密操作且并没有忽略"cfg缺失对应文件名加密信息"的情况,说明正常解密成功,此时cfg中记录的信息行可以被删除
@@ -587,15 +592,13 @@ public class CryptoService {
         // 最后的最后才删除源文件
         physicalDelete(cryptoContext, ListUtil.toLinkedList(cryptoContext.getBeforePath()));
         // 物理文件删除后更新缓存
-        /*Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+        Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
         windyBefore.setCode(WindyStatusEnum.NOT_EXIST.getCode());
         windyBefore.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
         windyBefore.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
         windyBefore.setLatestMsg("not exist");
         windyBefore.setUpdateTime(DateUtil.now());
-        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);*/
-        String parseIdBefore = windyCacheService.parseId(cryptoContext.getBeforePath());
-        redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseIdBefore);
+        redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
     }
 
     private void physicalDelete(CryptoContext cryptoContext, LinkedList<String> pathList) {
@@ -705,12 +708,17 @@ public class CryptoService {
             };
             Consumer<Void> successCs = aVoid -> {
                 log.debug("[{}]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), windyCacheService.parseId(path));
-                // 删除可能存在的缓存
+                // 缓存更新为删除状态
                 String parseId = windyCacheService.parseId(path);
-                redisMasterCache.deleteCacheMapValue(CacheConstants.WINDY_MAP, parseId);
-                // pathIdMap也删除对应的记录
-                String positiveSlashPath = windyCacheService.getPositiveSlashPath(path);
-                redisMasterCache.deleteCacheMapValue(CacheConstants.PATH_ID_MAP, positiveSlashPath);
+                Windy windy = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId);
+                if (windy != null) {
+                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
+                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
+                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
+                    windy.setLatestMsg("not exist");
+                    windy.setUpdateTime(DateUtil.now());
+                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+                }
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("最终删除(超时)失败:[{}ms],需要手动删除", timer.intervalMs()));
