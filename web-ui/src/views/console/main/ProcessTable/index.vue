@@ -14,7 +14,7 @@
           :direction="drawerVo.direction">
         <div>
           <el-container v-cloak class="windy-container">
-            <el-aside width="35vw" style="padding: 10px;">
+            <el-aside width="35vw" style="padding: 4px;">
               <ProcessPartAside></ProcessPartAside>
             </el-aside>
             <el-container>
