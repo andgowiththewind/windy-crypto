@@ -96,7 +96,7 @@ export default {
     },
     // ws消息分发
     wsMsgDispatch(msg) {
-      devConsoleLog('WS消息分发');
+      // devConsoleLog('WS消息分发');
       let res = {};
       try {
         res = JSON.parse(msg);
