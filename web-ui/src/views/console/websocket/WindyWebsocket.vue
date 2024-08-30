@@ -128,6 +128,7 @@ export default {
     },
     // {insightTableData: [], processTableData: []}
     updateInsightAndProcessTableData(data) {
+      this.$bus.$emit(Methods.FN_OBJECT_ASSIGN_TABLE_DATA, data.insightTableData);
     },
   },// methods
   watch: {
