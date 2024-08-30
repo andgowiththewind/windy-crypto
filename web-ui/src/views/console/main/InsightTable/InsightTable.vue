@@ -58,7 +58,7 @@
       <!--进度-->
       <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
         <template v-slot="scope">
-          <div v-if="scope.row.code>=20 && scope.row.code<=40">
+          <div v-if="(scope.row.code>=20 && scope.row.code<=40)||scope.row.code==-1">
             <el-progress v-if="scope.row.percentage" :percentage="scope.row.percentage||0"></el-progress>
           </div>
           <span v-else style="opacity: 25%">/</span>
