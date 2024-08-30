@@ -613,16 +613,6 @@ public class CryptoService {
             Consumer<Void> successCs = aVoid -> {
                 String parseId = windyCacheService.parseId(path);
                 log.debug("[{}]-[收尾阶段]-删除成功,耗时[{}]ms,被刪除:[{}]", cryptoContext.getBeforeCacheId(), timer.intervalMs(), parseId);
-                // 考虑到tmp文件不记录缓存的情况
-                Windy windy = redisMasterCache.getCacheMapValue(CacheConstants.WINDY_MAP, parseId);
-                if (windy != null) {
-                    windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
-                    windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
-                    windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg("not exist");
-                    windy.setUpdateTime(DateUtil.now());
-                    redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-                }
             };
             Consumer<Void> errorCs = aVoid -> {
                 throw new WindyException(StrUtil.format("[{}]-[收尾阶段]-删除(超时)失败:[{}ms]", cryptoContext.getBeforeCacheId(), timer.intervalMs()));
@@ -715,7 +705,7 @@ public class CryptoService {
                     windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
                     windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
                     windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg("not exist");
+                    windy.setLatestMsg("i18n_1829610650868011008");// 发生异常触发当前文件被删除
                     windy.setUpdateTime(DateUtil.now());
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                 }
@@ -732,7 +722,7 @@ public class CryptoService {
         windy.setCode(WindyStatusEnum.FREE.getCode());
         windy.setLabel(WindyStatusEnum.FREE.getLabel());
         windy.setDesc(WindyStatusEnum.FREE.getRemark());
-        windy.setLatestMsg("free");
+        windy.setLatestMsg("i18n_1829610946314772480");
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
         //

@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "当前文件解密成功后已删除";
+        String zh = "上次异常触发回滚。重新开放";
         // 纯小写
-        String en = "the current file has been decrypted and deleted";
+        String en = "last exception triggered rollback. re-open";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);

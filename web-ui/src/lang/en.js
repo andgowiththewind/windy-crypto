@@ -44,4 +44,6 @@ export default {
     i18n_1829609313837142016: 'just encrypted from normal file',
     i18n_1829609800674267136: 'the current file has been encrypted and deleted',
     i18n_1829609885185249280: 'the current file has been decrypted and deleted',
+    i18n_1829610650868011008: 'exception occurred and the current file was deleted',
+    i18n_1829610946314772480: 'last exception triggered rollback. re-open',
 }
