@@ -42,6 +42,7 @@ export default {
         return false;
       }
       if (this.wsPromise) {
+        this.wsUrlPrefixInit();
         devConsoleLog('前置条件未满足:wsPromise存在,有其他线程正在创建ws连接,当前线程终止防止交叉构建');
         return false;
       }
@@ -69,7 +70,8 @@ export default {
           // 定义future:定义连接关闭时的future
           this.wsInstanceVo.onclose = (e) => {
             devConsoleLog(`[${sessionId}]-ws连接关闭`, e);
-            reject(e);
+            this.wsPromise = null;
+            this.wsSessionId = '';
           };
           // 定义future:接收到消息时的future
           this.wsInstanceVo.onmessage = (event) => {
@@ -83,9 +85,8 @@ export default {
       });
       this.wsPromise.then(() => {
         this.wsPromise = null;
-      }).catch(() => {
+      }).catch((error) => {
         this.wsPromise = null;
-        this.wsSessionId = '';
       });
 
 
