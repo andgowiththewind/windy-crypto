@@ -596,7 +596,7 @@ public class CryptoService {
         windyBefore.setCode(WindyStatusEnum.NOT_EXIST.getCode());
         windyBefore.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
         windyBefore.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-        windyBefore.setLatestMsg("not exist");
+        windyBefore.setLatestMsg(cryptoContext.getAskEncrypt() ? "i18n_1829609800674267136" : "i18n_1829609885185249280");
         windyBefore.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
     }

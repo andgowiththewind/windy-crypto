@@ -42,4 +42,6 @@ export default {
     i18n_1829608424183312384: 'will be done soon',
     i18n_1829609121201246208: 'just decrypted from encrypted file',
     i18n_1829609313837142016: 'just encrypted from normal file',
+    i18n_1829609800674267136: 'the current file has been encrypted and deleted',
+    i18n_1829609885185249280: 'the current file has been decrypted and deleted',
 }

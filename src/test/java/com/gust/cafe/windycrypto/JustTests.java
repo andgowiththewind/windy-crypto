@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "刚由正常文件加密而成";
+        String zh = "当前文件解密成功后已删除";
         // 纯小写
-        String en = "just encrypted from normal file";
+        String en = "the current file has been decrypted and deleted";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
