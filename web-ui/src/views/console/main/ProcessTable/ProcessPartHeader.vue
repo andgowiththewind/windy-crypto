@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-alert style="text-align: center;" title="处理中" type="success" :closable="false"></el-alert>
+  <div >
+    <el-alert title="处理中" center type="success" :closable="false"></el-alert>
   </div>
 </template>
 
@@ -11,7 +11,9 @@ export default {
   name: "ProcessPartHeader",
   components: {},
   data() {
-    return {}
+    return {
+      alertStyle: "alert-style",
+    }
   },// data
   methods: {},// methods
   watch: {

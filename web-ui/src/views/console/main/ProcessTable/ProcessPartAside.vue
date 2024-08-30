@@ -1,6 +1,16 @@
 <template>
   <div>
-    <h1>ProcessPartAside</h1>
+    <div>
+      <el-card shadow="always">总是显示</el-card>
+    </div>
+    <p></p>
+    <div>
+      <el-card shadow="always">总是显示</el-card>
+    </div>
+    <p></p>
+    <div>
+      <el-card shadow="always">总是显示</el-card>
+    </div>
   </div>
 </template>
 

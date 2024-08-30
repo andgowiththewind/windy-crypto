@@ -14,17 +14,17 @@
           :direction="drawerVo.direction">
         <div>
           <el-container v-cloak class="windy-container">
-            <el-aside width="35vw">
+            <el-aside width="35vw" style="padding: 10px;">
               <ProcessPartAside></ProcessPartAside>
             </el-aside>
             <el-container>
-              <el-header style="padding: 0px;">
+              <el-header style="padding: 0px;height: 30px;">
                 <ProcessPartHeader></ProcessPartHeader>
               </el-header>
-              <el-main>
+              <el-main style="padding: 1px;">
                 <ProcessPartMain></ProcessPartMain>
               </el-main>
-              <el-footer>
+              <el-footer style="padding: 1px;height: 30px;">
                 <ProcessPartFooter></ProcessPartFooter>
               </el-footer>
             </el-container>
