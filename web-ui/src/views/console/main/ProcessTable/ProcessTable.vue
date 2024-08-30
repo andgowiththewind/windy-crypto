@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h1>ProcessTable</h1>
+    <div class="view-progress-btn" @click="drawerVo.show=true">
+      <el-tooltip effect="dark" :content="$t('i18n_1829433519491911680')" placement="top">
+        <span><i class="fa fa-table"></i></span>
+      </el-tooltip>
+    </div>
   </div>
 </template>
 
@@ -13,7 +17,11 @@ export default {
   name: "ProcessTable",
   components: {},
   data() {
-    return {}
+    return {
+      drawerVo: {
+        show: false,
+      }
+    }
   },// data
   methods: {},// methods
   watch: {
@@ -26,4 +34,17 @@ export default {
 </script>
 
 <style scoped>
+.view-progress-btn {
+  opacity: 65%;
+  color: rgb(0, 133, 125);
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  font-size: 70px;
+}
+
+.view-progress-btn:hover {
+  opacity: 100%;
+  color: rgb(0, 133, 125);
+}
 </style>
