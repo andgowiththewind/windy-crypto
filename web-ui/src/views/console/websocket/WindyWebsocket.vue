@@ -126,6 +126,7 @@ export default {
       let payload = {code: 555, data: this.insightTableDataIdListCopy};
       this.wsInstanceVo.send(JSON.stringify(payload));
     },
+    // {insightTableData: [], processTableData: []}
     updateInsightAndProcessTableData(data) {
     },
   },// methods
