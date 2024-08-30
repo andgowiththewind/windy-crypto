@@ -133,7 +133,7 @@ public class CryptoService {
         windy.setCode(WindyStatusEnum.OUTPUTTING.getCode());
         windy.setLabel(WindyStatusEnum.OUTPUTTING.getLabel());
         windy.setDesc(WindyStatusEnum.OUTPUTTING.getRemark());
-        windy.setLatestMsg("outputting");
+        windy.setLatestMsg(cryptoContext.getAskEncrypt() ? "i18n_1829606118809284608" : "i18n_1829606263315632128");
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
 

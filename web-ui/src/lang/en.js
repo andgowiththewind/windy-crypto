@@ -32,4 +32,6 @@ export default {
     i18n_1828982632629800961: 'do not ignore',
     i18n_1829433519491911680: 'view progress',
     i18n_1829605209761001472: 'waiting for thread allocation...',
+    i18n_1829606118809284608: 'encrypting...',
+    i18n_1829606263315632128: 'decrypting...',
 }

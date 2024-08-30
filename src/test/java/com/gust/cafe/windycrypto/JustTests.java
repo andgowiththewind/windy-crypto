@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "正在排队等待分配线程...";
+        String zh = "正在解密...";
         // 纯小写
-        String en = "waiting for thread allocation...";
+        String en = "decrypting...";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
