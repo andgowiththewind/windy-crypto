@@ -10,7 +10,6 @@ import {devConsoleLog} from '@/utils/commonUtils';
 import {getWsUrlPrefix} from '@/api/windyWebsocketApi';
 import {customAlphabet} from 'nanoid'
 import * as Methods from '@/config/Methods';
-import {FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY} from "@/config/Methods";
 
 
 export default {

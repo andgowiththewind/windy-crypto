@@ -36,8 +36,8 @@
 
 <script>
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
+import * as Methods from '@/config/Methods';
+import {FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA} from "@/config/Methods";
 
 export default {
   name: "ProcessPartMain",
@@ -67,7 +67,7 @@ export default {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    // this.init();
+    this.$bus.$on(Methods.FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA, (data) => this.processTableData = data);
   },// mounted
 }
 </script>
