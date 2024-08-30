@@ -10,7 +10,7 @@ windy-thread-pool:
     queue-capacity: 20000
     keep-alive-seconds: 60
   stat:
-    core-pool-size: 8
-    max-pool-size: 10
-    queue-capacity: 5000
+    core-pool-size: 12
+    max-pool-size: 16
+    queue-capacity: 500
     keep-alive-seconds: 60
