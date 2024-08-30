@@ -2,6 +2,8 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.convert.ConvertException;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,14 +43,14 @@ public class WsMessageService {
             // message是前端JSON.stringify后的字符串
             MsgPayloadDTO convert = null;
             try {
-                convert = Convert.convert(MsgPayloadDTO.class, message);
+                convert = Convert.convert(MsgPayloadDTO.class, JSONUtil.parseObj(message));
             } catch (ConvertException e) {
                 log.error("[WINDY CRYPTO WEBSOCKET]-消息格式错误:[ID={}],[消息={}]", sessionId, message, e);
             }
             if (convert != null && convert.getCode() != null) {
                 if (convert.getCode() == 555) {
                     // 当前约定555获取两个table的缓存数据
-                    List<String> ids = (List<String>) convert.getData();
+                    List<String> ids = (List<String>) convert.getData();// 约定
                     statService.onMessageUpdateTableCache(sessionId, ids);
                 } else if (convert.getCode() == 556) {
                     // 举例
