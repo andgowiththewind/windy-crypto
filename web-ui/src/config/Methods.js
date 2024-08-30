@@ -15,4 +15,5 @@ export const FN_UPDATE_TOP_FOLDER_PATH_COPY = 'fnUpdateTopFolderPathCopy';
 export const FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY = 'fnUpdateInsightTableDataIdListCopy';
 export const FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY = 'fnContractInsightTableDataIdListCopy';
 //
-export const FN_OBJECT_ASSIGN_TABLE_DATA = 'fnObjectAssignTableData';
+export const FN_OBJECT_ASSIGN_INSIGHT_TABLE_DATA = 'fnObjectAssignInsightTableData';
+export const FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA = 'fnObjectAssignProcessTableData';
