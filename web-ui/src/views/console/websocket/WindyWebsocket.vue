@@ -50,6 +50,49 @@ export default {
       let sessionId = nanoid(18);
       const url = `${this.wsUrlPrefix}/${sessionId}`;
       // 构建Promise
+      this.wsPromise = new Promise((resolve, reject) => {
+        try {
+          devConsoleLog(`[${sessionId}]-开始构建ws连接...`);
+          // 此时是异步的,不会阻塞
+          this.wsInstanceVo = new WebSocket(url);
+          // 定义future:定义连接成功时的future
+          this.wsInstanceVo.onopen = () => {
+            devConsoleLog(`[${sessionId}]-ws连接创建成功`);
+            this.wsSessionId = sessionId;
+            resolve(this.wsInstanceVo);
+          };
+          // 定义future:定义连接失败时的future
+          this.wsInstanceVo.onerror = (e) => {
+            devConsoleLog(`[${sessionId}]-ws连接创建失败`, e);
+            reject(e);
+          };
+          // 定义future:定义连接关闭时的future
+          this.wsInstanceVo.onclose = (e) => {
+            devConsoleLog(`[${sessionId}]-ws连接关闭`, e);
+            reject(e);
+          };
+          // 定义future:接收到消息时的future
+          this.wsInstanceVo.onmessage = (event) => {
+            devConsoleLog(`[${sessionId}]-ws接收到消息`, event);
+            this.wsMsgDispatch(event.data);
+          };
+        } catch (e) {
+          devConsoleLog('ws连接创建失败', e);
+          reject(e);
+        }
+      });
+      this.wsPromise.then(() => {
+        this.wsPromise = null;
+      }).catch(() => {
+        this.wsPromise = null;
+        this.wsSessionId = '';
+      });
+
+
+    },
+    // ws消息分发
+    wsMsgDispatch(msg) {
+      devConsoleLog('ws消息分发', msg);
     },
   },// methods
   watch: {
