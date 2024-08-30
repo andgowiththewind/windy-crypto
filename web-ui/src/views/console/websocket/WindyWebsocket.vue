@@ -8,8 +8,9 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import {devConsoleLog} from '@/utils/commonUtils';
 import {getWsUrlPrefix} from '@/api/windyWebsocketApi';
-// import {nanoid} from 'nanoid';
 import {customAlphabet} from 'nanoid'
+import * as Methods from '@/config/Methods';
+import {FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY} from "@/config/Methods";
 
 
 export default {
@@ -21,6 +22,7 @@ export default {
       wsSessionId: '',// 自定义的sessionId,记录当前连接
       wsInstanceVo: null,// websocket实例
       wsPromise: null,// 用于跟踪WebSocket连接状态的Promise,防止重复交叉构建
+      insightTableDataIdListCopy: [],// 用于存储`insightTable`的ID,针对性更新
     }
   },// data
   methods: {
@@ -97,6 +99,19 @@ export default {
     wsMsgDispatch(msg) {
       devConsoleLog('WS消息分发', msg);
     },
+    // 每隔N毫秒查询一次TABLE数据
+    tableIntervalStartUp(interval) {
+      setInterval(() => this.sendTableDataReqMsg(), interval);
+    },
+    // 发生WS消息到后端请求TABLE数据
+    sendTableDataReqMsg() {
+      let wsOk = this.wsInstanceVo != null && this.wsInstanceVo != undefined && this.wsInstanceVo.readyState === WebSocket.OPEN;
+      if (!wsOk) return false;
+      // 收集`insightTable`的ID,针对性更新
+      this.$bus.$emit(Methods.FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY);
+      let payload = {code: 555, data: this.insightTableDataIdListCopy};
+      this.wsInstanceVo.send(JSON.stringify(payload));
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
@@ -104,7 +119,9 @@ export default {
   mounted() {
     devConsoleLog('WindyWebsocket mounted');
     this.wsUrlPrefixInit();
-    this.wsIntervalStartUp(2000);// 每个N毫秒检查一次ws连接
+    this.wsIntervalStartUp(2000);// 每隔N毫秒检查一次ws连接
+    this.tableIntervalStartUp(1000);// 每隔N毫秒查询一次TABLE数据
+    this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY, (data) => this.insightTableDataIdListCopy = data);
   },// mounted
 }
 </script>

@@ -169,6 +169,12 @@ export default {
         Notification.success({title: this.$t('i18n_1827961313217875968'), message: res.msg, position: 'bottom-right'});
       }).finally().catch();
     },
+    // 收到通知需要传参
+    contractInsightTableDataIdListCopy() {
+      let ids = [];
+      this.tableData.map(row => ids.push(row.id));
+      this.$bus.$emit(Methods.FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY, ids);
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
@@ -177,6 +183,7 @@ export default {
     // 收到tableData
     this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => this.tableData = data);
     this.$bus.$on(Methods.FN_UPDATE_USER_PASSWORD, (data) => this.userPasswordCopy = data);
+    this.$bus.$on(Methods.FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY, (data) => this.contractInsightTableDataIdListCopy());
   },// mounted
 }
 </script>

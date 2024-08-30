@@ -12,3 +12,5 @@ export const FN_UPDATE_USER_PASSWORD = 'fnUpdateUserPassword';
 export const FN_CONTRACT_TOP_FOLDER_PATH_COPY = 'fnContractTopFolderPathCopy';
 export const FN_UPDATE_TOP_FOLDER_PATH_COPY = 'fnUpdateTopFolderPathCopy';
 //
+export const FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY = 'fnUpdateInsightTableDataIdListCopy';
+export const FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY = 'fnContractInsightTableDataIdListCopy';
