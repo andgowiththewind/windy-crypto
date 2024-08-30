@@ -30,4 +30,5 @@ export default {
     i18n_1828973612548362244: 'please enter the password...',
     i18n_1828982632629800960: 'ignore missing hidden filename',
     i18n_1828982632629800961: 'do not ignore',
+    i18n_1829433519491911680: 'view progress',
 }
