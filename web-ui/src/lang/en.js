@@ -34,4 +34,6 @@ export default {
     i18n_1829605209761001472: 'waiting for thread allocation...',
     i18n_1829606118809284608: 'encrypting...',
     i18n_1829606263315632128: 'decrypting...',
+    i18n_1829606906281570304: 'receiving encrypted file input stream...',
+    i18n_1829607020437884928: 'receiving the decryption file input stream...',
 }

@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "正在解密...";
+        String zh = "正在接收解密文件输入流...";
         // 纯小写
-        String en = "decrypting...";
+        String en = "receiving the decryption file input stream...";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
