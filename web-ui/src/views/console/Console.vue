@@ -16,6 +16,8 @@
         </el-footer>
       </el-container>
     </el-container>
+    <!--ws-->
+    <WindyWebsocket/>
   </div>
 </template>
 
@@ -27,10 +29,11 @@ import Aside from '@/views/console/aside/Aside.vue';
 import Header from '@/views/console/header/Header.vue';
 import Main from '@/views/console/main/Main.vue';
 import Footer from '@/views/console/footer/Footer.vue';
+import WindyWebsocket from '@/views/console/websocket/WindyWebsocket.vue';
 
 export default {
   name: "Console",
-  components: {Aside, Header, Main, Footer},
+  components: {Aside, Header, Main, Footer, WindyWebsocket},
   data() {
     return {}
   },// data
