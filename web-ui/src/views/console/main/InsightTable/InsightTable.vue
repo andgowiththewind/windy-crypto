@@ -54,7 +54,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('i18n_1827913996976656385')" prop="latestMsg" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column :label="$t('i18n_1827913996976656385')" prop="latestMsg" :show-overflow-tooltip="true">
+        <template v-slot="scope">
+          <span>{{ i18nMsgPlusAction(scope.row.latestMsg) }}</span>
+        </template>
+      </el-table-column>
       <!--进度-->
       <el-table-column :label="$t('i18n_1827913996980850688')" prop="percentage">
         <template v-slot="scope">
@@ -81,7 +85,7 @@
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
-import {devConsoleLog} from "@/utils/commonUtils";
+import {devConsoleLog, i18nMsgPlus} from "@/utils/commonUtils";
 import {cryptoSubmitFn, rowStyleFn, cellStyleFn, headerCellStyleFn} from "@/api/insightTableApi";
 
 export default {
@@ -97,6 +101,13 @@ export default {
     }
   },// data
   methods: {
+    i18nMsgPlusAction(msg) {
+      // 如果以`i18n_`开头则调用
+      if (msg.startsWith('i18n_')) {
+        return this.$t(msg);
+      }
+      return msg;
+    },
     getAbsPathCellId(row) {
       return 'absPathCellId_' + row.id;
     },
