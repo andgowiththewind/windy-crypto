@@ -54,7 +54,7 @@ public class JustTests {
         File file = FileUtil.file(currentDir, "src/main/resources/messages_en.properties");
         FileUtil.appendUtf8Lines(ListUtil.of(StrUtil.format("{}={}", id, en)), file);
         //
-        String format1 = StrUtil.format("{}:{}", id, zh);
+        String format1 = StrUtil.format("{}:{},", id, zh);
         File file1 = FileUtil.file(currentDir, "web-ui/src/lang/zh.js");
         List<String> lines = FileUtil.readUtf8Lines(file1);
         List<String> newLines = new ArrayList<>();
@@ -68,7 +68,7 @@ public class JustTests {
         newLines.add(lines.get(lines.size() - 1));
         FileUtil.writeUtf8Lines(newLines, file1);
         //
-        String format2 = StrUtil.format("{}:{}", id, en);
+        String format2 = StrUtil.format("{}:{},", id, en);
         File file2 = FileUtil.file(currentDir, "web-ui/src/lang/en.js");
         List<String> lines2 = FileUtil.readUtf8Lines(file2);
         List<String> newLines2 = new ArrayList<>();
