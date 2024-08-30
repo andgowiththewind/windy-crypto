@@ -44,11 +44,11 @@ public class WsMessageService {
                 log.error("[WINDY CRYPTO WEBSOCKET]-消息格式错误:[ID={}],[消息={}]", sessionId, message, e);
             }
             if (convert != null && convert.getCode() != null) {
-                if (convert.getCode() == CodeEnum.CODE_555.getCode()) {
+                if (convert.getCode().intValue() == CodeEnum.CODE_555.getCode().intValue()) {
                     // 当前约定555获取两个table的缓存数据
                     List<String> ids = (List<String>) convert.getData();// 约定
                     statService.onMessageUpdateTableCache(sessionId, ids);
-                } else if (convert.getCode() == CodeEnum.CODE_556.getCode()) {
+                } else if (convert.getCode().intValue() == CodeEnum.CODE_556.getCode().intValue()) {
                     // 举例
                 } else {
                     log.error("[WINDY CRYPTO WEBSOCKET]-消息类型错误(非法code):[ID={}],[消息={}]", sessionId, message);
