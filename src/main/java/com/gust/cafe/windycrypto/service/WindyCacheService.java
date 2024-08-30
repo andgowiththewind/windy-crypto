@@ -72,7 +72,7 @@ public class WindyCacheService {
                     .code(code)
                     .label(WindyStatusEnum.getByCode(code).getLabel())
                     .desc(WindyStatusEnum.getByCode(code).getRemark())
-                    .latestMsg("create just 1 second")
+                    .latestMsg("i18n_1829607370427424768")
                     .percentage(null)
                     .percentageLabel(null)
                     .size(size)

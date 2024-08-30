@@ -36,4 +36,5 @@ export default {
     i18n_1829606263315632128: 'decrypting...',
     i18n_1829606906281570304: 'receiving encrypted file input stream...',
     i18n_1829607020437884928: 'receiving the decryption file input stream...',
+    i18n_1829607370427424768: 'just created',
 }
