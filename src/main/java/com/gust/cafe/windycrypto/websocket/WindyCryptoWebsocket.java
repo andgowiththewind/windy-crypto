@@ -1,6 +1,17 @@
 package com.gust.cafe.windycrypto.websocket;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.convert.ConvertException;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONUtil;
+import com.gust.cafe.windycrypto.exception.WindyException;
+import com.gust.cafe.windycrypto.service.StatService;
+import com.gust.cafe.windycrypto.service.WsMessageService;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,13 +45,13 @@ public class WindyCryptoWebsocket {
         this.sessionId = sessionId;
         this.session = session;
         SESSION_POOL.put(sessionId, session);
-        log.debug("[WINDY CRYPTO WEBSOCKET]-连接加入:[ID={}],[当前在线连接数={}]", sessionId, SESSION_POOL.size());
+        log.debug("[WINDY CRYPTO WEBSOCKET]-连接加入:[sessionId={}],[当前在线连接数={}]", sessionId, SESSION_POOL.size());
     }
 
     @OnClose
     public void onClose(Session session) {
         SESSION_POOL.remove(sessionId);
-        log.debug("[WINDY CRYPTO WEBSOCKET]-连接关闭:[ID={}],[当前在线连接数={}]", sessionId, SESSION_POOL.size());
+        log.debug("[WINDY CRYPTO WEBSOCKET]-连接关闭:[sessionId={}],[当前在线连接数={}]", sessionId, SESSION_POOL.size());
     }
 
     @OnError
@@ -50,8 +61,8 @@ public class WindyCryptoWebsocket {
 
     @OnMessage
     public void onMessage(String message) {
-        log.debug("[WINDY CRYPTO WEBSOCKET]-收到前端消息:[ID={}],[消息={}]", sessionId, message);
-        // 处理消息
+        // log.debug("[WINDY CRYPTO WEBSOCKET]-收到前端消息:[sessionId={}],[消息={}]", sessionId, message);// 太频繁了,不打印
+        SpringUtil.getBean(WsMessageService.class).onMessage(sessionId, message);// service启动异步线程去处理
     }
 
     // 发送消息:单点信息发送
@@ -61,7 +72,7 @@ public class WindyCryptoWebsocket {
             try {
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
-                log.debug("[WINDY CRYPTO WEBSOCKET]-发送消息异常:[ID={}],[消息={}]", sessionId, message, e);
+                log.debug("[WINDY CRYPTO WEBSOCKET]-发送消息异常:[sessionId={}],[消息={}]", sessionId, message, e);
             }
         }
     }
@@ -78,7 +89,7 @@ public class WindyCryptoWebsocket {
             try {
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
-                log.debug("[WINDY CRYPTO WEBSOCKET]-广播消息异常:[ID={}],[消息={}]", sessionId, message, e);
+                log.debug("[WINDY CRYPTO WEBSOCKET]-广播消息异常:[sessionId={}],[消息={}]", sessionId, message, e);
             }
         });
     }
