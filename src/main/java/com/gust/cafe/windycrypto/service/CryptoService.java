@@ -116,7 +116,7 @@ public class CryptoService {
         windy.setCode(WindyStatusEnum.WAITING.getCode());
         windy.setLabel(WindyStatusEnum.WAITING.getLabel());
         windy.setDesc(WindyStatusEnum.WAITING.getRemark());
-        windy.setLatestMsg("queued");
+        windy.setLatestMsg("i18n_1829605209761001472");// 正在排队等待分配线程...
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
         log.debug("[{}]-更新状态为WAITING", cryptoContext.getBeforeCacheId());
