@@ -7,6 +7,8 @@
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import {devConsoleLog} from '@/utils/commonUtils';
+import {getWsUrlPrefix} from '@/api/windyWebsocketApi';
+import {nanoid} from 'nanoid';
 
 export default {
   name: "WindyWebsocket",
@@ -14,16 +16,40 @@ export default {
   data() {
     return {
       wsUrlPrefix: '',// 参考`ws://localhost:8080/windyCryptoWebsocket/{sessionId}`,但需要由后端拼接端口号后传递过来
+      wsSessionId: '',// 自定义的sessionId,记录当前连接
+      wsInstanceVo: null,// websocket实例
+      wsPromise: null,// 用于跟踪WebSocket连接状态的Promise,防止重复交叉构建
     }
   },// data
   methods: {
     // 如果ws地址不存在则发送一次请求
     wsUrlPrefixInit() {
       if (!this.wsUrlPrefix) {
-/*        this.$axios.get('/windyWebsocket/wsUrlPrefix').then(res => {
-          this.wsUrlPrefix = res.data;
-        });*/
+        getWsUrlPrefix().then(res => this.wsUrlPrefix = res.data).catch(err => devConsoleLog(err));
       }
+    },
+    wsIntervalStartUp(interval) {
+      setInterval(() => this.buildWsConnect(), interval);
+    },
+    // 检查,如果ws连接不存在则创建
+    buildWsConnect() {
+      if (this.cryptoWebSocketVo != null && this.cryptoWebSocketVo != undefined && this.cryptoWebSocketVo.readyState === WebSocket.OPEN) {
+        devConsoleLog('ws连接状态正常,无需重复创建');
+        return true;
+      }
+      if (!this.wsUrlPrefix) {
+        devConsoleLog('前置条件未满足:wsUrlPrefix为空,无法创建ws连接');
+        return false;
+      }
+      if (this.wsPromise) {
+        devConsoleLog('前置条件未满足:wsPromise存在,有其他线程正在创建ws连接,当前线程终止防止交叉构建');
+        return false;
+      }
+      // 可以构建
+      // 自定义会话ID
+      let sessionId = nanoid(18);
+      const url = `${this.wsUrlPrefix}/${sessionId}`;
+      // 构建Promise
     },
   },// methods
   watch: {
@@ -32,6 +58,7 @@ export default {
   mounted() {
     devConsoleLog('WindyWebsocket mounted');
     this.wsUrlPrefixInit();
+    this.wsIntervalStartUp(2000);// 每个N毫秒检查一次ws连接
   },// mounted
 }
 </script>
