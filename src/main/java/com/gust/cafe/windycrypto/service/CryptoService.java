@@ -493,7 +493,7 @@ public class CryptoService {
             windyBefore.setCode(WindyStatusEnum.ALMOST.getCode());
             windyBefore.setLabel(WindyStatusEnum.ALMOST.getLabel());
             windyBefore.setDesc(WindyStatusEnum.ALMOST.getRemark());
-            windyBefore.setLatestMsg("almost");
+            windyBefore.setLatestMsg("i18n_1829608424183312384");
             windyBefore.setUpdateTime(DateUtil.now());
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyBefore.getId(), windyBefore);
             //
@@ -504,7 +504,7 @@ public class CryptoService {
             windyAfter.setCode(WindyStatusEnum.ALMOST.getCode());
             windyAfter.setLabel(WindyStatusEnum.ALMOST.getLabel());
             windyAfter.setDesc(WindyStatusEnum.ALMOST.getRemark());
-            windyAfter.setLatestMsg("almost");
+            windyAfter.setLatestMsg("i18n_1829608424183312384");
             windyAfter.setUpdateTime(DateUtil.now());
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windyAfter.getId(), windyAfter);
             //
@@ -583,7 +583,7 @@ public class CryptoService {
         windyAfter.setCode(WindyStatusEnum.FREE.getCode());
         windyAfter.setLabel(WindyStatusEnum.FREE.getLabel());
         windyAfter.setDesc(WindyStatusEnum.FREE.getRemark());
-        windyAfter.setLatestMsg("free");
+        windyAfter.setLatestMsg(cryptoContext.getAskEncrypt() ? "" : "");
         windyAfter.setSize(size);
         windyAfter.setSizeLabel(sizeLabel);
         windyAfter.setUpdateTime(DateUtil.now());
