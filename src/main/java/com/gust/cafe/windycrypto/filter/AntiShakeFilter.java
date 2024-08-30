@@ -56,17 +56,16 @@ public class AntiShakeFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 已经在之前的filter中包装过了
         CachedBodyHttpServletRequest cachedBodyHttpServletRequest = (CachedBodyHttpServletRequest) request;
-
         //
+        String antiShakeContent = null;
+        // 获取请求路径
         String requestURI = request.getRequestURI();
-
         // 读取请求体
         String requestBody = cachedBodyHttpServletRequest.getRequestBodyString();
-        Assert.notBlank(requestBody, "请求体不能为空");
-
+        // 如果请求体为空则对请求路径进行防抖
+        antiShakeContent = StrUtil.isBlank(requestBody) ? requestURI : requestBody;
+        String cacheKey = DigestUtil.sha256Hex(antiShakeContent);
         // 一级缓存处理防抖
-
-        String cacheKey = DigestUtil.sha256Hex(requestBody);
         JSONObject jsonObjectInCache = cacheManager.getCache(CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK).get(cacheKey, JSONObject.class);
         if (jsonObjectInCache != null) {
             // 说明处于防抖期间
@@ -78,7 +77,7 @@ public class AntiShakeFilter extends OncePerRequestFilter {
                     .putOpt("msg", "接口正在防抖")
                     .putOpt("datetime", DateUtil.now())
                     .putOpt("uri", requestURI)
-                    .putOpt("body", JSONUtil.parseObj(requestBody));
+                    .putOpt("antiShakeFor", antiShakeContent);
             cacheManager.getCache(CacheConstants.CAFFEINE_ANTI_SHAKE_LOCK).put(cacheKey, cacheJson);
         }
 
