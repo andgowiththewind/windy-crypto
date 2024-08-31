@@ -21,6 +21,7 @@ import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.CommonConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
+import com.gust.cafe.windycrypto.domain.StatDailyTask;
 import com.gust.cafe.windycrypto.dto.CoverNameDTO;
 import com.gust.cafe.windycrypto.dto.CryptoContext;
 import com.gust.cafe.windycrypto.dto.NameConcatDTO;
@@ -72,6 +73,8 @@ public class CryptoService {
     private RedissonClient redissonClient;
     @Autowired
     private StatService statService;
+    @Autowired
+    private StatDailyTaskService statDailyTaskService;
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
@@ -448,6 +451,9 @@ public class CryptoService {
             // log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
             //
             statService.addSecondLevelBytes(NumberUtil.toStr(BigDecimal.valueOf(totalPerLoop)));
+            // 记录耗时
+            cryptoContext.setIoConsumingMs(globalTimer.intervalMs());
+            //
             //
             // 清除计时器
             frequencyTimer.clear();
@@ -473,6 +479,20 @@ public class CryptoService {
     }
 
     private void finalSuccess(CryptoContext cryptoContext) {
+        try {
+            Windy windyBefore = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
+            Long size = windyBefore.getSize();
+            Long ioConsumingMs = cryptoContext.getIoConsumingMs();
+            // 计算每秒的速度
+            BigDecimal speed = NumberUtil.div(BigDecimal.valueOf(size), BigDecimal.valueOf(ioConsumingMs / 1000), 2);
+            statDailyTaskService.addTask(StatDailyTask.builder()
+                    .ioDay(DateUtil.today())
+                    .ioSize(NumberUtil.toStr(BigDecimal.valueOf(size)))
+                    .ioRatePerSecond(NumberUtil.toStr(speed))
+                    .ioSuccess("1")
+                    .build());
+        } catch (Exception e) {
+        }
         log.debug("[{}]-加解密流程正常结束。", cryptoContext.getBeforeCacheId());
     }
 

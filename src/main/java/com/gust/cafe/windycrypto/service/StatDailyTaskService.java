@@ -1,5 +1,6 @@
 package com.gust.cafe.windycrypto.service;
 
+import com.gust.cafe.windycrypto.domain.StatDailyTask;
 import org.springframework.stereotype.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +20,7 @@ public class StatDailyTaskService {
     private StatDailyTaskMapper statDailyTaskMapper;
 
 
-
+    public void addTask(StatDailyTask insertVo) {
+        statDailyTaskMapper.insert(insertVo);
+    }
 }

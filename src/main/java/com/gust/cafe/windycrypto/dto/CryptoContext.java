@@ -41,4 +41,6 @@ public class CryptoContext {
     private List<Integer> bitSwitchList;// 比特位列表,已设计:[index=0代表是否加密了原文件名,index=1预留未分配,index=2预留未分配,index=3预留未分配]
     //
     private Boolean ignoreMissingHiddenFilename;// 当加密文件源文件名为加密形式且缺失配置文件时,是否忽略
+    //
+    private Long ioConsumingMs;// IO耗时毫秒数
 }
