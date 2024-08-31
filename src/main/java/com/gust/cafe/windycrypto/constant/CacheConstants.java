@@ -12,5 +12,5 @@ public class CacheConstants {
     // 配置更新锁
     public static final String CFG_CRUD_LOCK = "cfgCrudLock";
     // 记录某一秒的IO字节数
-    public static final String IO_BYTES_BY_SECOND = "ioBytesBySecond";
+    public static final String LAST_MINUTE_IO = "LAST_MINUTE_IO";
 }

@@ -2,7 +2,6 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,7 +9,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.RedisSlaveCache;
-import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
 import com.gust.cafe.windycrypto.constant.ThreadPoolConstants;
 import com.gust.cafe.windycrypto.dto.core.Windy;
@@ -99,7 +97,7 @@ public class StatService {
         CompletableFuture.runAsync(() -> {
             DateTime atThisMoment = DateUtil.date();
             String dt = DateUtil.format(atThisMoment, "yyyyMMddHHmmss");
-            String mapKey = StrUtil.format("{}_{}", CacheConstants.IO_BYTES_BY_SECOND, dt);
+            String mapKey = StrUtil.format("{}_{}", CacheConstants.LAST_MINUTE_IO, dt);
             redisMasterCache.listRightPushValue(mapKey, ListUtil.toList(subBytes));
         }, statTaskExecutor).whenComplete(getBiConsumer());
     }

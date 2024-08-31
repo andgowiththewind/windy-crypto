@@ -22,7 +22,7 @@ public class IoBytesBySecondJob {
     @Scheduled(cron = "0/2 * * * * ?")
     public void run() {
         // 删除1分钟前的缓存list
-        Collection<String> keys = redisMasterCache.keys(StrUtil.format("{}_*", CacheConstants.IO_BYTES_BY_SECOND));
+        Collection<String> keys = redisMasterCache.keys(StrUtil.format("{}_*", CacheConstants.LAST_MINUTE_IO));
         keys.stream().forEach(keyStr -> {
             String[] split = keyStr.split("_");
             String str = split[1];
