@@ -23,7 +23,8 @@
     <div>
       <!--折线图-->
       <el-card shadow="always">
-        <div ref="secondIoChart" style="width: 600px; height: 400px;"></div>
+        <!--        <div ref="secondIoChart" style="width: 600px; height: 400px;"></div>-->
+        <div ref="lineChart" class="chart"></div>
       </el-card>
     </div>
   </div>
@@ -38,6 +39,7 @@ export default {
   components: {},
   data() {
     return {
+      chart: null,
       // 模拟一年的日期数据（365天）
       contributions: this.generateContributions(),
     }
@@ -62,11 +64,114 @@ export default {
       const colors = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
       return colors[count];
     },
+
+    initChart() {
+      this.chart = echarts.init(this.$refs.lineChart);
+
+      let base = +new Date(1968, 9, 3);
+      let oneDay = 24 * 3600 * 1000;
+      let date = [];
+      let data = [Math.random() * 300];
+      for (let i = 1; i < 20000; i++) {
+        var now = new Date((base += oneDay));
+        date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+        data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
+      }
+
+      const option = {
+        tooltip: {
+          trigger: 'axis',
+          position: function (pt) {
+            return [pt[0], '10%'];
+          }
+        },
+        title: {
+          left: 'center',
+          text: 'Large Area Chart'
+        },
+        toolbox: {
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: date
+        },
+        yAxis: {
+          type: 'value',
+          boundaryGap: [0, '100%']
+        },
+        dataZoom: [
+          {
+            type: 'inside',
+            start: 0,
+            end: 10
+          },
+          {
+            start: 0,
+            end: 10
+          }
+        ],
+        series: [
+          {
+            name: 'Fake Data',
+            type: 'line',
+            symbol: 'none',
+            sampling: 'lttb',
+            itemStyle: {
+              color: 'rgb(255, 70, 131)'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: 'rgb(255, 158, 68)'
+                },
+                {
+                  offset: 1,
+                  color: 'rgb(255, 70, 131)'
+                }
+              ])
+            },
+            data: data
+          }
+        ]
+      };
+
+      this.chart.setOption(option);
+    },
+    generateTimeData() {
+      // 模拟生成时间轴数据
+      const timeData = [];
+      const now = new Date();
+      for (let i = 0; i < 10; i++) {
+        const date = new Date(now);
+        date.setDate(now.getDate() - i);
+        timeData.unshift(date.toISOString().slice(0, 10)); // 仅保留日期部分
+      }
+      return timeData;
+    },
+    generateSeriesData() {
+      // 模拟生成折线图的数据点
+      const seriesData = [];
+      for (let i = 0; i < 10; i++) {
+        seriesData.push(Math.floor(Math.random() * 100)); // 随机生成 0 到 100 的数据
+      }
+      return seriesData;
+    }
+
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
+    this.initChart();
     // 基于准备好的 dom，初始化 echarts 实例
     const myChart = echarts.init(this.$refs.chart);
 
@@ -108,5 +213,10 @@ export default {
   height: 14px;
   background-color: #ebedf0;
   border-radius: 2px;
+}
+
+.chart {
+  width: 100%;
+  height: 400px;
 }
 </style>
