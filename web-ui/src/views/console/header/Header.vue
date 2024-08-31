@@ -87,14 +87,23 @@ export default {
       this.$bus.$emit(Methods.FN_UPDATE_TOP_FOLDER_PATH_COPY, this.topFolderPath);
     },
     startTour() {
-      introJs().setOptions({
+      const intro = introJs();
+      intro.setOptions({
         nextLabel: this.$t('i18n_1829970869540233216'),// 下一个
         prevLabel: this.$t('i18n_1829971268699680768'),// 上一个
         showStepNumbers: true,
         stepNumbersOfLabel: '/',
         overlayOpacity: 0.8,
         disableInteraction: true,
-      }).start();
+      });
+      intro.onChange(async () => {
+        const currentStepIndex = intro._currentStep;// 获取当前步骤的索引
+        // devConsoleLog('当前步骤索引:', currentStepIndex);
+        if (currentStepIndex === 9) {
+
+        }
+      });
+      intro.start();
     },
   },// methods
   watch: {

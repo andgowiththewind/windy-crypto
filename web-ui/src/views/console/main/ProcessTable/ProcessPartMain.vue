@@ -23,7 +23,11 @@
       </el-table-column>
 
       <template #empty>
-        <el-empty :description="$t('i18n_1829935506197274624')">
+        <el-empty
+            :data-title="$t('i18n_1829979488998633472')"
+            :data-intro="$t('i18n_1829979698315341824')"
+            data-step="11"
+            :description="$t('i18n_1829935506197274624')">
           <template #image>
             <img :src="logoLeft" alt="Custom Image"/>
           </template>

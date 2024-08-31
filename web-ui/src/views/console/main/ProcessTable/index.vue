@@ -101,17 +101,17 @@ export default {
 }
 
 .el-header, .el-footer {
-  background-color: #B3C0D1;
+  background-color: #eef7ea;
   color: #333;
 }
 
 .el-aside {
-  background-color: #D3DCE6;
+  background-color: #eef7ea;
   color: #333;
 }
 
 .el-main {
-  background-color: #E9EEF3;
+  background-color: #eef7ea;
   color: #333;
 }
 </style>
