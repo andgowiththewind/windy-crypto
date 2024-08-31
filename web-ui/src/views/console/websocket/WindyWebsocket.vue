@@ -10,6 +10,7 @@ import {devConsoleLog} from '@/utils/commonUtils';
 import {getWsUrlPrefix} from '@/api/windyWebsocketApi';
 import {customAlphabet} from 'nanoid'
 import * as Methods from '@/config/Methods';
+import {FN_OBJECT_ASSIGN_PIE} from "@/config/Methods";
 
 
 export default {
@@ -131,6 +132,7 @@ export default {
       this.$bus.$emit(Methods.FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA, data.processTableData);
       this.$bus.$emit(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, data.ioList);
       this.$bus.$emit(Methods.FN_OBJECT_ASSIGN_GRID_LIST, data.gridList);
+      this.$bus.$emit(Methods.FN_OBJECT_ASSIGN_PIE, data.pie);
     },
   },// methods
   watch: {

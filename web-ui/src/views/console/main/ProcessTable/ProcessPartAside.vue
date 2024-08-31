@@ -1,15 +1,10 @@
 <template>
   <div>
     <div>
+      <!--热力图-->
       <el-card shadow="always">
-        <div class="contribution-grid" >
-          <div
-              v-for="(contribution, index) in gridList"
-              :key="contribution.id"
-              :title="contribution.title"
-              class="contribution-day"
-              :style="{ backgroundColor: contribution.color }">
-          </div>
+        <div class="contribution-grid">
+          <div v-for="(contribution, index) in gridList" :key="contribution.id" :title="contribution.title" class="contribution-day" :style="{ backgroundColor: contribution.color }"></div>
         </div>
       </el-card>
     </div>
@@ -19,6 +14,15 @@
       <el-card shadow="always">
         <div style="height: 400px;width: 100%;">
           <div ref="secondIoChart" class="second-io-chart-style"></div>
+        </div>
+      </el-card>
+    </div>
+    <p></p>
+    <div>
+      <!--饼图-->
+      <el-card shadow="always">
+        <div style="height: 400px;width: 100%;">
+          <div ref="pieChart" class="pie-chart-style"></div>
         </div>
       </el-card>
     </div>
@@ -41,6 +45,8 @@ export default {
       ioEchartData: [],
       gridList: this.generateContributions(),
       contributions: this.generateContributions(),// 模拟一年的日期数据（365天）
+      pieVo: {waiting: 0, io: 0, free: 0},
+      pieChart: null,
     }
   },// data
   methods: {
@@ -155,6 +161,57 @@ export default {
       };
       return option;
     },
+    updatePieChart() {
+      this.pieChart = echarts.init(this.$refs.pieChart);
+      let option = this.getPieChartOptions();
+      this.pieChart.setOption(option);
+    },
+    getPieChartOptions() {
+      let option = {
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          top: '5%',
+          left: 'center'
+        },
+        series: [
+          {
+            name: 'Access From',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: 40,
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: [
+              {value: 1048, name: 'Search Engine'},
+              {value: 735, name: 'Direct'},
+              {value: 580, name: 'Email'},
+              {value: 484, name: 'Union Ads'},
+              {value: 300, name: 'Video Ads'}
+            ]
+          }
+        ]
+      };
+      return option;
+    },
   },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
@@ -168,6 +225,9 @@ export default {
     });
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_GRID_LIST, (data) => {
       this.gridList = data;
+    });
+    this.$bus.$on(Methods.FN_OBJECT_ASSIGN_PIE, (data) => {
+      this.updatePieChart();
     });
   },// mounted
   beforeDestroy() {
@@ -194,6 +254,12 @@ export default {
 }
 
 .second-io-chart-style {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.pie-chart-style {
   width: 100%;
   height: 100%;
   position: relative;
