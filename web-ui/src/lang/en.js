@@ -49,4 +49,5 @@ export default {
     i18n_1829771607149789184: 'no data, please enter the directory to load the directory tree',
     i18n_1829773338935959552: 'reset has been executed',
     i18n_1829888844594548736: 'BYTE STREAM FLUCTUATION',
+    i18n_1829932998070595584: 'view traffic fluctuations after initiating the task',
 }

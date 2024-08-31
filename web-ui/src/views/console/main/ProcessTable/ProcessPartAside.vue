@@ -15,7 +15,7 @@
         <div style="height: 400px;width: 100%;">
           <div v-if="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>
           <div v-else class="empty-placeholder">
-            <el-empty :description="$t('i18n_1829771607149789184')"/>
+            <el-empty :description="$t('i18n_1829932998070595584')"/>
           </div>
         </div>
       </el-card>
