@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 
@@ -94,16 +95,20 @@ public class StatService {
     }
 
     // 记录秒级别的本次处理的字节数,用于统计
-    public void addSecondLevelBytes(double subBytes) {
+    public void addSecondLevelBytes(String subBytes) {
         CompletableFuture.runAsync(() -> {
             DateTime atThisMoment = DateUtil.date();
             String dt = DateUtil.format(atThisMoment, "yyyyMMddHHmmss");
             String mapKey = StrUtil.format("{}_{}", CacheConstants.IO_BYTES_BY_SECOND, dt);
             redisMasterCache.listRightPushValue(mapKey, ListUtil.toList(subBytes));
-        }, statTaskExecutor).whenComplete((v, e) -> {
+        }, statTaskExecutor).whenComplete(getBiConsumer());
+    }
+
+    private static BiConsumer<Void, Throwable> getBiConsumer() {
+        return (v, e) -> {
             if (e != null) {
                 log.error("addSecondLevelBytes error", e);
             }
-        });
+        };
     }
 }

@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -424,7 +425,7 @@ public class CryptoService {
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                     //
                     // 开一个异步线程记录秒级别的本次处理的字节数,用于统计
-                    statService.addSecondLevelBytes(NumberUtil.sub(windyBeforeSize, total));
+                    statService.addSecondLevelBytes(NumberUtil.toStr(NumberUtil.sub(BigDecimal.valueOf(windyBeforeSize), BigDecimal.valueOf(total))));
                     //
                     // 重置计时器,重新计时直至下一次周期
                     frequencyTimer.restart();
@@ -440,7 +441,9 @@ public class CryptoService {
             windy.setUpdateTime(DateUtil.now());
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
             log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
-
+            //
+            statService.addSecondLevelBytes(NumberUtil.toStr(NumberUtil.sub(BigDecimal.valueOf(windyBeforeSize), BigDecimal.valueOf(total))));
+            //
             // 清除计时器
             frequencyTimer.clear();
             frequencyTimer = null;
