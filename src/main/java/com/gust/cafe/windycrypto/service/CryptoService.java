@@ -372,8 +372,6 @@ public class CryptoService {
             // 缓冲区
             byte[] buffer = new byte[bufferSize];
 
-            // 计时器,控制打印频率,一定频率会重置
-            TimeInterval frequencyTimer = DateUtil.timer();
             // 计时器,记录全局耗时
             TimeInterval globalTimer = DateUtil.timer();
 
@@ -388,6 +386,9 @@ public class CryptoService {
 
             // 本次操作是否为加密
             Boolean askEncrypt = cryptoContext.getAskEncrypt();
+
+            // 计时器,控制打印频率,一定频率会重置
+            TimeInterval frequencyTimer = DateUtil.timer();
 
             // 循环读取源文件的输入流,写入到临时文件的输出流
             while ((len = cryptoContext.getBis().read(buffer)) != -1) {
@@ -419,6 +420,7 @@ public class CryptoService {
                     windy.setPercentageLabel(StrUtil.format("{}%", percentage));
                     windy.setUpdateTime(DateUtil.now());
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
+
                     //
                     // 重置计时器,重新计时直至下一次周期
                     frequencyTimer.restart();
