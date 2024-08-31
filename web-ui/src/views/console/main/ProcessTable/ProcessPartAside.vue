@@ -79,7 +79,7 @@ export default {
     },
     getIoChartOptions() {
       // 从`ioEchartData`每个元素中提取key的值组成`xAxisData`
-      let xAxisData = this.ioEchartData.map(item => item.echartKey);
+      let xAxisData = this.ioEchartData.map(item => item.key);
       let seriesData = this.ioEchartData.map(item => item.value);
       //
       const option = {

@@ -101,7 +101,7 @@ public class StatService {
                     total = NumberUtil.add(total, bigDecimalVal);
                 }
                 return JSONUtil.createObj()
-                        .putOpt("key", DateUtil.format(dt, "yyyy-MM-dd HH:mm:ss"))
+                        .putOpt("key", DateUtil.format(dt, "HH:mm:ss"))
                         .putOpt("value", total.longValue())
                         .putOpt("datetimeStr", DateUtil.format(dt, "yyyy-MM-dd HH:mm:ss"))
                         .putOpt("label", FileUtil.readableFileSize(total.longValue()));
@@ -122,7 +122,7 @@ public class StatService {
                 ioList.add(first.get());
             } else {
                 ioList.add(JSONUtil.createObj()
-                        .putOpt("key", dtStr)
+                        .putOpt("key", DateUtil.format(offsetSecond, "HH:mm:ss"))
                         .putOpt("value", 0)
                         .putOpt("datetimeStr", dtStr)
                         .putOpt("label", "0B")
