@@ -108,7 +108,7 @@ export default {
   },// data
   methods: {
     getTableDataEmptyDesc() {
-      return this.$t('i18n_1829939196081623040') + this.reqLatestDatetime ? " @ " + this.reqLatestDatetime : '';
+      return this.$t('i18n_1829939196081623040') + (this.reqLatestDatetime ? " (@" + this.reqLatestDatetime + ")" : '');
     },
     i18nMsgPlusAction(msg) {
       // 如果以`i18n_`开头则调用
@@ -213,6 +213,7 @@ export default {
     // 收到tableData
     this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => {
       this.tableData = data;
+      this.reqLatestDatetime = this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
     });
     this.$bus.$on(Methods.FN_UPDATE_USER_PASSWORD, (data) => this.userPasswordCopy = data);
     this.$bus.$on(Methods.FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY, (data) => this.contractInsightTableDataIdListCopy());
