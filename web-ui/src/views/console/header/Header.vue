@@ -8,7 +8,7 @@
         <el-button size="mini" type="primary" icon="el-icon-edit" @click="changeLanguage">
           <i>{{ 'zh' === this.$i18n.locale ? 'Switch English' : '切换中文' }}</i>
         </el-button>
-        <el-button size="mini" @click="startTour" data-intro="点击这里开始引导" data-hint='Hello step one!' data-step="1" @keyup.enter.prevent>开始引导</el-button>
+        <el-button size="mini" @click="startTour" data-intro="点击这里开始引导" data-step="1" @keyup.enter.prevent>{{ $t('i18n_1829966694198755328') }}</el-button>
       </el-button-group>
     </div>
   </div>
