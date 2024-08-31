@@ -21,7 +21,10 @@
     </div>
     <p></p>
     <div>
-      <el-card shadow="always">总是显示</el-card>
+      <!--折线图-->
+      <el-card shadow="always">
+        <div ref="secondIoChart" style="width: 600px; height: 400px;"></div>
+      </el-card>
     </div>
   </div>
 </template>
