@@ -8,7 +8,7 @@
         :row-style="rowStyleFn"
         :cell-style="cellStyleFn"
         :header-cell-style="headerCellStyleFn"
-        :max-height="350"
+        :max-height="900"
         :data="processTableData"
         style="width: 100%;min-height:200px;">
       <el-table-column label="ID" prop="id" width="170" :show-overflow-tooltip="true"></el-table-column>

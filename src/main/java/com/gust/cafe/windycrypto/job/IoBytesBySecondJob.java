@@ -26,7 +26,7 @@ public class IoBytesBySecondJob {
         keys.stream().forEach(keyStr -> {
             String str = StrUtil.subAfter(keyStr, StrUtil.format("{}_", CacheConstants.LAST_MINUTE_IO), false);
             DateTime dateTime = DateUtil.parse(str, "yyyyMMddHHmmss");
-            DateTime offsetSecond = DateUtil.offsetSecond(DateUtil.date(), -1 * 60 * 2);
+            DateTime offsetSecond = DateUtil.offsetSecond(DateUtil.date(), -1 * 60);// 只记录最近N秒的数据
             // 如果是N分钟前则删除，避免积压
             if (dateTime.before(offsetSecond)) {
                 redisMasterCache.listDelete(keyStr);
