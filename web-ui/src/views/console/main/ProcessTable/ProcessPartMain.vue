@@ -24,6 +24,7 @@
 
       <template #empty>
         <el-empty
+            class="shake-on-hover"
             :description="$t('i18n_1829935506197274624')">
           <template #image>
             <img :src="logoLeft" alt="Custom Image"/>

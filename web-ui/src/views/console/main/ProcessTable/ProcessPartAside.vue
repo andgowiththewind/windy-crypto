@@ -8,7 +8,7 @@
       <el-card shadow="always">
         <div class="contribution-grid">
           <el-tooltip class="item" effect="dark" :content="contribution.title" placement="top" v-for="(contribution, index) in gridList" :key="contribution.id">
-            <div class="contribution-day" :style="{ backgroundColor: contribution.color }"></div>
+            <div class="contribution-day shake-on-hover" :style="{ backgroundColor: contribution.color }"></div>
           </el-tooltip>
         </div>
       </el-card>

@@ -1,6 +1,6 @@
 <template>
-  <div >
-    <el-alert title="(ง •̀_•́)ง" center type="success" :closable="false"></el-alert>
+  <div>
+    <el-alert class="shake-on-hover" title="(ง •̀_•́)ง" center type="success" :closable="false"></el-alert>
   </div>
 </template>
 
