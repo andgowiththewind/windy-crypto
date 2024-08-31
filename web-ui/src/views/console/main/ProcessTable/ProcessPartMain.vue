@@ -21,14 +21,22 @@
           <span v-else style="opacity: 25%">/</span>
         </template>
       </el-table-column>
+
+      <template #empty>
+        <el-empty description="No data available">
+          <template #image>
+            <img :src="logoLeft" alt="Custom Image"/>
+          </template>
+        </el-empty>
+      </template>
     </el-table>
   </div>
 </template>
 
 <script>
-// import {Notification, MessageBox, Message, Loading} from 'element-ui';
+import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
-import {FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA} from "@/config/Methods";
+import logoLeft from '@/assets/logo_left.png';
 
 export default {
   name: "ProcessPartMain",
@@ -36,6 +44,7 @@ export default {
   data() {
     return {
       processTableData: [],
+      logoLeft: logoLeft,
     }
   },// data
   methods: {
