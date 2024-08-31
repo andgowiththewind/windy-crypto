@@ -80,7 +80,7 @@
       </el-table-column>
 
       <template #empty>
-        <el-empty description="No data available"></el-empty>
+        <el-empty :description="getTableDataEmptyDesc()"></el-empty>
       </template>
 
     </el-table>
@@ -108,6 +108,7 @@ export default {
   },// data
   methods: {
     getTableDataEmptyDesc() {
+      return 1;
     },
     i18nMsgPlusAction(msg) {
       // 如果以`i18n_`开头则调用
