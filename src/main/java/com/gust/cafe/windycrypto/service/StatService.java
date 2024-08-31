@@ -132,8 +132,8 @@ public class StatService {
             } else {
                 BigDecimal div = NumberUtil.div(BigDecimal.valueOf(success), BigDecimal.valueOf(maxSuccess), 2);
                 // 比较div是否介于0~0.25
-                if (NumberUtil.isGreaterOrEqual(div, BigDecimal.ZERO) && NumberUtil.isLessOrEqual(div, BigDecimal.valueOf(0.25))) {
-                    jo.putOpt("color", "#ebedf0");
+                if (NumberUtil.isGreater(div, BigDecimal.ZERO) && NumberUtil.isLessOrEqual(div, BigDecimal.valueOf(0.25))) {
+                    jo.putOpt("color", "#c6e48b");
                 } else if (NumberUtil.isGreaterOrEqual(div, BigDecimal.valueOf(0.25)) && NumberUtil.isLessOrEqual(div, BigDecimal.valueOf(0.5))) {
                     jo.putOpt("color", "#c6e48b");
                 } else if (NumberUtil.isGreaterOrEqual(div, BigDecimal.valueOf(0.5)) && NumberUtil.isLessOrEqual(div, BigDecimal.valueOf(0.75))) {
