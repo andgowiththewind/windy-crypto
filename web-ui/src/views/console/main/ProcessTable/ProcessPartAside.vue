@@ -228,7 +228,7 @@ export default {
       this.gridList = data;
     });
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_PIE, (data) => {
-
+      this.pieVo = data;
       this.updatePieChart();
     });
   },// mounted
