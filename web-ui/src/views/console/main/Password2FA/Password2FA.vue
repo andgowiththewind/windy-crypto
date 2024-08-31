@@ -3,7 +3,11 @@
     <div class="business-btn-zone">
       <el-form @submit.native.prevent :inline="true" size="mini">
         <el-form-item label="">
-          <el-input v-model="userPassword" :placeholder="$t('i18n_1828973612548362244')" show-password></el-input>
+          <el-input
+              :data-title="$t('i18n_1829983741548851200')"
+              :data-intro="$t('i18n_1829984384175005696')"
+              data-step="8"
+              v-model="userPassword" :placeholder="$t('i18n_1828973612548362244')" show-password></el-input>
         </el-form-item>
         <el-form-item label="" prop="isRequireCoverName">
           <el-radio-group v-model="isRequireCoverName" size="mini">

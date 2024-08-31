@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "这里展示当前文件的基本信息以及可操作的功能";
+        String zh = "加密或者解密操作都需要密码,请注意!!!!! 如果您忘记密码将没有任何人能够帮助您找回密码,请务必牢记密码";
         // 纯小写
-        String en = "Here shows the basic information and functions that can be operated on the current file";
+        String en = "Encryption or decryption operations require a password, please note!!!!! If you forget your password, no one will be able to help you retrieve it, so be sure to remember your password";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);

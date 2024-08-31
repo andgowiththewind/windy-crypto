@@ -66,4 +66,6 @@ export default {
     i18n_1829981599945715712: 'load all files in the directory after setting the conditions and press this button',
     i18n_1829982589360943104: 'file list insight',
     i18n_1829982840658489344: 'Here shows the basic information and functions that can be operated on the current file',
+    i18n_1829983741548851200: 'input password',
+    i18n_1829984384175005696: 'Encryption or decryption operations require a password, please note!!!!! If you forget your password, no one will be able to help you retrieve it, so be sure to remember your password',
 }
