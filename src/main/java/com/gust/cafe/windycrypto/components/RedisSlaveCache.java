@@ -248,7 +248,7 @@ public class RedisSlaveCache {
      *
      * @param values 要记录的数字
      */
-    public void listRightPushValue(final String key, List<Integer> values) {
+    public <T> void listRightPushValue(final String key, List<T> values) {
         redisTemplate.opsForList().rightPushAll(key, values);
     }
 
@@ -257,7 +257,7 @@ public class RedisSlaveCache {
      *
      * @return 列表中的数字
      */
-    public List<Integer> listGetAll(final String key) {
+    public <T> List<T> listGetAll(final String key) {
         return redisTemplate.opsForList().range(key, 0, -1);
     }
 

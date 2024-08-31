@@ -1,12 +1,14 @@
 package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.gust.cafe.windycrypto.components.RedisMasterCache;
 import com.gust.cafe.windycrypto.components.RedisSlaveCache;
 import com.gust.cafe.windycrypto.components.WindyLang;
 import com.gust.cafe.windycrypto.constant.CacheConstants;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class StatService {
+    @Autowired
+    private RedisMasterCache redisMasterCache;
     @Autowired
     private RedisSlaveCache redisSlaveCache;// 高频数据请求必须走从库
     @Autowired
@@ -95,11 +99,7 @@ public class StatService {
             DateTime atThisMoment = DateUtil.date();
             String dt = DateUtil.format(atThisMoment, "yyyyMMddHHmmss");
             String mapKey = StrUtil.format("{}_{}", CacheConstants.IO_BYTES_BY_SECOND, dt);
-
-
-
-            
-
+            redisMasterCache.listRightPushValue(mapKey, ListUtil.toList(subBytes));
         }, statTaskExecutor).whenComplete((v, e) -> {
             if (e != null) {
                 log.error("addSecondLevelBytes error", e);
