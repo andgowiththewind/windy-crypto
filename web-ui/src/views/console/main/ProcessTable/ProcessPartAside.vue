@@ -7,7 +7,9 @@
         data-step="11">
       <el-card shadow="always">
         <div class="contribution-grid">
-          <div v-for="(contribution, index) in gridList" :key="contribution.id" :title="contribution.title" class="contribution-day" :style="{ backgroundColor: contribution.color }"></div>
+          <el-tooltip class="item" effect="dark" :content="contribution.title" placement="top" v-for="(contribution, index) in gridList" :key="contribution.id">
+            <div class="contribution-day" :style="{ backgroundColor: contribution.color }"></div>
+          </el-tooltip>
         </div>
       </el-card>
     </div>
