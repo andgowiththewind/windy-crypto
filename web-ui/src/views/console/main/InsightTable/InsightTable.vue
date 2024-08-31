@@ -78,6 +78,11 @@
           </span>
         </template>
       </el-table-column>
+
+      <template #empty>
+        <el-empty description="No data available"></el-empty>
+      </template>
+
     </el-table>
   </div>
 </template>
@@ -97,10 +102,13 @@ export default {
       cellStyleFnVal: cellStyleFn,
       headerCellStyleFnVal: headerCellStyleFn,
       tableData: [],
+      reqLatestDatetime: '',// 表格请求最新时间
       userPasswordCopy: '',
     }
   },// data
   methods: {
+    getTableDataEmptyDesc() {
+    },
     i18nMsgPlusAction(msg) {
       // 如果以`i18n_`开头则调用
       if (msg.startsWith('i18n_')) {
@@ -202,7 +210,9 @@ export default {
   },// watch
   mounted() {
     // 收到tableData
-    this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => this.tableData = data);
+    this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA, (data) => {
+      this.tableData = data;
+    });
     this.$bus.$on(Methods.FN_UPDATE_USER_PASSWORD, (data) => this.userPasswordCopy = data);
     this.$bus.$on(Methods.FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY, (data) => this.contractInsightTableDataIdListCopy());
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_INSIGHT_TABLE_DATA, (data) => this.objectAssignTableData(data));
