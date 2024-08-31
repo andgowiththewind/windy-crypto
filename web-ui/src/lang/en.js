@@ -54,4 +54,5 @@ export default {
     i18n_1829939196081623040: 'please enter the directory address above and click "query file list"',
     i18n_1829940779393613824: 'last update time',
     i18n_1829966694198755328: 'START GUIDE',
+    i18n_1829967318650957824: 'click here to start the guide',
 }

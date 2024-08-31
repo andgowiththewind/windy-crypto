@@ -5,10 +5,21 @@
     </div>
     <div class="windy-change-language">
       <el-button-group>
-        <el-button size="mini" type="primary" icon="el-icon-edit" @click="changeLanguage">
+        <el-button
+            size="mini"
+            type="primary"
+            icon="el-icon-edit"
+            @click="changeLanguage">
           <i>{{ 'zh' === this.$i18n.locale ? 'Switch English' : '切换中文' }}</i>
         </el-button>
-        <el-button size="mini" @click="startTour" data-intro="点击这里开始引导" data-step="1" @keyup.enter.prevent>{{ $t('i18n_1829966694198755328') }}</el-button>
+        <!--新手引导-->
+        <el-button
+            size="mini"
+            @click="startTour"
+            :data-intro="$t('i18n_1829967318650957824')"
+            data-step="1">
+          {{ $t('i18n_1829966694198755328') }}
+        </el-button>
       </el-button-group>
     </div>
   </div>
@@ -65,7 +76,6 @@ export default {
     },
     startTour() {
       introJs().start();
-      // introJs(".introduction-farm").start();
     },
   },// methods
   watch: {
