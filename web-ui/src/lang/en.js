@@ -73,4 +73,5 @@ export default {
     i18n_1829987088964169728: 'click to show progress dialog',
     i18n_1829999207910731776: 'heatmap',
     i18n_1829999466489552896: 'show the number of operations per day and other information over the past year',
+    i18n_1830000164283219968: 'bytes processed per second recently',
 }

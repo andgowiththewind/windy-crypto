@@ -1,10 +1,10 @@
 <template>
   <div>
+    <!--热力图-->
     <div
         :data-title="$t('i18n_1829999207910731776')"
         :data-intro="$t('i18n_1829999466489552896')"
         data-step="11">
-      <!--热力图-->
       <el-card shadow="always">
         <div class="contribution-grid">
           <div v-for="(contribution, index) in gridList" :key="contribution.id" :title="contribution.title" class="contribution-day" :style="{ backgroundColor: contribution.color }"></div>
@@ -12,7 +12,10 @@
       </el-card>
     </div>
     <p></p>
-    <div>
+    <div
+        :data-title="$t('i18n_1829888844594548736')"
+        :data-intro="$t('i18n_1830000164283219968')"
+        data-step="12">
       <!--折线图-->
       <el-card shadow="always">
         <div style="height: 400px;width: 100%;">

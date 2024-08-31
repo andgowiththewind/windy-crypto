@@ -102,7 +102,7 @@ export default {
         if (currentStepIndex === 10) {
           this.$bus.$emit(Methods.FN_SHOW__PROCESS_DRAWER_VO);
           return new Promise((resolve) => {
-            // setInterval(resolve, 1500);
+            // setInterval(resolve, 1000);
             resolve();
           });
         }

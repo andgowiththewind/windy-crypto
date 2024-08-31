@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "展示过去一年时间每天操作的次数等信息";
+        String zh = "最近每秒处理的字节数";
         // 纯小写
-        String en = "show the number of operations per day and other information over the past year";
+        String en = "bytes processed per second recently";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
