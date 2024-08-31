@@ -41,7 +41,7 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "上一个";
+        String zh = "关闭";
         // 纯小写
         String en = "previous";
         String id = IdUtil.getSnowflakeNextIdStr();

@@ -78,6 +78,10 @@ export default {
       introJs().setOptions({
         nextLabel: this.$t('i18n_1829970869540233216'),// 下一个
         prevLabel: this.$t('i18n_1829971268699680768'),// 上一个
+        showStepNumbers: true,
+        stepNumbersOfLabel: '/',
+        overlayOpacity: 0.8,
+        disableInteraction: true,
       }).start();
     },
   },// methods
@@ -109,7 +113,5 @@ export default {
   top: 10px;
 }
 
-.introJsCustomTooltip {
-  color: red;
-}
+
 </style>
