@@ -1,6 +1,14 @@
 <template>
   <div v-loading="loading">
-    <el-button type="warning" size="mini" style="width: 100%;height: 50px;" @click="askContractHandleTopFolderEnter">
+    <el-button
+        data-title="aaaaaaaaaa"
+        data-intro="111111111111111"
+        data-step="2"
+        data-disable-interaction="true"
+        type="warning"
+        size="mini"
+        style="width: 100%;height: 50px;"
+        @click="askContractHandleTopFolderEnter">
       <i>{{ $t('i18n_1826858923819405312') }}</i>
     </el-button>
     <el-tree
@@ -23,6 +31,8 @@ import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from '@/utils/commonUtils';
 import {getTreeData} from '@/api/asideApi';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 export default {
   name: "Aside",

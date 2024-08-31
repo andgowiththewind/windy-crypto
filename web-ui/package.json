@@ -15,6 +15,7 @@
     "echarts": "^5.5.1",
     "element-ui": "^2.15.14",
     "font-awesome": "^4.7.0",
+    "intro.js": "^8.0.0-beta.1",
     "moment": "^2.30.1",
     "nanoid": "^5.0.7",
     "vue": "^2.6.14",

@@ -3,8 +3,13 @@
     <div class="windy-path-input">
       <el-input size="mini" v-model="topFolderPath" :placeholder="$t('i18n_1826859557616488448')" @keyup.enter.native="handleTopFolderEnter"></el-input>
     </div>
-    <div class="windy-change-language" @click="changeLanguage">
-      <i>{{ 'zh' === this.$i18n.locale ? 'Switch English' : '切换中文' }}</i>
+    <div class="windy-change-language">
+      <el-button-group>
+        <el-button size="mini" type="primary" icon="el-icon-edit" @click="changeLanguage">
+          <i>{{ 'zh' === this.$i18n.locale ? 'Switch English' : '切换中文' }}</i>
+        </el-button>
+        <el-button size="mini" @click="startTour" data-intro="点击这里开始引导" data-hint='Hello step one!' data-step="1" @keyup.enter.prevent>开始引导</el-button>
+      </el-button-group>
     </div>
   </div>
 </template>
@@ -13,7 +18,8 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from '@/utils/commonUtils';
-import {FN_CONTRACT_HANDLE_TOP_FOLDER_ENTER} from "@/config/Methods";
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 export default {
   name: "Header",
@@ -56,6 +62,10 @@ export default {
     contractTopFolderPathCopy() {
       // 收到通知后向目标组件传递数据
       this.$bus.$emit(Methods.FN_UPDATE_TOP_FOLDER_PATH_COPY, this.topFolderPath);
+    },
+    startTour() {
+      introJs().start();
+      // introJs(".introduction-farm").start();
     },
   },// methods
   watch: {
