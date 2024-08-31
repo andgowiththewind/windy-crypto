@@ -15,6 +15,7 @@
           :size="'80%'"
           :with-header="false"
           title="process-table"
+          v-show="drawerVo.show"
           :visible.sync="drawerVo.show"
           :direction="drawerVo.direction">
         <div>
@@ -67,6 +68,8 @@ export default {
   },// watch
   mounted() {
     this.$bus.$on(Methods.FN_SHOW__PROCESS_DRAWER_VO, () => this.drawerVo.show = true);
+    this.drawerVo.show = true;
+    setTimeout(() => this.drawerVo.show = false, 2000);
   },// mounted
 }
 </script>
