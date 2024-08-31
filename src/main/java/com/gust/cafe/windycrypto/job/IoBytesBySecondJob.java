@@ -27,7 +27,7 @@ public class IoBytesBySecondJob {
             String[] split = keyStr.split("_");
             String str = split[1];
             DateTime dateTime = DateUtil.parse(str, "yyyyMMddHHmmss");
-            DateTime offsetSecond = DateUtil.offsetSecond(DateUtil.date(), 60 * 5);
+            DateTime offsetSecond = DateUtil.offsetSecond(DateUtil.date(), -1 * 60 * 5);
             // 如果是一分钟前则删除
             if (dateTime.before(offsetSecond)) {
                 redisMasterCache.listDelete(keyStr);
