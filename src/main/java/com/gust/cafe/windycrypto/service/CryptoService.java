@@ -372,6 +372,9 @@ public class CryptoService {
             // 已经读取的字节总数
             long total = 0;
 
+            // 记录每次循环读取的字节数
+            long totalPerLoop = 0;
+
             // 缓冲区
             byte[] buffer = new byte[bufferSize];
 
@@ -410,6 +413,7 @@ public class CryptoService {
                 cryptoContext.getBos().write(newBuffer);
                 // 更新已经读取的字节数
                 total += len;
+                totalPerLoop += len;
                 //
                 // 流读取的频率是非常快的,如果每次都更新缓存和发布消息,会导致卡死,所以需要通过间隔时间控制频率
                 if (frequencyTimer.intervalMs() > 800L) {
@@ -425,7 +429,8 @@ public class CryptoService {
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                     //
                     // 开一个异步线程记录秒级别的本次处理的字节数,用于统计
-                    statService.addSecondLevelBytes(NumberUtil.toStr(NumberUtil.sub(BigDecimal.valueOf(windyBeforeSize), BigDecimal.valueOf(total))));
+                    statService.addSecondLevelBytes(NumberUtil.toStr(BigDecimal.valueOf(totalPerLoop)));
+                    totalPerLoop = 0;
                     //
                     // 重置计时器,重新计时直至下一次周期
                     frequencyTimer.restart();
@@ -442,7 +447,7 @@ public class CryptoService {
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
             log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
             //
-            statService.addSecondLevelBytes(NumberUtil.toStr(NumberUtil.sub(BigDecimal.valueOf(windyBeforeSize), BigDecimal.valueOf(total))));
+            statService.addSecondLevelBytes(NumberUtil.toStr(BigDecimal.valueOf(totalPerLoop)));
             //
             // 清除计时器
             frequencyTimer.clear();
