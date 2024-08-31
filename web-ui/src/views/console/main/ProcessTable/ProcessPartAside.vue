@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div>
+    <div
+        :data-title="$t('热力图')"
+        :data-intro="$t('热力图')"
+        data-step="11">
       <!--热力图-->
       <el-card shadow="always">
         <div class="contribution-grid">

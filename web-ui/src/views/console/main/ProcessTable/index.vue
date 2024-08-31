@@ -46,6 +46,7 @@ import ProcessPartMain from '@/views/console/main/ProcessTable/ProcessPartMain.v
 import ProcessPartHeader from '@/views/console/main/ProcessTable/ProcessPartHeader.vue';
 import ProcessPartAside from '@/views/console/main/ProcessTable/ProcessPartAside.vue';
 import ProcessPartFooter from '@/views/console/main/ProcessTable/ProcessPartFooter.vue';
+import * as Methods from '@/config/Methods';
 
 export default {
   name: "ProcessTable",
@@ -65,7 +66,7 @@ export default {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
   mounted() {
-    // this.init();
+    this.$bus.$on(Methods.FN_SHOW__PROCESS_DRAWER_VO, () => this.drawerVo.show = true);
   },// mounted
 }
 </script>

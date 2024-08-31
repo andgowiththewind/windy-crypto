@@ -96,11 +96,14 @@ export default {
         overlayOpacity: 0.8,
         disableInteraction: true,
       });
-      intro.onChange(async () => {
+      intro.onbeforechange(async () => {
         const currentStepIndex = intro._currentStep;// 获取当前步骤的索引
-        // devConsoleLog('当前步骤索引:', currentStepIndex);
-        if (currentStepIndex === 9) {
-
+        devConsoleLog('当前步骤索引:', currentStepIndex);
+        if (currentStepIndex === 10) {
+          this.$bus.$emit(Methods.FN_SHOW__PROCESS_DRAWER_VO);
+          // return new Promise((resolve) => {
+          //   setInterval(resolve, 1500);
+          // });
         }
       });
       intro.start();

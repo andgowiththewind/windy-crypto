@@ -20,3 +20,5 @@ export const FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA = 'fnObjectAssignProcessTableDa
 export const FN_OBJECT_ASSIGN_IO_ECHART_DATA = 'fnObjectAssignIoEchartData';
 export const FN_OBJECT_ASSIGN_GRID_LIST = 'fnObjectAssignGridList';
 export const FN_OBJECT_ASSIGN_PIE = 'fnObjectAssignPie';
+//
+export const FN_SHOW__PROCESS_DRAWER_VO = 'fnShowProcessDrawerVo';
