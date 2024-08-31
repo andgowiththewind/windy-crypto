@@ -1,6 +1,11 @@
 <template>
   <div>
-    <div class="view-progress-btn" @click="drawerVo.show=true">
+    <div
+        :data-title="$t('i18n_1829987088964169728')"
+        :data-intro="$t('i18n_1829987088964169728')"
+        data-step="10"
+        class="view-progress-btn"
+        @click="drawerVo.show=true">
       <el-tooltip effect="dark" :content="$t('i18n_1829433519491911680')" placement="top">
         <span><i class="fa fa-table"></i></span>
       </el-tooltip>

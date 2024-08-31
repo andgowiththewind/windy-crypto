@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "以`password.txt`为例,如果选择隐藏源文件名,加密后的文件名不是`$safeLockedV2$......password.txt`而是`$safeLockedV2$...$1827544881568940032.mp4`,同时将在同级目录下生成一个`windycfg`文件记录源文件名加密后的密文,请妥善保管。";
+        String zh = "弹出层将展示更多信息";
         // 纯小写
-        String en = "Take `password.txt` as an example, if you choose to hide the source file name, the encrypted file name is not `$safeLockedV2$......password.txt` but `$safeLockedV2$...$1827544881568940032.mp4`, and a `windycfg` file will be generated in the same directory to record the ciphertext of the encrypted source file name, please keep it properly.";
+        String en = "click to show progress dialog";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
