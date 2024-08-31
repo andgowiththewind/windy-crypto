@@ -145,7 +145,7 @@ export default {
     this.initChart();
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, (data) => {
       this.ioEchartData = data;
-      devConsoleLog('this.ioEchartData', this.ioEchartData);
+      // devConsoleLog('this.ioEchartData', this.ioEchartData);
       this.updateChart();
     });
   },// mounted
