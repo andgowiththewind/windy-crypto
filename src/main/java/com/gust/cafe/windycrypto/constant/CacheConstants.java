@@ -11,4 +11,6 @@ public class CacheConstants {
     public static final String WINDY_GET_OR_DEFAULT_LOCK = "windyGetOrDefaultLock";
     // 配置更新锁
     public static final String CFG_CRUD_LOCK = "cfgCrudLock";
+    // 记录某一秒的IO字节数
+    public static final String IO_BYTES_BY_SECOND = "ioBytesBySecond";
 }

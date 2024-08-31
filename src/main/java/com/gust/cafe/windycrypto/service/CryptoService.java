@@ -69,6 +69,8 @@ public class CryptoService {
     private RedisMasterCache redisMasterCache;
     @Autowired
     private RedissonClient redissonClient;
+    @Autowired
+    private StatService statService;
 
     //
     public void actionAsync(List<String> absPathList, CryptoSubmitReqVo reqVo) {
@@ -420,7 +422,9 @@ public class CryptoService {
                     windy.setPercentageLabel(StrUtil.format("{}%", percentage));
                     windy.setUpdateTime(DateUtil.now());
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-
+                    //
+                    // 开一个异步线程记录秒级别的本次处理的字节数,用于统计
+                    statService.addSecondLevelBytes(NumberUtil.sub(windyBeforeSize, total));
                     //
                     // 重置计时器,重新计时直至下一次周期
                     frequencyTimer.restart();

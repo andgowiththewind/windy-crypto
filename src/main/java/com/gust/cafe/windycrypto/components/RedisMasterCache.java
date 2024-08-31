@@ -242,4 +242,30 @@ public class RedisMasterCache {
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * list
+     *
+     * @param values 要记录的数字
+     */
+    public void listRightPushValue(final String key, List<Integer> values) {
+        redisTemplate.opsForList().rightPushAll(key, values);
+    }
+
+    /**
+     * list
+     *
+     * @return 列表中的数字
+     */
+    public List<Integer> listGetAll(final String key) {
+        return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+    /**
+     * list
+     */
+    public void listDelete(final String key) {
+        redisTemplate.delete(key);
+    }
+
 }

@@ -2,6 +2,9 @@ package com.gust.cafe.windycrypto.service;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.gust.cafe.windycrypto.components.RedisSlaveCache;
@@ -84,5 +87,23 @@ public class StatService {
         //
         // (4) 发生websocket消息
         WindyCryptoWebsocket.sendMessage(sessionId, message);
+    }
+
+    // 记录秒级别的本次处理的字节数,用于统计
+    public void addSecondLevelBytes(double subBytes) {
+        CompletableFuture.runAsync(() -> {
+            DateTime atThisMoment = DateUtil.date();
+            String dt = DateUtil.format(atThisMoment, "yyyyMMddHHmmss");
+            String mapKey = StrUtil.format("{}_{}", CacheConstants.IO_BYTES_BY_SECOND, dt);
+
+
+
+            
+
+        }, statTaskExecutor).whenComplete((v, e) -> {
+            if (e != null) {
+                log.error("addSecondLevelBytes error", e);
+            }
+        });
     }
 }
