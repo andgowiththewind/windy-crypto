@@ -13,4 +13,6 @@ public class CacheConstants {
     public static final String CFG_CRUD_LOCK = "cfgCrudLock";
     // 记录某一秒的IO字节数
     public static final String LAST_MINUTE_IO = "LAST_MINUTE_IO";
+    //
+    public static final String AS_OF_YESTERDAY_STAT_DAILY_TASK_DATA = "asOfYesterdayStatDailyTaskData";
 }

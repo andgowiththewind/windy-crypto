@@ -5,7 +5,6 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -81,12 +80,24 @@ public class StatService {
     }
 
     private List<JSONObject> getHeatMapList() {
-        // 根据时间范围查库
-        DateTime min = DateUtil.offsetDay(DateUtil.date(), -365);
-        String minIoDay = DateUtil.format(min, "yyyy-MM-dd");
-        DateTime max = DateUtil.date();
-        String maxIoDay = DateUtil.format(max, "yyyy-MM-dd");
-        List<StatDailyTask> tasks = statDailyTaskMapper.selectHeatMapList(minIoDay, maxIoDay);
+        // 根据时间范围查库,365日前至昨日的数据都查缓存,今天的数据实时查
+        List<StatDailyTask> tasks = new ArrayList<>();
+        List<StatDailyTask> asOfYesterdayStatDailyTaskData = redisSlaveCache.getCacheObject(CacheConstants.AS_OF_YESTERDAY_STAT_DAILY_TASK_DATA);
+        if (asOfYesterdayStatDailyTaskData == null) {
+            DateTime min = DateUtil.offsetDay(DateUtil.date(), -365);
+            String minIoDay = DateUtil.format(min, "yyyy-MM-dd");
+            String maxIoDay = DateUtil.format(DateUtil.yesterday(), "yyyy-MM-dd");
+            tasks = Optional.ofNullable(statDailyTaskMapper.selectHeatMapList(minIoDay, maxIoDay)).filter(CollectionUtil::isNotEmpty).orElse(new ArrayList<>());
+            // 缓存
+            redisMasterCache.setCacheObject(CacheConstants.AS_OF_YESTERDAY_STAT_DAILY_TASK_DATA, tasks);
+        } else {
+            tasks = asOfYesterdayStatDailyTaskData;
+        }
+        // 查今天的数据
+        String today = DateUtil.format(DateUtil.date(), "yyyy-MM-dd");
+        List<StatDailyTask> todayTasks = Optional.ofNullable(statDailyTaskMapper.selectHeatMapList(today, today)).filter(CollectionUtil::isNotEmpty).orElse(new ArrayList<>());
+        // 合并
+        tasks.addAll(todayTasks);
         //
         List<JSONObject> resultList = new ArrayList<>();
         DateTime justNow = DateUtil.date();
