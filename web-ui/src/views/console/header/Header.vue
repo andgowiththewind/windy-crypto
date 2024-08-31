@@ -6,6 +6,8 @@
     <div class="windy-change-language">
       <el-button-group>
         <el-button
+            :data-intro="$t('i18n_1829975151219986432')"
+            data-step="2"
             size="mini"
             type="primary"
             icon="el-icon-edit"

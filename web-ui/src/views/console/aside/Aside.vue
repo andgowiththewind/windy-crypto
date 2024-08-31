@@ -1,9 +1,9 @@
 <template>
   <div v-loading="loading">
     <el-button
-        data-title="aaaaaaaaaa"
+        :data-title="$t('i18n_1826858923819405312')"
         data-intro="111111111111111"
-        data-step="2"
+        data-step="3"
         data-disable-interaction="true"
         type="warning"
         size="mini"
