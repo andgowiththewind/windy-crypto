@@ -20,7 +20,7 @@ public class IoBytesBySecondJob {
 
     // 每隔2秒执行一次
     @Scheduled(cron = "0/2 * * * * ?")
-    public void run() {
+    public void delLastMinuteIo() {
         // 删除1分钟前的缓存list
         Collection<String> keys = redisMasterCache.keys(StrUtil.format("{}_*", CacheConstants.LAST_MINUTE_IO));
         keys.stream().forEach(keyStr -> {

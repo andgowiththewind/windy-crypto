@@ -92,7 +92,12 @@ public class StatService {
         WindyCryptoWebsocket.sendMessage(sessionId, message);
     }
 
-    // 记录秒级别的本次处理的字节数,用于统计
+    /**
+     * 记录秒级别的本次处理的字节数,用于统计
+     *
+     * @param subBytes
+     * @see {@link com.gust.cafe.windycrypto.job.IoBytesBySecondJob#delLastMinuteIo} 删除的操作写在JOB中
+     */
     public void addSecondLevelBytes(String subBytes) {
         CompletableFuture.runAsync(() -> {
             DateTime atThisMoment = DateUtil.date();
