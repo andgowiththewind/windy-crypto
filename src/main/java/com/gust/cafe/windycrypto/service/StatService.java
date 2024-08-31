@@ -31,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 
@@ -58,15 +59,16 @@ public class StatService {
     @SneakyThrows
     public void onMessageUpdateTableCache(String sessionId, List<String> ids) {
         // (1) 条件分页查询的table数据
-        List<Windy> insightTableData = getInsightTableData(ids);
+        List<Windy> insightTableData = Optional.ofNullable(tryNotThrow(() -> getInsightTableData(ids))).orElse(new ArrayList<>());
         // (2) 正在加解密的全部记录
-        List<Windy> processTableData = getProcessTableData();
+        // List<Windy> processTableData = getProcessTableData();
+        List<Windy> processTableData = Optional.ofNullable(tryNotThrow(() -> getProcessTableData())).orElse(new ArrayList<>());
         // (3) 最近一分钟的IO信息
-        List<JSONObject> ioList = getIoList();
+        List<JSONObject> ioList = Optional.ofNullable(tryNotThrow(this::getIoList)).orElse(new ArrayList<>());
         // (4) 近一年的热力图
-        List<JSONObject> gridList = getHeatMapList();
+        List<JSONObject> gridList = Optional.ofNullable(tryNotThrow(this::getHeatMapList)).orElse(new ArrayList<>());
         // (5) 饼图:排队中、IO中、空闲中
-        JSONObject pie = getPie();
+        JSONObject pie = Optional.ofNullable(tryNotThrow(this::getPie)).orElse(new JSONObject());
         //
         // (X) 合并
         JSONObject data = JSONUtil.createObj()
@@ -225,7 +227,8 @@ public class StatService {
         return ioList;
     }
 
-    private List<Windy> getProcessTableData() throws InterruptedException, ExecutionException {
+    @SneakyThrows
+    private List<Windy> getProcessTableData() {
         List<Windy> processTableData = new ArrayList<>();
         Map<String, Windy> windyMap = redisSlaveCache.getCacheMap(CacheConstants.WINDY_MAP);
         Set<String> idSet = windyMap.keySet();
@@ -247,7 +250,8 @@ public class StatService {
         return processTableData;
     }
 
-    private List<Windy> getInsightTableData(List<String> ids) throws InterruptedException, ExecutionException {
+    @SneakyThrows
+    private List<Windy> getInsightTableData(List<String> ids) {
         List<Windy> insightTableData = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(ids)) {
             List<CompletableFuture<Windy>> futureList = ids.stream()
@@ -285,5 +289,14 @@ public class StatService {
                 log.error("addSecondLevelBytes error", e);
             }
         };
+    }
+
+    public <T> T tryNotThrow(Supplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Exception e) {
+            log.error("tryNotThrow error", e);
+            return null;
+        }
     }
 }
