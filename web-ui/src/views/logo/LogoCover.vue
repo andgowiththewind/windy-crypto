@@ -7,18 +7,17 @@
         v-cloak
         @click="unCoverLogo">
     </el-image>
+    <AuthorInfo></AuthorInfo>
   </div>
 </template>
 
 <script>
 import logo_right from '@/assets/logo_right.png';
-// import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
+import AuthorInfo from '@/views/console/footer/AuthorInfo.vue';
 
 export default {
   name: "LogoCover",
-  components: {},
+  components: {AuthorInfo},
   data() {
     return {
       logoRight: logo_right

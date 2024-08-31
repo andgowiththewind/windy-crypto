@@ -1,17 +1,16 @@
 <template>
   <div>
-    <h1>Footer</h1>
+      <AuthorInfo></AuthorInfo>
   </div>
 </template>
 
 <script>
 // import {Notification, MessageBox, Message, Loading} from 'element-ui';
-// import request from '@/utils/request';
-// import * as CommonConsts from '@/config/CommonConsts';
+import AuthorInfo from '@/views/console/footer/AuthorInfo.vue';
 
 export default {
   name: "Footer",
-  components: {},
+  components: {AuthorInfo},
   data() {
     return {}
   },// data
@@ -26,4 +25,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>
