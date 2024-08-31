@@ -2,7 +2,7 @@
   <div>
     <div>
       <el-card shadow="always">
-        <div class="contribution-grid">
+        <div class="contribution-grid" >
           <div
               v-for="(contribution, index) in gridList"
               :key="contribution.id"
@@ -39,7 +39,7 @@ export default {
     return {
       chart: null,
       ioEchartData: [],
-      gridList: [],
+      gridList: this.generateContributions(),
       contributions: this.generateContributions(),// 模拟一年的日期数据（365天）
     }
   },// data
@@ -52,8 +52,9 @@ export default {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
         contributions.push({
-          date: date.toISOString().slice(0, 10), // 只保留日期部分
-          count: Math.floor(Math.random() * 5)  // 随机生成 0 到 4 之间的贡献数
+          id: i + 1,
+          title: `${date.toISOString().slice(0, 10)}：no query results`,
+          color: '#ebedf0',
         });
       }
       return contributions;
@@ -166,6 +167,7 @@ export default {
       this.updateChart();
     });
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_GRID_LIST, (data) => {
+      this.gridList = data;
     });
   },// mounted
   beforeDestroy() {

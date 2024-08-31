@@ -92,16 +92,16 @@ public class StatService {
         DateTime justNow = DateUtil.date();
         // 原子Integer
         AtomicInteger atomicInteger = new AtomicInteger(0);
-        for (int i = 365; i > 0; i--) {
+        for (int i = 365; i >= 0; i--) {
             DateTime offsetDay = DateUtil.offsetDay(justNow, -i);
             String dtStr = DateUtil.format(offsetDay, "yyyy-MM-dd");
             List<StatDailyTask> groupByIoDay = tasks.stream().filter(task -> task.getIoDay().equals(dtStr)).collect(Collectors.toList());
             Map<Boolean, List<StatDailyTask>> ioSuccessMap = groupByIoDay.stream().collect(Collectors.partitioningBy(task -> task.getIoSuccess().equals("1")));
             List<StatDailyTask> successPart = ioSuccessMap.get(Boolean.TRUE);
-            Long ioRatePerSecondSum = successPart.stream().collect(Collectors.summingLong(row -> Long.parseLong(row.getIoRatePerSecond())));
+            Double ioRatePerSecondSum = successPart.stream().collect(Collectors.summingDouble(row -> Double.parseDouble(row.getIoRatePerSecond())));
             BigDecimal averageSpeed = successPart.size() == 0 ? BigDecimal.ZERO : NumberUtil.div(BigDecimal.valueOf(ioRatePerSecondSum), BigDecimal.valueOf(successPart.size()), 0);
             //
-            String title = StrUtil.format("{}:{} success,{} error,average speed:{}", dtStr, successPart.size(), ioSuccessMap.get(Boolean.FALSE).size(), FileUtil.readableFileSize(averageSpeed.longValue()));
+            String title = StrUtil.format("{}：[success={}], [error={}], [average speed={}]", dtStr, successPart.size(), ioSuccessMap.get(Boolean.FALSE).size(), FileUtil.readableFileSize(averageSpeed.longValue()));
             //
             JSONObject item = JSONUtil.createObj()
                     .putOpt("id", atomicInteger.incrementAndGet())
