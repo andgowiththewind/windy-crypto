@@ -36,6 +36,8 @@ export default {
   data() {
     return {
       chart: null,
+      ioEchartData: [],
+
       // 模拟一年的日期数据（365天）
       contributions: this.generateContributions(),
     }
@@ -60,18 +62,23 @@ export default {
       const colors = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
       return colors[count];
     },
-
     initChart() {
       this.chart = echarts.init(this.$refs.secondIoChart);
-      let base = +new Date(1968, 9, 3);
-      let oneDay = 24 * 3600 * 1000;
-      let date = [];
-      let data = [Math.random() * 300];
-      for (let i = 1; i < 2000; i++) {
-        var now = new Date((base += oneDay));
-        date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
-        data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
-      }
+      let option = this.getIoChartOptions();
+      this.chart.setOption(option);
+      // 自动调整图表大小以适应窗口变化
+      window.addEventListener('resize', () => {
+        this.chart.resize();
+      });
+    },
+    updateChart() {
+      let option = this.getIoChartOptions();
+      this.chart.setOption(option);
+    },
+    getIoChartOptions() {
+      // 从`ioEchartData`每个元素中提取key的值组成`xAxisData`
+      let xAxisData = this.ioEchartData.map(item => item.echartKey);
+      let seriesData = this.ioEchartData.map(item => item.value);
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -95,7 +102,7 @@ export default {
         xAxis: {
           type: 'category',// 表示 X 轴是类别轴，也就是说 X 轴上的值是离散的类别（例如日期、字符串等）
           boundaryGap: false,
-          data: date
+          data: xAxisData
         },
         yAxis: {
           type: 'value',
@@ -133,18 +140,11 @@ export default {
                 }
               ])
             },
-            data: data
+            data: seriesData
           }
         ]
       };
-
-      this.chart.setOption(option);
-
-
-      // 自动调整图表大小以适应窗口变化
-      window.addEventListener('resize', () => {
-        this.chart.resize();
-      });
+      return option;
     },
   },// methods
   watch: {
@@ -153,7 +153,8 @@ export default {
   mounted() {
     this.initChart();
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, (data) => {
-      console.log('FN_OBJECT_ASSIGN_IO_ECHART_DATA', data);
+      this.ioEchartData = data;
+      this.updateChart();
     });
   },// mounted
   beforeDestroy() {
