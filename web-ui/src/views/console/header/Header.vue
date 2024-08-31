@@ -75,7 +75,10 @@ export default {
       this.$bus.$emit(Methods.FN_UPDATE_TOP_FOLDER_PATH_COPY, this.topFolderPath);
     },
     startTour() {
-      introJs().start();
+      introJs().setOptions({
+        nextLabel: this.$t('i18n_1829970869540233216'),// 下一个
+        prevLabel: this.$t('i18n_1829971268699680768'),// 上一个
+      }).start();
     },
   },// methods
   watch: {
@@ -104,5 +107,9 @@ export default {
   position: fixed;
   right: 10px;
   top: 10px;
+}
+
+.introJsCustomTooltip {
+  color: red;
 }
 </style>

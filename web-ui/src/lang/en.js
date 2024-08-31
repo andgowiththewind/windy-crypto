@@ -55,4 +55,6 @@ export default {
     i18n_1829940779393613824: 'last update time',
     i18n_1829966694198755328: 'START GUIDE',
     i18n_1829967318650957824: 'click here to start the guide',
+    i18n_1829970869540233216: 'next',
+    i18n_1829971268699680768: 'previous',
 }
