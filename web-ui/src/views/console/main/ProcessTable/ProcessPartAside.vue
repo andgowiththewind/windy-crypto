@@ -8,8 +8,8 @@
               :key="contribution.date"
               :title="contribution.date + ': ' + contribution.count + ' contributions'"
               class="contribution-day"
-              :style="{ backgroundColor: getBackgroundColor(contribution.count) }"
-          ></div>
+              :style="{ backgroundColor: getBackgroundColor(contribution.count) }">
+          </div>
         </div>
       </el-card>
     </div>
