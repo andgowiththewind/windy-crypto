@@ -15,7 +15,16 @@
         </el-form-item>
         <el-form-item>
           <el-button-group>
-            <el-button type="primary" icon="el-icon-arrow-left" style="width: 15vw;" @click="submitConditionPagingQuery">{{ $t('i18n_1826863045788438530') }}</el-button>
+            <el-button
+                :data-title="$t('i18n_1826863045788438530')"
+                :data-intro="$t('i18n_1829981599945715712')"
+                data-step="6"
+                type="primary"
+                icon="el-icon-arrow-left"
+                style="width: 15vw;"
+                @click="submitConditionPagingQuery">
+              {{ $t('i18n_1826863045788438530') }}
+            </el-button>
             <el-button type="primary" plain style="width: 5vw;" @click="resetConditionalForm">{{ $t('i18n_1826863045788438531') }}<i class="el-icon-arrow-right el-icon--right"></i></el-button>
           </el-button-group>
         </el-form-item>

@@ -63,4 +63,7 @@ export default {
     i18n_1829978708568571904: 'you can also click the button to load the directory tree',
     i18n_1829979488998633472: 'directory tree',
     i18n_1829979698315341824: 'clicking on a node will also fill the directory address into the input box',
+    i18n_1829981599945715712: 'load all files in the directory after setting the conditions and press this button',
+    i18n_1829982589360943104: 'file list insight',
+    i18n_1829982840658489344: 'Here shows the basic information and functions that can be operated on the current file',
 }

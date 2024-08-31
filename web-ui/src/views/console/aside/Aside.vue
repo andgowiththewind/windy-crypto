@@ -35,8 +35,6 @@ import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import {devConsoleLog} from '@/utils/commonUtils';
 import {getTreeData} from '@/api/asideApi';
-import introJs from 'intro.js';
-import 'intro.js/introjs.css';
 
 export default {
   name: "Aside",

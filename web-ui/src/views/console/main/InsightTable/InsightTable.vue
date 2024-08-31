@@ -2,6 +2,9 @@
   <div>
     <!--table-->
     <el-table
+        :data-title="$t('i18n_1829982589360943104')"
+        :data-intro="$t('i18n_1829982840658489344')"
+        data-step="7"
         size="mini"
         :fit="true"
         :stripe="true"
