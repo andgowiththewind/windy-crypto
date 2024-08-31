@@ -68,6 +68,7 @@ service.interceptors.response.use(
     error => {
         // 结构赋值：从error中取出message属性,并创建一个同名的变量,并赋值给它
         let {message} = error;
+        console.log('^^^^^',message);
         if (message == "Network Error") {
             message = "后端接口连接异常";
         } else if (message.includes("timeout")) {
@@ -75,7 +76,7 @@ service.interceptors.response.use(
         } else if (error.response && error.response.data && error.response.data.msg) {
             message = error.response.data.msg;
         } else if (message.includes("Request failed with status code")) {
-            message = "系统接口" + message.substr(message.length - 3) + "异常";
+            message = "系统接口 " + message.substr(message.length - 3) + " 异常";
         }
         Message({message: message, type: 'error', duration: 5 * 1000})
         return Promise.reject(error)
