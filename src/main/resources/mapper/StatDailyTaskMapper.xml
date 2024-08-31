@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gust.cafe.windycrypto.mapper.StatDailyTaskMapper">
+    <resultMap id="BaseResultMap" type="com.gust.cafe.windycrypto.domain.StatDailyTask">
+        <!--@mbg.generated generated on Sat Aug 31 23:00:13 CST 2024.-->
+        <!--@Table stat_daily_task-->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="io_day" jdbcType="LONGVARCHAR" property="ioDay"/>
+        <result column="io_size" jdbcType="LONGVARCHAR" property="ioSize"/>
+        <result column="io_rate_per_second" jdbcType="LONGVARCHAR" property="ioRatePerSecond"/>
+        <result column="io_success" jdbcType="LONGVARCHAR" property="ioSuccess"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated generated on Sat Aug 31 23:00:13 CST 2024.-->
+        id,
+        io_day,
+        io_size,
+        io_rate_per_second,
+        io_success
+    </sql>
+</mapper>
