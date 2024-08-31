@@ -51,4 +51,5 @@ export default {
     i18n_1829888844594548736: 'BYTE STREAM FLUCTUATION',
     i18n_1829932998070595584: 'view traffic fluctuations after initiating the task',
     i18n_1829935506197274624: 'view the IO progress percentage after initiating the task',
+    i18n_1829939196081623040: 'please enter the directory address above and click "query file list"',
 }
