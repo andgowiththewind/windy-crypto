@@ -12,7 +12,7 @@
         @node-click="handleNodeClick">
     </el-tree>
     <div v-else class="empty-placeholder">
-      <el-empty description="暂无数据,请输入目录后加载目录树"/>
+      <el-empty :description="$t('i18n_1829771607149789184')"/>
     </div>
   </div>
 </template>

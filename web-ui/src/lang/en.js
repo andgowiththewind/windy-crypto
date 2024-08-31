@@ -46,4 +46,5 @@ export default {
     i18n_1829609885185249280: 'the current file has been decrypted and deleted',
     i18n_1829610650868011008: 'exception occurred and the current file was deleted',
     i18n_1829610946314772480: 'last exception triggered rollback. re-open',
+    i18n_1829771607149789184: 'no data, please enter the directory to load the directory tree',
 }
