@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "发起任务后查看IO进度百分比";
+        String zh = "请在上面输入目录地址后点击\"查询文件列表\"";
         // 纯小写
-        String en = "view the IO progress percentage after initiating the task";
+        String en = "please enter the directory address above and click \"query file list\"";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
