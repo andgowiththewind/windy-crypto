@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-        :data-title="$t('热力图')"
-        :data-intro="$t('热力图')"
+        :data-title="$t('i18n_1829999207910731776')"
+        :data-intro="$t('i18n_1829999466489552896')"
         data-step="11">
       <!--热力图-->
       <el-card shadow="always">

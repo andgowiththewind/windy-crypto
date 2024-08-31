@@ -101,9 +101,10 @@ export default {
         devConsoleLog('当前步骤索引:', currentStepIndex);
         if (currentStepIndex === 10) {
           this.$bus.$emit(Methods.FN_SHOW__PROCESS_DRAWER_VO);
-          // return new Promise((resolve) => {
-          //   setInterval(resolve, 1500);
-          // });
+          return new Promise((resolve) => {
+            // setInterval(resolve, 1500);
+            resolve();
+          });
         }
       });
       intro.start();
