@@ -1,6 +1,6 @@
 <template>
   <div >
-    <el-alert title="处理中" center type="success" :closable="false"></el-alert>
+    <el-alert title="(ง •̀_•́)ง" center type="success" :closable="false"></el-alert>
   </div>
 </template>
 

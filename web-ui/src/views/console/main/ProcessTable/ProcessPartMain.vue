@@ -23,7 +23,7 @@
       </el-table-column>
 
       <template #empty>
-        <el-empty description="No data available">
+        <el-empty :description="$t('i18n_1829935506197274624')">
           <template #image>
             <img :src="logoLeft" alt="Custom Image"/>
           </template>
