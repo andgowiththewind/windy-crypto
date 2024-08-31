@@ -4,12 +4,16 @@
       <i>{{ $t('i18n_1826858923819405312') }}</i>
     </el-button>
     <el-tree
+        v-if="treeVo.data.length>0"
         :data="treeVo.data"
         :props="treeVo.defaultProps"
         node-key="id"
         :default-expanded-keys="treeVo.defaultExpandedKeys"
         @node-click="handleNodeClick">
     </el-tree>
+    <div v-else class="empty-placeholder">
+      <el-empty description="暂无数据,请输入目录后加载目录树"/>
+    </div>
   </div>
 </template>
 
