@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "输入文件夹路径后按下Enter加载目录树";
+        String zh = "单击节点也会将目录地址填充到输入框";
         // 纯小写
-        String en = "load directory tree after entering the folder path and pressing Enter";
+        String en = "clicking on a node will also fill the directory address into the input box";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);

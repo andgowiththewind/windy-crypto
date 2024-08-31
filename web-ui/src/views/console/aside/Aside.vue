@@ -2,7 +2,7 @@
   <div v-loading="loading">
     <el-button
         :data-title="$t('i18n_1826858923819405312')"
-        data-intro="111111111111111"
+        :data-intro="$t('i18n_1829978708568571904')"
         data-step="4"
         type="warning"
         size="mini"
@@ -19,7 +19,12 @@
         :default-expanded-keys="treeVo.defaultExpandedKeys"
         @node-click="handleNodeClick">
     </el-tree>
-    <div v-else class="empty-placeholder">
+    <div
+        :data-title="$t('i18n_1829979488998633472')"
+        :data-intro="$t('i18n_1829979698315341824')"
+        data-step="5"
+        v-else
+        class="empty-placeholder">
       <el-empty :description="$t('i18n_1829771607149789184')"/>
     </div>
   </div>
