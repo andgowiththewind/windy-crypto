@@ -58,4 +58,6 @@ export default {
     i18n_1829970869540233216: 'next',
     i18n_1829971268699680768: 'previous',
     i18n_1829975151219986432: 'you can switch language here',
+    i18n_1829977716108193792: 'folder-path-input-box',
+    i18n_1829978187938021376: 'load directory tree after entering the folder path and pressing Enter',
 }

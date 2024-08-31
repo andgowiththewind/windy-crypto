@@ -1,7 +1,15 @@
 <template>
   <div>
     <div class="windy-path-input">
-      <el-input size="mini" v-model="topFolderPath" :placeholder="$t('i18n_1826859557616488448')" @keyup.enter.native="handleTopFolderEnter"></el-input>
+      <el-input
+          :data-title="$t('i18n_1829977716108193792')"
+          :data-intro="$t('i18n_1829978187938021376')"
+          data-step="3"
+          size="mini"
+          v-model="topFolderPath"
+          :placeholder="$t('i18n_1826859557616488448')"
+          @keyup.enter.native="handleTopFolderEnter">
+      </el-input>
     </div>
     <div class="windy-change-language">
       <el-button-group>

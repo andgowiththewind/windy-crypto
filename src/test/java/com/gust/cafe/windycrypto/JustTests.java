@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "这里可以切换语言";
+        String zh = "输入文件夹路径后按下Enter加载目录树";
         // 纯小写
-        String en = "you can switch language here";
+        String en = "load directory tree after entering the folder path and pressing Enter";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
