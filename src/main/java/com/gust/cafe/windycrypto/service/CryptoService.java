@@ -419,7 +419,7 @@ public class CryptoService {
                 if (frequencyTimer.intervalMs() > 800L) {
                     // 计算当前百分比
                     Integer percentage = Convert.toInt(StrUtil.replaceLast(NumberUtil.formatPercent(NumberUtil.div(total, windyBeforeSize, 4), 0), "%", ""));
-                    log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
+                    // log.debug("[{}]-处理核心IO操作-当前百分比:[{}%]", cryptoContext.getBeforeCacheId(), percentage);
                     // TODO 更新缓存状态信息
                     Windy windy = windyCacheService.lockGetOrDefault(cryptoContext.getBeforePath());
                     windy.setLatestMsg("i18n_1829607775228129280");
@@ -445,7 +445,7 @@ public class CryptoService {
             windy.setPercentageLabel("100%");
             windy.setUpdateTime(DateUtil.now());
             redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
-            log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
+            // log.debug("[{}]-当前百分比:[{}%],总耗时[{}]ms", cryptoContext.getBeforeCacheId(), 100, globalTimer.intervalMs());
             //
             statService.addSecondLevelBytes(NumberUtil.toStr(BigDecimal.valueOf(totalPerLoop)));
             //

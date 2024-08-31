@@ -31,7 +31,7 @@
               :current-page.sync="payload.page.pageNum"
               :page-size="payload.page.pageSize"
               :total="payload.page.total"
-              layout="total, prev, pager, next, jumper">
+              layout="total, sizes,prev, pager, next, jumper">
           </el-pagination>
         </el-form-item>
       </el-form>
@@ -53,7 +53,7 @@ export default {
       loading: false,
       payload: {
         model: {name: ''},
-        page: {pageNum: 1, pageSize: 10, total: 0},
+        page: {pageNum: 1, pageSize: 30, total: 0},
         params: {searchScope: 'all', path: ''},
       },
     }
