@@ -27,6 +27,7 @@
 
 <script>
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
+import * as Methods from '@/config/Methods';
 import * as echarts from 'echarts';
 
 export default {
@@ -151,6 +152,9 @@ export default {
   },// watch
   mounted() {
     this.initChart();
+    this.$bus.$on(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, (data) => {
+      console.log('FN_OBJECT_ASSIGN_IO_ECHART_DATA', data);
+    });
   },// mounted
   beforeDestroy() {
     if (this.chart) {
