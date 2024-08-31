@@ -13,8 +13,8 @@
       <!--折线图-->
       <el-card shadow="always">
         <div style="height: 400px;width: 100%;">
-          <div v-if="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>
-          <div v-else class="empty-placeholder">
+          <div v-show="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>
+          <div v-show="ioEchartData.length==0" class="empty-placeholder">
             <el-empty :description="$t('i18n_1829932998070595584')"/>
           </div>
         </div>
@@ -24,7 +24,7 @@
     <div>
       <!--饼图-->
       <el-card shadow="always">
-        <div style="height: 400px;width: 100%;">
+        <div style="height: 200px;width: 100%;">
           <div ref="pieChart" class="pie-chart-style"></div>
         </div>
       </el-card>
@@ -180,7 +180,7 @@ export default {
         },
         series: [
           {
-            name: 'Access From',
+            name: 'status',
             type: 'pie',
             radius: ['40%', '70%'],
             avoidLabelOverlap: false,
