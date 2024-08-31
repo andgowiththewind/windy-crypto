@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "字节流量波动";
+        String zh = "发起任务后查看流量波动";
         // 纯小写
-        String en = "BYTE STREAM FLUCTUATION";
+        String en = "view traffic fluctuations after initiating the task";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);

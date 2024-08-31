@@ -13,7 +13,10 @@
       <!--折线图-->
       <el-card shadow="always">
         <div style="height: 400px;width: 100%;">
-          <div ref="secondIoChart" class="second-io-chart-style"></div>
+          <div v-if="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>
+          <div v-else class="empty-placeholder">
+            <el-empty :description="$t('i18n_1829771607149789184')"/>
+          </div>
         </div>
       </el-card>
     </div>
@@ -201,11 +204,9 @@ export default {
               show: false
             },
             data: [
-              {value: 1048, name: 'Search Engine'},
-              {value: 735, name: 'Direct'},
-              {value: 580, name: 'Email'},
-              {value: 484, name: 'Union Ads'},
-              {value: 300, name: 'Video Ads'}
+              {value: this.pieVo.free, name: 'FREE'},
+              {value: this.pieVo.io, name: 'IO'},
+              {value: this.pieVo.waiting, name: 'WAITING'}
             ]
           }
         ]
@@ -218,6 +219,7 @@ export default {
   },// watch
   mounted() {
     this.initChart();
+    this.updatePieChart();
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, (data) => {
       this.ioEchartData = data;
       // devConsoleLog('this.ioEchartData', this.ioEchartData);
