@@ -2,12 +2,22 @@
   <div>
     <div>
       <el-card shadow="always">
-        <div ref="chart" style="width: 600px; height: 400px;"></div>
+        <div class="contribution-grid">
+          <div
+              v-for="(contribution, index) in contributions"
+              :key="contribution.date"
+              :title="contribution.date + ': ' + contribution.count + ' contributions'"
+              class="contribution-day"
+              :style="{ backgroundColor: getBackgroundColor(contribution.count) }"
+          ></div>
+        </div>
       </el-card>
     </div>
     <p></p>
     <div>
-      <el-card shadow="always">总是显示</el-card>
+      <el-card shadow="always">
+        <div ref="chart" style="width: 600px; height: 400px;"></div>
+      </el-card>
     </div>
     <p></p>
     <div>
@@ -24,9 +34,32 @@ export default {
   name: "ProcessPartAside",
   components: {},
   data() {
-    return {}
+    return {
+      // 模拟一年的日期数据（365天）
+      contributions: this.generateContributions(),
+    }
   },// data
-  methods: {},// methods
+  methods: {
+    generateContributions() {
+      const contributions = [];
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 364); // 从 365 天前开始
+      for (let i = 0; i < 365; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        contributions.push({
+          date: date.toISOString().slice(0, 10), // 只保留日期部分
+          count: Math.floor(Math.random() * 5)  // 随机生成 0 到 4 之间的贡献数
+        });
+      }
+      return contributions;
+    },
+    getBackgroundColor(count) {
+      // 根据贡献数返回不同的背景颜色
+      const colors = ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'];
+      return colors[count];
+    },
+  },// methods
   watch: {
     // 'searchParamVo.topPath': {handler: function (val, oldVal) {if (val) {this.searchParamVo.topPath = val;this.searchParamVo.topPath = '';}}, deep: true},
   },// watch
@@ -61,4 +94,16 @@ export default {
 </script>
 
 <style scoped>
+.contribution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 14px);
+  grid-gap: 4px;
+}
+
+.contribution-day {
+  width: 14px;
+  height: 14px;
+  background-color: #ebedf0;
+  border-radius: 2px;
+}
 </style>
