@@ -6,6 +6,7 @@
     <div class="windy-change-language">
       <el-button-group>
         <el-button
+            :data-title="'zh' === this.$i18n.locale ? 'Switch English' : '切换中文'"
             :data-intro="$t('i18n_1829975151219986432')"
             data-step="2"
             size="mini"
@@ -16,10 +17,11 @@
         </el-button>
         <!--新手引导-->
         <el-button
-            size="mini"
-            @click="startTour"
+            :data-title="$t('i18n_1829966694198755328')"
             :data-intro="$t('i18n_1829967318650957824')"
-            data-step="1">
+            data-step="1"
+            @click="startTour"
+            size="mini">
           {{ $t('i18n_1829966694198755328') }}
         </el-button>
       </el-button-group>

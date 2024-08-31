@@ -3,8 +3,7 @@
     <el-button
         :data-title="$t('i18n_1826858923819405312')"
         data-intro="111111111111111"
-        data-step="3"
-        data-disable-interaction="true"
+        data-step="4"
         type="warning"
         size="mini"
         style="width: 100%;height: 50px;"
