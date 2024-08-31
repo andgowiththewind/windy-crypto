@@ -18,4 +18,14 @@
         io_rate_per_second,
         io_success
     </sql>
+
+    <select id="selectHeatMapList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        FROM stat_daily_task
+        WHERE io_day <![CDATA[>=]]> #{minIoDay,jdbcType=VARCHAR}
+          AND io_day <![CDATA[<=]]> #{maxIoDay,jdbcType=VARCHAR}
+          AND io_success = 1
+        ORDER BY io_day DESC
+    </select>
 </mapper>

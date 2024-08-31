@@ -4,11 +4,11 @@
       <el-card shadow="always">
         <div class="contribution-grid">
           <div
-              v-for="(contribution, index) in contributions"
-              :key="contribution.date"
-              :title="contribution.date + ': ' + contribution.count + ' contributions'"
+              v-for="(contribution, index) in gridList"
+              :key="contribution.id"
+              :title="contribution.title"
               class="contribution-day"
-              :style="{ backgroundColor: getBackgroundColor(contribution.count) }">
+              :style="{ backgroundColor: contribution.color }">
           </div>
         </div>
       </el-card>
@@ -39,9 +39,8 @@ export default {
     return {
       chart: null,
       ioEchartData: [],
-
-      // 模拟一年的日期数据（365天）
-      contributions: this.generateContributions(),
+      gridList: [],
+      contributions: this.generateContributions(),// 模拟一年的日期数据（365天）
     }
   },// data
   methods: {
@@ -165,6 +164,8 @@ export default {
       this.ioEchartData = data;
       // devConsoleLog('this.ioEchartData', this.ioEchartData);
       this.updateChart();
+    });
+    this.$bus.$on(Methods.FN_OBJECT_ASSIGN_GRID_LIST, (data) => {
     });
   },// mounted
   beforeDestroy() {

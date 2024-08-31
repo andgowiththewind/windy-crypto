@@ -18,3 +18,4 @@ export const FN_CONTRACT_INSIGHT_TABLE_DATA_ID_LIST_COPY = 'fnContractInsightTab
 export const FN_OBJECT_ASSIGN_INSIGHT_TABLE_DATA = 'fnObjectAssignInsightTableData';
 export const FN_OBJECT_ASSIGN_PROCESS_TABLE_DATA = 'fnObjectAssignProcessTableData';
 export const FN_OBJECT_ASSIGN_IO_ECHART_DATA = 'fnObjectAssignIoEchartData';
+export const FN_OBJECT_ASSIGN_GRID_LIST = 'fnObjectAssignGridList';
