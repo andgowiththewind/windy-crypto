@@ -119,12 +119,14 @@ public class StatService {
             } else {
                 ioList.add(JSONUtil.createObj()
                         .putOpt("key", dtStr)
-                        .putOpt("echartKey", DateUtil.format(DateUtil.parse(dtStr), "yyyy-MM-dd HH:mm:ss"))
+                        .putOpt("echartKey", DateUtil.format(DateUtil.parse(dtStr), "HH:mm:ss"))
                         .putOpt("value", 0)
                         .putOpt("label", "0B")
                 );
             }
         }
+        // 倒叙
+        Collections.reverse(ioList);
 
         //
         // (X) 合并

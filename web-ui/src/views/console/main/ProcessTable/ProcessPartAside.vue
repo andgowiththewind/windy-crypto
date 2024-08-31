@@ -29,6 +29,8 @@
 import {Notification, MessageBox, Message, Loading} from 'element-ui';
 import * as Methods from '@/config/Methods';
 import * as echarts from 'echarts';
+import {devConsoleLog} from '@/utils/commonUtils';
+
 
 export default {
   name: "ProcessPartAside",
@@ -79,6 +81,7 @@ export default {
       // 从`ioEchartData`每个元素中提取key的值组成`xAxisData`
       let xAxisData = this.ioEchartData.map(item => item.echartKey);
       let seriesData = this.ioEchartData.map(item => item.value);
+      //
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -92,9 +95,7 @@ export default {
         },
         toolbox: {
           feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
+            // dataZoom: {yAxisIndex: 'none'},
             restore: {},
             saveAsImage: {}
           }
@@ -108,20 +109,10 @@ export default {
           type: 'value',
           boundaryGap: [0, '100%']
         },
-        dataZoom: [
-          {
-            type: 'inside',
-            start: 0,
-            end: 10
-          },
-          {
-            start: 0,
-            end: 10
-          }
-        ],
+        // dataZoom: [{type: 'inside', start: 0, end: 10}, {start: 0, end: 10}],
         series: [
           {
-            name: 'Fake Data',
+            name: 'Fake Data',// 系列名称
             type: 'line',
             symbol: 'none',
             sampling: 'lttb',
@@ -154,6 +145,7 @@ export default {
     this.initChart();
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_IO_ECHART_DATA, (data) => {
       this.ioEchartData = data;
+      devConsoleLog('this.ioEchartData', this.ioEchartData);
       this.updateChart();
     });
   },// mounted
