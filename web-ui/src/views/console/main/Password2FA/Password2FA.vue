@@ -10,7 +10,11 @@
               v-model="userPassword" :placeholder="$t('i18n_1828973612548362244')" show-password></el-input>
         </el-form-item>
         <el-form-item label="" prop="isRequireCoverName">
-          <el-radio-group v-model="isRequireCoverName" size="mini">
+          <el-radio-group
+              :data-title="$t('i18n_1829984895003422720')"
+              :data-intro="$t('i18n_1829986041721913344')"
+              data-step="9"
+              v-model="isRequireCoverName" size="mini">
             <el-radio-button label="hide">{{ $t('i18n_1828966632739966976') }}</el-radio-button>
             <el-radio-button label="notHide">{{ $t('i18n_1828966632739966977') }}</el-radio-button>
           </el-radio-group>
