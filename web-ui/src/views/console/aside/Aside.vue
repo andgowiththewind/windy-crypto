@@ -4,6 +4,7 @@
       <i>{{ $t('i18n_1826858923819405312') }}</i>
     </el-button>
     <el-tree
+        style="background-color: #d1dae5;"
         v-if="treeVo.data.length>0"
         :data="treeVo.data"
         :props="treeVo.defaultProps"

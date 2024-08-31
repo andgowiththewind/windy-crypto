@@ -11,7 +11,7 @@
         :header-cell-style="headerCellStyleFnVal"
         :data="tableData"
         style="width: 100%;min-height:500px;">
-      <el-table-column label="ID" width="170" :show-overflow-tooltip="true">
+      <el-table-column label="ID" width="100" :show-overflow-tooltip="true">
         <template v-slot="scope">
           <span
               :id="getIdCellId(scope.row)"
