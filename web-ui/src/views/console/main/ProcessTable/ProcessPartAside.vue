@@ -13,10 +13,9 @@
       <!--折线图-->
       <el-card shadow="always">
         <div style="height: 400px;width: 100%;">
-          <div v-show="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>
-          <div v-show="ioEchartData.length==0" class="empty-placeholder">
-            <el-empty :description="$t('i18n_1829932998070595584')"/>
-          </div>
+          <div ref="secondIoChart" class="second-io-chart-style"></div>
+          <!--<div v-show="ioEchartData.length>0" ref="secondIoChart" class="second-io-chart-style"></div>-->
+          <!--<div v-show="ioEchartData.length==0" class="empty-placeholder"><el-empty :description="$t('i18n_1829932998070595584')"/></div>-->
         </div>
       </el-card>
     </div>
@@ -229,6 +228,7 @@ export default {
       this.gridList = data;
     });
     this.$bus.$on(Methods.FN_OBJECT_ASSIGN_PIE, (data) => {
+
       this.updatePieChart();
     });
   },// mounted
