@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "暂无数据,请输入目录后加载目录树";
+        String zh = "已执行重置";
         // 纯小写
-        String en = "no data, please enter the directory to load the directory tree";
+        String en = "reset has been executed";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
