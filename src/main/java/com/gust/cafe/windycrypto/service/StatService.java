@@ -65,18 +65,39 @@ public class StatService {
         List<JSONObject> ioList = getIoList();
         // (4) 近一年的热力图
         List<JSONObject> gridList = getHeatMapList();
+        // (5) 饼图:排队中、IO中、空闲中
+        JSONObject pie = getPie();
         //
         // (X) 合并
         JSONObject data = JSONUtil.createObj()
                 .putOpt("insightTableData", insightTableData)
                 .putOpt("processTableData", processTableData)
                 .putOpt("ioList", ioList)
-                .putOpt("gridList", gridList);
+                .putOpt("gridList", gridList)
+                .putOpt("pie", pie);
         JSONObject resVo = JSONUtil.createObj().putOpt("code", WsMessageService.CodeEnum.CODE_555.getCode()).putOpt("data", data);
         String message = JSONUtil.toJsonStr(resVo);
         //
         // (X) 发生websocket消息
         WindyCryptoWebsocket.sendMessage(sessionId, message);
+    }
+
+    private JSONObject getPie() {
+        Map<String, Windy> cacheMap = redisSlaveCache.getCacheMap(CacheConstants.WINDY_MAP);
+        // 转换为List<Windy>
+        List<Windy> windyList = new ArrayList<>(cacheMap.values());
+        Map<Integer, List<Windy>> collect = windyList.stream().collect(Collectors.groupingBy(Windy::getCode));
+        List<Windy> outputtingCount = collect.get(WindyStatusEnum.OUTPUTTING.getCode());
+        List<Windy> almostCount = collect.get(WindyStatusEnum.ALMOST.getCode());
+        List<Windy> freeCount = collect.get(WindyStatusEnum.FREE.getCode());
+        List<Windy> waitingCount = collect.get(WindyStatusEnum.WAITING.getCode());
+        // List<Windy> inputtingCount = collect.get(WindyStatusEnum.INPUTTING.getCode());
+        //
+        JSONObject pie = JSONUtil.createObj()
+                .putOpt("waiting", CollectionUtil.size(waitingCount))
+                .putOpt("io", CollectionUtil.size(outputtingCount))
+                .putOpt("free", CollectionUtil.size(freeCount));
+        return pie;
     }
 
     private List<JSONObject> getHeatMapList() {
