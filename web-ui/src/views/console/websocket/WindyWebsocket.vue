@@ -140,7 +140,7 @@ export default {
     devConsoleLog('WindyWebsocket mounted');
     this.wsUrlPrefixInit();
     this.wsIntervalStartUp(2000);// 每隔N毫秒检查一次ws连接
-    this.tableIntervalStartUp(1500);// 每隔N毫秒查询一次TABLE数据
+    this.tableIntervalStartUp(2000);// 每隔N毫秒查询一次TABLE数据
     this.$bus.$on(Methods.FN_UPDATE_INSIGHT_TABLE_DATA_ID_LIST_COPY, (data) => this.insightTableDataIdListCopy = data);
   },// mounted
 }

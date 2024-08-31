@@ -83,8 +83,26 @@ export default {
       let seriesData = this.ioEchartData.map(item => item.value);
       //
       const option = {
+        grid: {
+          left: '1%',  // 默认是'10%'，增大这个值以增加左边距
+          right: '2%',
+          bottom: '2%',
+          containLabel: true
+        },
         tooltip: {
           trigger: 'axis',
+          formatter: function (params) {
+            // params 是一个数组，包含当前鼠标悬浮点的所有系列的数据
+            let tooltipContent = '';
+            params.forEach(item => {
+              // 查找与当前点匹配的ioEchartData元素
+              let dataItem = this.ioEchartData.find(d => d.key === item.name);
+              if (dataItem) {
+                tooltipContent += `[${dataItem.datetimeStr}]---${dataItem.label}<br/>`;
+              }
+            });
+            return tooltipContent;
+          }.bind(this),  // 绑定当前this上下文
           position: function (pt) {
             return [pt[0], '10%'];
           }
