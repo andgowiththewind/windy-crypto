@@ -48,4 +48,5 @@ export default {
     i18n_1829610946314772480: 'last exception triggered rollback. re-open',
     i18n_1829771607149789184: 'no data, please enter the directory to load the directory tree',
     i18n_1829773338935959552: 'reset has been executed',
+    i18n_1829888844594548736: 'BYTE STREAM FLUCTUATION',
 }

@@ -91,7 +91,7 @@ export default {
         },
         title: {
           left: 'center',
-          text: 'Large Area Chart',// 标题
+          text: this.$t('i18n_1829888844594548736'),// 标题
         },
         toolbox: {
           feature: {
