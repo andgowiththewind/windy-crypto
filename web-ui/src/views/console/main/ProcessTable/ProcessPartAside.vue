@@ -62,17 +62,15 @@ export default {
 
     initChart() {
       this.chart = echarts.init(this.$refs.secondIoChart);
-
       let base = +new Date(1968, 9, 3);
       let oneDay = 24 * 3600 * 1000;
       let date = [];
       let data = [Math.random() * 300];
-      for (let i = 1; i < 20000; i++) {
+      for (let i = 1; i < 2000; i++) {
         var now = new Date((base += oneDay));
         date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
         data.push(Math.round((Math.random() - 0.5) * 20 + data[i - 1]));
       }
-
       const option = {
         tooltip: {
           trigger: 'axis',
@@ -82,7 +80,7 @@ export default {
         },
         title: {
           left: 'center',
-          text: 'Large Area Chart'
+          text: 'Large Area Chart',// 标题
         },
         toolbox: {
           feature: {
@@ -94,7 +92,7 @@ export default {
           }
         },
         xAxis: {
-          type: 'category',
+          type: 'category',// 表示 X 轴是类别轴，也就是说 X 轴上的值是离散的类别（例如日期、字符串等）
           boundaryGap: false,
           data: date
         },
