@@ -100,7 +100,11 @@ public class StatService {
                     BigDecimal bigDecimalVal = BigDecimal.valueOf(longVal);
                     total = NumberUtil.add(total, bigDecimalVal);
                 }
-                return JSONUtil.createObj().putOpt("key", dt).putOpt("value", total.longValue()).putOpt("label", FileUtil.readableFileSize(total.longValue()));
+                return JSONUtil.createObj()
+                        .putOpt("key", DateUtil.format(dt, "HH:mm:ss"))
+                        .putOpt("value", total.longValue())
+                        .putOpt("datetimeStr", DateUtil.format(dt, "yyyy-MM-dd HH:mm:ss"))
+                        .putOpt("label", FileUtil.readableFileSize(total.longValue()));
             }, statTaskExecutor)).collect(Collectors.toList());
             CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
             CompletableFuture<List<JSONObject>> allResults = allFutures.thenApply(v -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList()));
@@ -111,9 +115,9 @@ public class StatService {
         DateTime justNow = DateUtil.date();
         for (int i = 0; i < 60; i++) {
             DateTime offsetSecond = DateUtil.offsetSecond(justNow, -(i + 1));
-            String dtStr = DateUtil.format(offsetSecond, "yyyyMMddHHmmss");
+            String dtStr = DateUtil.format(offsetSecond, "yyyy-MM-dd HH:mm:ss");
             // 如果`resultList`有对应的记录,则收集,否则补0
-            Optional<JSONObject> first = resultList.stream().filter(jo -> jo.getStr("key").equals(dtStr)).findFirst();
+            Optional<JSONObject> first = resultList.stream().filter(jo -> jo.getStr("datetimeStr").equals(dtStr)).findFirst();
             if (first.isPresent()) {
                 ioList.add(first.get());
             } else {
