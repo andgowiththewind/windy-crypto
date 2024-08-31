@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -39,7 +42,7 @@ public class StatService {
     private ThreadPoolTaskExecutor statTaskExecutor;
 
     /**
-     * 返回两个表格的数据
+     * 返回两个表格的数据 & IO信息
      * <p>都使用线程池进行优化</p>
      *
      * @param sessionId ws连接的唯一标识
@@ -81,14 +84,50 @@ public class StatService {
             List<Windy> windyList = allResults.get();
             windyList.forEach(windy -> Optional.ofNullable(windy).filter(w -> w != null).ifPresent(processTableData::add));
         }
+        // (3) 最近一分钟的IO信息
+        Collection<String> ioKeys = redisSlaveCache.keys(StrUtil.format("{}_*", CacheConstants.LAST_MINUTE_IO));
+        List<JSONObject> ioList = new ArrayList<>();
+        List<JSONObject> resultList = new ArrayList<>();
+        if (CollectionUtil.isNotEmpty(ioKeys)) {
+            List<CompletableFuture<JSONObject>> futureList = ioKeys.stream().map(key -> CompletableFuture.supplyAsync(() -> {
+                String dtStr = StrUtil.subAfter(key, StrUtil.format("{}_", CacheConstants.LAST_MINUTE_IO), false);
+                DateTime dt = DateUtil.parse(dtStr, "yyyyMMddHHmmss");
+                //
+                List<String> longList = redisSlaveCache.listGetAll(key);
+                BigDecimal total = BigDecimal.ZERO;
+                for (String longStr : longList) {
+                    long longVal = Long.parseLong(longStr);
+                    BigDecimal bigDecimalVal = BigDecimal.valueOf(longVal);
+                    total = NumberUtil.add(total, bigDecimalVal);
+                }
+                return JSONUtil.createObj().putOpt("key", dt).putOpt("value", total.longValue()).putOpt("label", FileUtil.readableFileSize(total.longValue()));
+            }, statTaskExecutor)).collect(Collectors.toList());
+            CompletableFuture<Void> allFutures = CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
+            CompletableFuture<List<JSONObject>> allResults = allFutures.thenApply(v -> futureList.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+            resultList = allResults.join();
+            //
+        }
+        // 从当前时刻往前推2分钟
+        DateTime justNow = DateUtil.date();
+        for (int i = 0; i < 60; i++) {
+            DateTime offsetSecond = DateUtil.offsetSecond(justNow, -(i + 1));
+            String dtStr = DateUtil.format(offsetSecond, "yyyyMMddHHmmss");
+            // 如果`resultList`有对应的记录,则收集,否则补0
+            Optional<JSONObject> first = resultList.stream().filter(jo -> jo.getStr("key").equals(dtStr)).findFirst();
+            if (first.isPresent()) {
+                ioList.add(first.get());
+            } else {
+                ioList.add(JSONUtil.createObj().putOpt("key", dtStr).putOpt("value", 0).putOpt("label", "0B"));
+            }
+        }
+
         //
-        //
-        // (3) 合并
-        JSONObject data = JSONUtil.createObj().putOpt("insightTableData", insightTableData).putOpt("processTableData", processTableData);
+        // (X) 合并
+        JSONObject data = JSONUtil.createObj().putOpt("insightTableData", insightTableData).putOpt("processTableData", processTableData).putOpt("ioList", ioList);
         JSONObject resVo = JSONUtil.createObj().putOpt("code", WsMessageService.CodeEnum.CODE_555.getCode()).putOpt("data", data);
         String message = JSONUtil.toJsonStr(resVo);
         //
-        // (4) 发生websocket消息
+        // (X) 发生websocket消息
         WindyCryptoWebsocket.sendMessage(sessionId, message);
     }
 
