@@ -193,8 +193,14 @@ public class StatService {
                 );
             }
         }
-        // 倒叙
-        Collections.reverse(ioList);
+        // 倒序
+        ioList = ioList.stream().sorted((s1, s2) -> {
+            String datetimeStr1 = s1.getStr("datetimeStr");
+            String datetimeStr2 = s2.getStr("datetimeStr");
+            DateTime dt1 = DateUtil.parse(datetimeStr1, "yyyy-MM-dd HH:mm:ss");
+            DateTime dt2 = DateUtil.parse(datetimeStr2, "yyyy-MM-dd HH:mm:ss");
+            return dt1.after(dt2) ? 1 : -1;
+        }).collect(Collectors.toList());
         return ioList;
     }
 
