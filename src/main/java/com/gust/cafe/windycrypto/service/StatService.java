@@ -89,7 +89,7 @@ public class StatService {
         Map<Integer, List<Windy>> collect = windyList.stream().collect(Collectors.groupingBy(Windy::getCode));
         List<Windy> outputtingCount = collect.get(WindyStatusEnum.OUTPUTTING.getCode());
         List<Windy> almostCount = collect.get(WindyStatusEnum.ALMOST.getCode());
-        List<Windy> freeCount = collect.get(WindyStatusEnum.FREE.getCode()).stream().filter(w -> FileUtil.exist(w.getAbsPath())).collect(Collectors.toList());
+        List<Windy> freeCount = Optional.ofNullable(collect.get(WindyStatusEnum.FREE.getCode())).orElse(new ArrayList<>()).stream().filter(w -> FileUtil.exist(w.getAbsPath())).collect(Collectors.toList());
         List<Windy> waitingCount = collect.get(WindyStatusEnum.WAITING.getCode());
         // List<Windy> inputtingCount = collect.get(WindyStatusEnum.INPUTTING.getCode());
         //
