@@ -95,6 +95,10 @@ export default {
         stepNumbersOfLabel: '/',
         overlayOpacity: 0.8,
         disableInteraction: true,
+        dontShowAgain: true,
+        dontShowAgainCookieDays: 1,
+        tooltipClass: 'introJsCustomTooltip',
+        dontShowAgainLabel: this.$t('i18n_1830002466448613376'),
       });
       intro.onbeforechange(async () => {
         const currentStepIndex = intro._currentStep;// 获取当前步骤的索引
@@ -120,6 +124,7 @@ export default {
     this.$bus.$on(Methods.FN_CONTRACT_HANDLE_TOP_FOLDER_ENTER, () => this.handleTopFolderEnter());
     // 从`localStorage`中读取上次设置的语言
     this.langInit();
+    this.startTour();
   },// mounted
 }
 </script>
@@ -137,6 +142,7 @@ export default {
   right: 10px;
   top: 10px;
 }
+
 
 
 </style>

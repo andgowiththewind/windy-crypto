@@ -74,4 +74,5 @@ export default {
     i18n_1829999207910731776: 'heatmap',
     i18n_1829999466489552896: 'show the number of operations per day and other information over the past year',
     i18n_1830000164283219968: 'bytes processed per second recently',
+    i18n_1830002466448613376: 'no longer prompt (if you want to guide again after selection, you need to clear the cookie)',
 }

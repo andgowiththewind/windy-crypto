@@ -41,9 +41,9 @@ public class JustTests {
     @Test
     public void i18nTest() {
         // 为前后端同时增加翻译
-        String zh = "最近每秒处理的字节数";
+        String zh = "不再提示(选中后如果想再次引导需要清理cookie)";
         // 纯小写
-        String en = "bytes processed per second recently";
+        String en = "no longer prompt (if you want to guide again after selection, you need to clear the cookie)";
         String id = IdUtil.getSnowflakeNextIdStr();
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
         String format = StrUtil.format("i18n_{}={}", id, zh);
