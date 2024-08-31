@@ -108,7 +108,7 @@ export default {
   },// data
   methods: {
     getTableDataEmptyDesc() {
-      return this.$t('i18n_1829939196081623040') + (this.reqLatestDatetime ? " (@" + this.reqLatestDatetime + ")" : '');
+      return this.$t('i18n_1829939196081623040') + (this.reqLatestDatetime ? "  (" + this.$t('i18n_1829940779393613824') + " @" + this.reqLatestDatetime + ")" : '');
     },
     i18nMsgPlusAction(msg) {
       // 如果以`i18n_`开头则调用

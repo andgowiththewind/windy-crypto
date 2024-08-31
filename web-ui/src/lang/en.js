@@ -52,4 +52,5 @@ export default {
     i18n_1829932998070595584: 'view traffic fluctuations after initiating the task',
     i18n_1829935506197274624: 'view the IO progress percentage after initiating the task',
     i18n_1829939196081623040: 'please enter the directory address above and click "query file list"',
+    i18n_1829940779393613824: 'last update time',
 }
