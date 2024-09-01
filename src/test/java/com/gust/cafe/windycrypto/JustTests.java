@@ -5,20 +5,27 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.SystemUtil;
-import org.apache.ibatis.logging.LogException;
+import com.gust.cafe.windycrypto.util.ProcessBuilderUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class JustTests {
 
     @Test
     public void test01() {
+        // {"npm.cmd", "installAAA", "--registry=https://registry.npmmirror.com"}
+        String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "installAAA", "--registry=https://registry.npmmirror.com"), String.class);
+        File workingDirectory = FileUtil.file("D:/gust/dev/project/github/windy-crypto/web-ui");
+        ProcessBuilderUtils.run(commandWithArgs, workingDirectory);
+        System.out.println("=====================");
     }
 
     @Test
@@ -83,5 +90,6 @@ public class JustTests {
         newLines2.add(lines2.get(lines2.size() - 1));
         FileUtil.writeUtf8Lines(newLines2, file2);
     }
+
 
 }
