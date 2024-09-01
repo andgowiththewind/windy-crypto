@@ -745,7 +745,7 @@ public class CryptoService {
                     windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
                     windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
                     windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg("i18n_1829610650868011008");// 发生异常触发当前文件被删除
+                    windy.setLatestMsg(StrUtil.isNotBlank(throwable.getMessage()) ? throwable.getMessage() : "i18n_1829610650868011008");// 发生异常触发当前文件被删除
                     windy.setUpdateTime(DateUtil.now());
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                 }
