@@ -25,7 +25,7 @@ public class ProcessBuilderUtils {
      * @param workingDirectory
      */
     @SneakyThrows
-    public static void execute(String[] commandWithArgs, File workingDirectory) {
+    public static int execute(String[] commandWithArgs, File workingDirectory) {
         TimeInterval timer = DateUtil.timer();
         // 创建 ProcessBuilder 实例
         ProcessBuilder processBuilder = new ProcessBuilder(commandWithArgs);
@@ -52,13 +52,14 @@ public class ProcessBuilderUtils {
         int exitValue = process.waitFor();
 
         // 打印执行时间
-        log.debug("process executed in {} ms", timer.intervalMs());
+        log.debug("process executed in {} ms with exit code {}", timer.intervalMs(), exitValue);
 
         // 如果进程返回值不为0，抛出异常
         if (exitValue != 0) {
             throw new RuntimeException("process failed with exit code " + exitValue);
         }
 
+        return exitValue;
     }
 
 }
