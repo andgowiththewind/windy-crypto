@@ -115,6 +115,12 @@ public class CryptoService {
             Windy windy = windyCacheService.lockGetOrDefault(beforePath);// 实时查询缓存
             WindyStatusEnum anEnum = WindyStatusEnum.getByCode(windy.getCode());// 状态要求FREE
             Assert.isTrue(anEnum != null && anEnum.equals(WindyStatusEnum.FREE), "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1828354895519027200"));// 非空闲状态,已有其他任务在处理,当前任务终止
+
+            // 特殊:安全起见,小于8个字节的文件不允许加密
+            Long size = windy.getSize();
+            Assert.isTrue(size != null && size >= 8, "[{}]-{}", cryptoContext.getBeforeCacheId(), WindyLang.msg("i18n_1830297202640822272"));// 文件大小不符合要求,当前任务终止
+
+
         });
 
         // 满足条件则将状态更新为排队中
