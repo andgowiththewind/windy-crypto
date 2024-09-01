@@ -39,19 +39,19 @@ public class RunUtils {
         // 合并两个异步任务
         CompletableFuture<ResultDTO> complexFuture = checkSqliteFuture.thenCombine(checkRedisFuture, (sqliteResult, redisResult) -> {
             if (sqliteResult.getSuccess() && redisResult.getSuccess()) {
-                return ResultDTO.builder().success(true).message("全部调节准备完毕").build();
+                return ResultDTO.builder().success(true).message("all adjustments are ready").build();
             } else {
                 String msg = CollectionUtil.toList(sqliteResult.getMessage(), redisResult.getMessage()).stream().collect(Collectors.joining(";"));
                 return ResultDTO.builder().success(false).message(msg).build();
             }
         }).exceptionally(e -> {
-            log.error("未知异常 => ", e);
+            log.error("unknown anomaly => ", e);
             throw new RuntimeException(e);
         });
         // 阻塞主线程
         ResultDTO resultDTO = complexFuture.get();
         if (!resultDTO.getSuccess()) {
-            log.info("运行环境检查正常,耗时[{}]ms", mainThreadTimer.intervalMs());
+            log.info("the running environment is checked normally, which takes [{0}] ms.", mainThreadTimer.intervalMs());
             throw new RuntimeException(resultDTO.getMessage());
         }
         //
@@ -94,14 +94,14 @@ public class RunUtils {
                             .templateName("up_redis_windows.conf.ftl")
                             .outputFile(upRedisWindowsConf)
                             .build());
-                    log.info("渲染文件[{}]成功", upRedisWindowsConf.getAbsolutePath());
+                    log.info("rendering file success [{}]", upRedisWindowsConf.getAbsolutePath());
                 }
             }
-            log.info("REDIS环境检查完毕,耗时[{}]ms", timer.intervalMs());
-            return ResultDTO.builder().success(true).message(StrUtil.format("REDIS环境检查完毕,耗时[{}]ms", timer.intervalMs())).build();
+            log.info("redis environmental inspection is completed, which takes [{}] ms.", timer.intervalMs());
+            return ResultDTO.builder().success(true).message(StrUtil.format("redis environmental inspection is completed, which takes [{}] ms.", timer.intervalMs())).build();
         } catch (ZipException e) {
-            log.error("REDIS检查失败 => ", e);
-            return ResultDTO.builder().success(false).message("解压缩文件失败").build();
+            log.error("redis check failed. => ", e);
+            return ResultDTO.builder().success(false).message("failed to decompress file.").build();
         }
     }
 
@@ -112,7 +112,7 @@ public class RunUtils {
             String currentDir = SystemUtil.getUserInfo().getCurrentDir();
             File sqliteFile = FileUtil.file(currentDir, "attachments", "db", "windy-crypto.sqlite");
             if (FileUtil.exist(sqliteFile) && FileUtil.isFile(sqliteFile)) {
-                return ResultDTO.builder().success(true).message(StrUtil.format("sqlite文件存在,耗时[{}]ms", timer.intervalMs())).build();
+                return ResultDTO.builder().success(true).message(StrUtil.format("The sqlite file exists, which took [{}] ms.", timer.intervalMs())).build();
             }
             // 否则在目录下找最新时间的zip进行解压缩
             File parent = FileUtil.getParent(sqliteFile, 1);
@@ -132,15 +132,15 @@ public class RunUtils {
                         try {
                             new ZipFile(f).extractAll(FileUtil.getAbsolutePath(parent));
                         } catch (ZipException e) {
-                            log.error("解压缩文件失败[{}]", f.getAbsolutePath());
+                            log.error("failed to decompress file [{}]", f.getAbsolutePath());
                             throw new RuntimeException(e);
                         }
                     });
             // 再次检查sqlite文件
             if (FileUtil.exist(sqliteFile) && FileUtil.isFile(sqliteFile)) {
-                return ResultDTO.builder().success(true).message(StrUtil.format("sqlite文件存在,耗时[{}]ms", timer.intervalMs())).build();
+                return ResultDTO.builder().success(true).message(StrUtil.format("the sqlite file exists, which took [{}] ms.", timer.intervalMs())).build();
             } else {
-                return ResultDTO.builder().success(false).message(StrUtil.format("sqlite文件不存在,耗时[{}]ms", timer.intervalMs())).build();
+                return ResultDTO.builder().success(false).message(StrUtil.format("the sqlite file does not exist, which takes [{}] ms.", timer.intervalMs())).build();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -150,7 +150,7 @@ public class RunUtils {
     @SneakyThrows
     private static void executeCommand(String batPath) {
 
-        Assert.isTrue(FileUtil.exist(batPath) && FileUtil.isFile(batPath), "文件不存在或不是文件:{}", batPath);
+        Assert.isTrue(FileUtil.exist(batPath) && FileUtil.isFile(batPath), "file does not exist or is not a file :{}", batPath);
         String parent = FileUtil.getParent(batPath, 1);
         String name = FileUtil.getName(batPath);
         String cmdPart = StrUtil.format("cd {} && call {}", parent, name);
