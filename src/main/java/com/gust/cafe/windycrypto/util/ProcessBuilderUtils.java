@@ -25,7 +25,7 @@ public class ProcessBuilderUtils {
      * @param workingDirectory
      */
     @SneakyThrows
-    public static void run(String[] commandWithArgs, File workingDirectory) {
+    public static void execute(String[] commandWithArgs, File workingDirectory) {
         TimeInterval timer = DateUtil.timer();
         // 创建 ProcessBuilder 实例
         ProcessBuilder processBuilder = new ProcessBuilder(commandWithArgs);

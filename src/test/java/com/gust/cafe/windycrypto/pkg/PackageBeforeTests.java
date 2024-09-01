@@ -1,60 +1,24 @@
 package com.gust.cafe.windycrypto.pkg;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Console;
 
-import java.util.Arrays;
+import java.io.File;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteResultHandler;
-import org.apache.commons.exec.PumpStreamHandler;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.system.SystemUtil;
+import com.gust.cafe.windycrypto.util.ProcessBuilderUtils;
 
 public class PackageBeforeTests {
+
+
     public static void main(String[] args) {
-        Console.error("======================================PackageBeforeTests");
-        // 创建命令行
-        // CommandLine cmdLine = new CommandLine("cmd");
-        // cmdLine.addArgument("/c");
-        // cmdLine.addArgument("npm run build:prod");
-
-        // npm install --registry=https://registry.npmmirror.com
-
-        CommandLine cmdLine = new CommandLine("npm.cmd");// win环境需要使用`npm.cmd`
-        cmdLine.addArgument("installw");
-        cmdLine.addArgument("--registry=https://registry.npmmirror.com");
-
-        // 设置输出流
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-
-        // 创建执行器
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setWorkingDirectory(FileUtil.file("D:/gust/dev/project/github/windy-crypto/web-ui"));
-        executor.setStreamHandler(streamHandler);
-
-        // 异步执行命令
-        ExecuteResultHandler resultHandler = new ExecuteResultHandler() {
-            @Override
-            public void onProcessComplete(int exitValue) {
-                System.out.println("Process completed with exit value: " + exitValue);
-                System.out.println("Output: " + outputStream.toString());
-            }
-
-            @Override
-            public void onProcessFailed(ExecuteException e) {
-                System.err.println("Process failed: " + e.getMessage());
-            }
-        };
-
-        try {
-            executor.execute(cmdLine, resultHandler);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // 注意win环境使用`npm.cmd`代替`npm`
+        String[] installArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install", "--registry=https://registry.npmmirror.com"), String.class);
+        File workingDirectory = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "web-ui");
+        ProcessBuilderUtils.execute(installArgs, workingDirectory);
+        //
+        String[] buildArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "run", "build:prod"), String.class);
+        ProcessBuilderUtils.execute(buildArgs, workingDirectory);
     }
 }

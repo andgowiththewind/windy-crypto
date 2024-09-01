@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class JustTests {
@@ -25,7 +24,7 @@ public class JustTests {
         String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install----test---AAA", "--registry=https://registry.npmmirror.com"), String.class);
         // String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install", "--registry=https://registry.npmmirror.com"), String.class);
         File workingDirectory = FileUtil.file("D:/gust/dev/project/github/windy-crypto/web-ui");
-        ProcessBuilderUtils.run(commandWithArgs, workingDirectory);
+        ProcessBuilderUtils.execute(commandWithArgs, workingDirectory);
         System.out.println("=====================");
     }
 
