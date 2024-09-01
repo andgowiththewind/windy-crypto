@@ -22,7 +22,8 @@ public class JustTests {
     @Test
     public void test01() {
         // {"npm.cmd", "installAAA", "--registry=https://registry.npmmirror.com"}
-        String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "installAAA", "--registry=https://registry.npmmirror.com"), String.class);
+        String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install----test---AAA", "--registry=https://registry.npmmirror.com"), String.class);
+        // String[] commandWithArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install", "--registry=https://registry.npmmirror.com"), String.class);
         File workingDirectory = FileUtil.file("D:/gust/dev/project/github/windy-crypto/web-ui");
         ProcessBuilderUtils.run(commandWithArgs, workingDirectory);
         System.out.println("=====================");
