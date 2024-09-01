@@ -54,3 +54,6 @@ attachments/redis
 ### log ###
 logs/
 app.lock
+
+### web-ui dist copy ###
+src/main/resources/static

@@ -31,5 +31,7 @@ public class PackageBeforeTests {
         //
         String[] buildArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "run", "build:prod"), String.class);
         ProcessBuilderUtils.execute(buildArgs, workingDirectory);
+        //
+        // 拷贝到`resources/static`目录
     }
 }
