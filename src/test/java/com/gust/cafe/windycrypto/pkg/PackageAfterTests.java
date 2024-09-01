@@ -115,6 +115,8 @@ public class PackageAfterTests {
     }
 
     private static void exe4j() {
+        File mkdir = FileUtil.mkdir(FileUtil.file(getCurrentDir(), "target/exe-jar2exe"));
+
     }
 
 
