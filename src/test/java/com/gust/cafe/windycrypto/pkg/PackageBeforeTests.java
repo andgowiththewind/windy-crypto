@@ -28,10 +28,16 @@ public class PackageBeforeTests {
         String[] installArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install", "--registry=https://registry.npmmirror.com"), String.class);
         File workingDirectory = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "web-ui");
         ProcessBuilderUtils.execute(installArgs, workingDirectory);
+        Console.log("安装成功");
         //
         String[] buildArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "run", "build:prod"), String.class);
         ProcessBuilderUtils.execute(buildArgs, workingDirectory);
+        Console.log("构建成功");
         //
         // 拷贝到`resources/static`目录
+        File from = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "web-ui/dist");
+        File to = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "src/main/resources/static");
+        FileUtil.copyContent(from, to, true);
+        Console.log("拷贝成功");
     }
 }
