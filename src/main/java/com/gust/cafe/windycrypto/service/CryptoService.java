@@ -44,9 +44,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -720,6 +718,9 @@ public class CryptoService {
             log.error(StrUtil.format("[{}]-发生未知异常", Thread.currentThread().getName()), throwable);
         }
         if (cryptoContext == null) return;
+
+        String msg = Optional.ofNullable(throwable).map(t -> t.getCause()).filter(Objects::nonNull).map(tt -> tt.getMessage()).orElseGet(() -> WindyLang.msg("i18n_1829610650868011008"));
+
         // 1.0 删除可能存在的临时文件以及最终文件
         List<String> pathList = ListUtil.toLinkedList(cryptoContext.getTmpPath(), cryptoContext.getAfterPath());
         for (String path : pathList) {
@@ -745,7 +746,7 @@ public class CryptoService {
                     windy.setCode(WindyStatusEnum.NOT_EXIST.getCode());
                     windy.setLabel(WindyStatusEnum.NOT_EXIST.getLabel());
                     windy.setDesc(WindyStatusEnum.NOT_EXIST.getRemark());
-                    windy.setLatestMsg(StrUtil.isNotBlank(throwable.getMessage()) ? throwable.getMessage() : "i18n_1829610650868011008");// 发生异常触发当前文件被删除
+                    windy.setLatestMsg(msg);
                     windy.setUpdateTime(DateUtil.now());
                     redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
                 }
@@ -762,7 +763,7 @@ public class CryptoService {
         windy.setCode(WindyStatusEnum.FREE.getCode());
         windy.setLabel(WindyStatusEnum.FREE.getLabel());
         windy.setDesc(WindyStatusEnum.FREE.getRemark());
-        windy.setLatestMsg("i18n_1829610946314772480");
+        windy.setLatestMsg(msg);
         windy.setUpdateTime(DateUtil.now());
         redisMasterCache.setCacheMapValue(CacheConstants.WINDY_MAP, windy.getId(), windy);
         //
