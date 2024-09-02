@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -150,7 +151,9 @@ public class PackageAfterTests {
         File outputFile = FileUtil.file(getCurrentDir(), "target/windy-crypto-exe2setup.iss");
         Map<String, Object> dataModel = new HashMap<>();
         dataModel.put("fmMyAppName", "windy-crypto");
-
+        dataModel.put("fmMyAppPublisher", "windy");
+        dataModel.put("fmAppId", IdUtil.randomUUID().toUpperCase());
+        dataModel.put("InfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt")), "\\", "/"));
     }
 
     private static String getCurrentDir() {
