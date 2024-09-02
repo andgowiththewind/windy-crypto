@@ -57,7 +57,7 @@ public class RunUtils {
         //
         // 启动`attachments/.redis/打开两个REDIS.bat`
         String currentDir = SystemUtil.getUserInfo().getCurrentDir();
-        File file = FileUtil.file(currentDir, "attachments", "redis", "打开两个REDIS.bat");
+        File file = FileUtil.file(currentDir, "attachments", "redis", "100---打开两个REDIS.bat");
         executeCommand(file.getAbsolutePath());
     }
 
