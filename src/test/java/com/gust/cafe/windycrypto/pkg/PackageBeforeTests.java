@@ -4,6 +4,8 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.ArrayUtil;
@@ -28,16 +30,16 @@ public class PackageBeforeTests {
         String[] installArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "install", "--registry=https://registry.npmmirror.com"), String.class);
         File workingDirectory = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "web-ui");
         ProcessBuilderUtils.execute(installArgs, workingDirectory);
-        Console.log("安装成功：{}", FileUtil.getAbsolutePath(workingDirectory));
+        Console.error("{} 安装成功：{}", Arrays.stream(installArgs).collect(Collectors.joining(" ")), FileUtil.getAbsolutePath(workingDirectory));
         //
         String[] buildArgs = ArrayUtil.toArray(ListUtil.toList("npm.cmd", "run", "build:prod"), String.class);
         ProcessBuilderUtils.execute(buildArgs, workingDirectory);
-        Console.log("构建成功：{}", FileUtil.getAbsolutePath(workingDirectory));
+        Console.error("{} 构建成功：{}", Arrays.stream(buildArgs).collect(Collectors.joining(" ")), FileUtil.getAbsolutePath(workingDirectory));
         //
         // 拷贝到`resources/static`目录
         File from = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "web-ui/dist");
         File to = FileUtil.file(SystemUtil.getUserInfo().getCurrentDir(), "src/main/resources/static");
         FileUtil.copyContent(from, to, true);
-        Console.log("拷贝成功：{} ===> {}", FileUtil.getAbsolutePath(from), FileUtil.getAbsolutePath(to));
+        Console.error("拷贝成功：{} ===> {}", FileUtil.getAbsolutePath(from), FileUtil.getAbsolutePath(to));
     }
 }
