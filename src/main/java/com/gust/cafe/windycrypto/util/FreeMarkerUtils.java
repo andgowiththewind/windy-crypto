@@ -33,8 +33,8 @@ public class FreeMarkerUtils {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FmConfig {
-        private File directoryForTemplateLoading;
         private Map<String, Object> dataModel;
+        private File directoryForTemplateLoading;
         private String templateName;
         private File outputFile;
     }

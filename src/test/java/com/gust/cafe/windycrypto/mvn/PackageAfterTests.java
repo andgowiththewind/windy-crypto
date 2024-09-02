@@ -116,7 +116,17 @@ public class PackageAfterTests {
     private static void exe4j() {
         // exe4j软件不会自动创建目录
         File mkdir = FileUtil.mkdir(FileUtil.file(getCurrentDir(), "target/exe-jar2exe"));
-
+        // exe4j 配置文件
+        File directoryForTemplateLoading = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe");
+        String templateName = "jar2exe.exe4j.ftl";
+        File outputFile = FileUtil.file(getCurrentDir(), "target/windy-crypto-jar2exe.exe4j");
+        Map<String, Object> dataModel = new HashMap<>();
+        // 项目名称
+        dataModel.put("applicationName", "windy-crypto");
+        // 产品输出目录
+        dataModel.put("distributionSourceDir", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/exe-jar2exe")), "\\", "/"));
+        // jar 包位置
+        dataModel.put("classPathArchiveLocation", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/windy-crypto.jar")), "\\", "/"));
     }
 
 
