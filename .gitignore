@@ -49,7 +49,7 @@ attachments/redis
 !attachments/redis/redis01/up_redis_windows.conf.ftl
 !attachments/redis/redis02/up.bat
 !attachments/redis/redis02/up_redis_windows.conf.ftl
-!attachments/redis/打开两个REDIS.bat
+!attachments/redis/100---打开两个REDIS.bat
 
 ### log ###
 logs/
