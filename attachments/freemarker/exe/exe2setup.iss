@@ -3,29 +3,24 @@
 
 #define MyAppName "windy-crypto"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "windy"
-#define MyAppURL "gust.cafe"
-#define MyAppExeName "windy-crypto.exe"
-#define MyJreName "jre"
+#define MyAppPublisher "Windy"
+#define MyAppExeName "startup.bat"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{257A33E0-8CE6-43C7-B4C2-AD8A091683A3}
+AppId={{45AAA6A8-F6F3-4A0C-B33C-E967E9B910FF}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=D:\gust\dev\project\github\windy-crypto\LICENSE
+InfoAfterFile=D:\gust\dev\project\github\windy-crypto\target\infoFileAfterInstall.txt
 OutputDir=D:\gust\dev\project\github\windy-crypto\target\exe-exe2setup
 OutputBaseFilename=windy-crypto-setup
-SetupIconFile=C:\cafe\attachment\ico\53.ico
+SetupIconFile=D:\gust\dev\project\github\windy-crypto\target\0002.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -36,8 +31,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
+Source: "D:\gust\dev\project\github\windy-crypto\target\startup.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "D:\gust\dev\project\github\windy-crypto\target\startup.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\gust\dev\project\github\windy-crypto\target\exe-jar2exe\windy-crypto.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\cafe\dev\jdk1.8.0_221\jre\*"; DestDir: "{app}\{#MyJreName}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\gust\dev\project\github\windy-crypto\target\attachments\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\gust\dev\project\github\windy-crypto\target\config\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -45,5 +43,5 @@ Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
 

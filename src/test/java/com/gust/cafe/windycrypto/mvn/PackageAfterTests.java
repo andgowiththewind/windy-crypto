@@ -149,7 +149,7 @@ public class PackageAfterTests {
         String templateName = "exe2setup.iss.ftl";
         File outputFile = FileUtil.file(getCurrentDir(), "target/windy-crypto-exe2setup.iss");
         Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("applicationName", "windy-crypto");
+        dataModel.put("fmMyAppName", "windy-crypto");
 
     }
 
