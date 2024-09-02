@@ -74,16 +74,15 @@ export default {
       Message.success(this.$t('i18n_1829773338935959552'));
     },
     submitConditionPagingQuery() {
-      this.loading = true;
       devConsoleLog('submitConditionPagingQuery');
       devConsoleLog('接收合并之前的payload', this.payload);
       // 激活其他多个组件的合约,要求其向当前组件传递数据更新payload
       this.$bus.$emit(Methods.FN_CONTRACT_PAYLOAD);
-
       if (this.payload.params.path) {
+        devConsoleLog('路径不为空，不允许查询');
         return false;
       }
-
+      this.loading = true;
       getInsightTableData(this.payload).then(response => {
         devConsoleLog(response);
         this.payload.page.total = response.data.total;
