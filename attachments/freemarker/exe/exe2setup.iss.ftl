@@ -5,6 +5,9 @@
 #define MyAppVersion "1.0"
 #define MyAppPublisher "${fmMyAppPublisher}"
 #define MyAppExeName "startup.bat"
+#define MyJreDirName "jre"
+#define MyAttachmentsDirName "attachments"
+#define MyConfigDirName "config"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -17,10 +20,10 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-InfoAfterFile=${InfoAfterFile}
+InfoAfterFile=${fmInfoAfterFile}
 OutputDir=D:\gust\dev\project\github\windy-crypto\target\exe-exe2setup
-OutputBaseFilename=windy-crypto-setup
-SetupIconFile=D:\gust\dev\project\github\windy-crypto\target\0002.ico
+OutputBaseFilename=${fmOutputBaseFilename}
+SetupIconFile=${fmSetupIconFile}
 Compression=lzma
 SolidCompression=yes
 
@@ -32,10 +35,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "D:\gust\dev\project\github\windy-crypto\target\startup.bat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\gust\dev\project\github\windy-crypto\target\startup.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\gust\dev\project\github\windy-crypto\target\exe-jar2exe\windy-crypto.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "D:\gust\dev\project\github\windy-crypto\target\attachments\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\gust\dev\project\github\windy-crypto\target\config\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmJreDirPath}\*"; DestDir: "{app}\{#MyJreName}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

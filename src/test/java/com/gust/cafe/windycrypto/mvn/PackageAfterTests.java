@@ -153,7 +153,11 @@ public class PackageAfterTests {
         dataModel.put("fmMyAppName", "windy-crypto");
         dataModel.put("fmMyAppPublisher", "windy");
         dataModel.put("fmAppId", IdUtil.randomUUID().toUpperCase());
-        dataModel.put("InfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt")), "\\", "/"));
+        dataModel.put("fmInfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt")), "\\", "/"));
+        dataModel.put("fmOutputDir", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/exe-exe2setup")), "\\", "/"));
+        dataModel.put("fmOutputBaseFilename", "windy-crypto-setup");
+        dataModel.put("fmSetupIconFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/0002.ico")), "\\", "/"));
+        dataModel.put("fmJreDirPath", "C:\\cafe\\dev\\jdk1.8.0_221\\jre");
     }
 
     private static String getCurrentDir() {
