@@ -3,6 +3,7 @@
     <envs>
       <env name="MY_DEV_LOG_HOME" value="$PROJECT_DIR$/../../../../../manylogs/windy-crypto-logs" />
       <env name="spring.profiles.active" value="dev" />
+      <env name="IBATIS_LOG_LEVEL" value="DEBUG" />
     </envs>
     <module name="windy-crypto" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.gust.cafe.windycrypto.WindyCryptoApplication" />
