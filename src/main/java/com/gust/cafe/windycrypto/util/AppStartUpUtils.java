@@ -5,13 +5,17 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.TimeInterval;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.system.SystemUtil;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import org.springframework.core.env.Environment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,10 +32,10 @@ import java.util.stream.Collectors;
  * @date 2024-08-22 16:50
  */
 @Slf4j
-public class RunUtils {
+public class AppStartUpUtils {
 
     @SneakyThrows
-    public static void check() {
+    public static void checkBeforeRun() {
         TimeInterval mainThreadTimer = DateUtil.timer();
         //
         CompletableFuture<ResultDTO> checkSqliteFuture = CompletableFuture.supplyAsync(() -> checkSqlite());
@@ -169,6 +173,19 @@ public class RunUtils {
             System.out.println("Batch file executed successfully.");
         } else {
             System.err.println("Failed to execute batch file with error code: " + exitCode);
+        }
+    }
+
+    public static void bannerPrint() {
+        Console.log(ResourceUtil.readUtf8Str("banner_copy.txt"));
+    }
+
+    public static void openUrl() {
+        try {
+            String port = SpringUtil.getBean(Environment.class).getProperty("server.port");
+            FileUtils.openUrl(StrUtil.format("http://localhost:{}", port));
+        } catch (Exception e) {
+            Console.error("failed to open the browser, please open the homepage manually");
         }
     }
 

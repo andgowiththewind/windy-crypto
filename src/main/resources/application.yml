@@ -19,6 +19,8 @@ spring:
   messages:
     basename: messages # i18n messages 国际化,src/main/resources/messages.properties
     encoding: utf-8
+  main:
+    banner-mode: off
 logging:
   config: classpath:logback-spring-${spring.profiles.active}.xml # 指定哪个日志配置文件才生效
   level:
