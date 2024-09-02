@@ -83,8 +83,10 @@ public class RunUtils {
                 File redisServerExe = FileUtil.file(redisDir, "redis-server.exe");
                 boolean rseOk = FileUtil.exist(redisServerExe) && FileUtil.isFile(redisServerExe);
                 // 如果不存在则解压缩
-                Assert.isTrue(FileUtil.exist(zip) && FileUtil.isFile(zip), "file does not exist or is not a file :{}", zip);
-                if (!rseOk) new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
+                if (!rseOk) {
+                    Assert.isTrue(FileUtil.exist(zip) && FileUtil.isFile(zip), "file does not exist or is not a file :{}", zip);
+                    new ZipFile(zip).extractAll(FileUtil.getAbsolutePath(redisDir));
+                }
                 File upRedisWindowsConf = FileUtil.file(redisDir, "up_redis_windows.conf");
                 // 如果不存在则渲染
                 boolean urwcOk = FileUtil.exist(upRedisWindowsConf) && FileUtil.isFile(upRedisWindowsConf);
