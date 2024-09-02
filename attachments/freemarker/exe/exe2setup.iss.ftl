@@ -4,7 +4,7 @@
 #define MyAppName "${fmMyAppName}"
 #define MyAppVersion "1.0"
 #define MyAppPublisher "${fmMyAppPublisher}"
-#define MyAppExeName "startup.bat"
+#define MyAppExeName "${fmMyAppName}"
 #define MyJreDirName "jre"
 #define MyAttachmentsDirName "attachments"
 #define MyConfigDirName "config"
@@ -46,5 +46,6 @@ Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
+; Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
