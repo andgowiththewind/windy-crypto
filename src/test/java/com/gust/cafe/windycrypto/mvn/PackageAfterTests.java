@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.SystemUtil;
+import com.gust.cafe.windycrypto.util.FileUtils;
 import com.gust.cafe.windycrypto.util.FreeMarkerUtils;
 import lombok.SneakyThrows;
 import net.lingala.zip4j.ZipFile;
@@ -34,6 +35,11 @@ public class PackageAfterTests {
         redis();
         config();
         exe4j();
+        openTargetDir();
+    }
+
+    private static void openTargetDir() {
+        FileUtils.openDirectory(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target")));
     }
 
     private static void config() {
