@@ -43,7 +43,7 @@ attachments/db/*.sqlite
 !attachments/db/*.zip
 
 ### REDIS ###
-#attachments/redis
+attachments/redis
 !attachments/redis/REDIS-X64-3.2.100.zip
 !attachments/redis/redis01/up.bat
 !attachments/redis/redis01/up_redis_windows.conf.ftl
