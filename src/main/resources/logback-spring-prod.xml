@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <property name="MY_LOG_MAX_HISTORY" value="60"/>
-    <property name="MY_LOG_HOME" value="./logs/"/>
-    <property name="MY_LOG_CHARSET" value="UTF-8"/>
+    <property name="MY_LOG_HOME" value="./logs/prod/"/>
+    <property name="MY_LOG_CHARSET" value="gbk"/>
     <property name="MY_LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{50} # %method][%line] %msg%n"/>
 
     <appender name="WATCHDOG_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
