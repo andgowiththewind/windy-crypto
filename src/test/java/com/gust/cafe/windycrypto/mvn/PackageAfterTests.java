@@ -111,7 +111,7 @@ public class PackageAfterTests {
                 Console.error("已渲染模板文件：{}", templateName);
             }
             // 一个脚本
-            File bat2 = FileUtil.file(getCurrentDir(), "attachments/redis/打开两个REDIS.bat");
+            File bat2 = FileUtil.file(getCurrentDir(), "attachments/redis/100---打开两个REDIS.bat");
             if (FileUtil.exist(bat2) && FileUtil.isFile(bat2)) {
                 File batCopy = FileUtil.file(getCurrentDir(), "target", "attachments/redis", FileUtil.getName(bat2));
                 FileUtil.copy(bat2, batCopy, true);
