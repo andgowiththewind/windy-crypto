@@ -26,3 +26,4 @@ logging:
   level:
     org.mybatis: ${IBATIS_LOG_LEVEL:WARN}
     org.apache.ibatis: ${IBATIS_LOG_LEVEL:WARN}
+    org.mybatis.spring.SqlSessionFactoryBean: ${IBATIS_LOG_LEVEL:WARN}
