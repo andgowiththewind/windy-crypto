@@ -114,6 +114,12 @@ public class PackageAfterTests {
     }
 
     private static void exe4j() {
+        exe4jHandleExe2jar();
+        exe4jHandleJar2Setup();
+
+    }
+
+    private static void exe4jHandleExe2jar() {
         // exe4j软件不会自动创建目录
         FileUtil.mkdir(FileUtil.file(getCurrentDir(), "target/exe-jar2exe"));
         // exe4j 配置文件
@@ -136,11 +142,16 @@ public class PackageAfterTests {
                 .templateName(templateName)
                 .outputFile(outputFile)
                 .build());
-        //
-        //
-        // innoSetup 配置文件
     }
 
+    private static void exe4jHandleJar2Setup() {
+        File directoryForTemplateLoading = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe");
+        String templateName = "exe2setup.iss.ftl";
+        File outputFile = FileUtil.file(getCurrentDir(), "target/windy-crypto-exe2setup.iss");
+        Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("applicationName", "windy-crypto");
+
+    }
 
     private static String getCurrentDir() {
         return SystemUtil.getUserInfo().getCurrentDir();
