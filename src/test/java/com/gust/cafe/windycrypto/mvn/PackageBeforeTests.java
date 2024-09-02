@@ -1,4 +1,4 @@
-package com.gust.cafe.windycrypto.pkg;
+package com.gust.cafe.windycrypto.mvn;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;

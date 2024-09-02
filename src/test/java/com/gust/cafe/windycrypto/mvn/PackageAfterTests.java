@@ -1,4 +1,4 @@
-package com.gust.cafe.windycrypto.pkg;
+package com.gust.cafe.windycrypto.mvn;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.FileUtil;
@@ -10,7 +10,6 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.system.SystemUtil;
 import com.gust.cafe.windycrypto.util.FreeMarkerUtils;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
@@ -115,6 +114,7 @@ public class PackageAfterTests {
     }
 
     private static void exe4j() {
+        // exe4j软件不会自动创建目录
         File mkdir = FileUtil.mkdir(FileUtil.file(getCurrentDir(), "target/exe-jar2exe"));
 
     }

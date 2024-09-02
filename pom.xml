@@ -251,7 +251,7 @@
                             <!-- 在什么范围找主类 -->
                             <classpathScope>test</classpathScope>
                             <!-- 指定要执行的主类 -->
-                            <mainClass>com.gust.cafe.windycrypto.pkg.PackageBeforeTests</mainClass>
+                            <mainClass>com.gust.cafe.windycrypto.mvn.PackageBeforeTests</mainClass>
                             <arguments>
                                 <!-- 传递参数,支持多个 -->
                                 <argument>arg1</argument>
@@ -276,7 +276,7 @@
                         </goals>
                         <configuration>
                             <!-- 自定义测试类 -->
-                            <mainClass>com.gust.cafe.windycrypto.pkg.PackageAfterTests</mainClass>
+                            <mainClass>com.gust.cafe.windycrypto.mvn.PackageAfterTests</mainClass>
                             <classpathScope>test</classpathScope>
                             <arguments>
                                 <!-- 传递参数,支持多个 -->
