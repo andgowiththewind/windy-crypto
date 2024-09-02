@@ -135,7 +135,10 @@ public class PackageAfterTests {
         // jar 包位置
         dataModel.put("classPathArchiveLocation", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/windy-crypto.jar")), "\\", "/"));
         // 图标文件
-        dataModel.put("iconFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/0001.ico")), "\\", "/"));
+        File icoFrom = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/0001.ico");
+        File icoTo = FileUtil.file(getCurrentDir(), "target/0001.ico");
+        FileUtil.copy(icoFrom, icoTo, true);
+        dataModel.put("iconFile", StrUtil.replace(FileUtil.getAbsolutePath(icoTo), "\\", "/"));
         // 渲染
         FreeMarkerUtils.renderFile(FreeMarkerUtils.FmConfig.builder()
                 .directoryForTemplateLoading(directoryForTemplateLoading)
@@ -156,8 +159,17 @@ public class PackageAfterTests {
         dataModel.put("fmInfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt")), "\\", "/"));
         dataModel.put("fmOutputDir", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/exe-exe2setup")), "\\", "/"));
         dataModel.put("fmOutputBaseFilename", "windy-crypto-setup");
-        dataModel.put("fmSetupIconFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/0002.ico")), "\\", "/"));
+        File icoFrom = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/0002.ico");
+        File icoTo = FileUtil.file(getCurrentDir(), "target/0002.ico");
+        FileUtil.copy(icoFrom, icoTo, true);
+        dataModel.put("fmSetupIconFile", StrUtil.replace(FileUtil.getAbsolutePath(icoTo), "\\", "/"));
         dataModel.put("fmJreDirPath", "C:\\cafe\\dev\\jdk1.8.0_221\\jre");
+        FreeMarkerUtils.renderFile(FreeMarkerUtils.FmConfig.builder()
+                .directoryForTemplateLoading(directoryForTemplateLoading)
+                .dataModel(dataModel)
+                .templateName(templateName)
+                .outputFile(outputFile)
+                .build());
     }
 
     private static String getCurrentDir() {
