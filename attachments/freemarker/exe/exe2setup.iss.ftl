@@ -34,10 +34,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "D:\gust\dev\project\github\windy-crypto\target\startup.bat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\gust\dev\project\github\windy-crypto\target\exe-jar2exe\windy-crypto.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "D:\gust\dev\project\github\windy-crypto\target\attachments\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\gust\dev\project\github\windy-crypto\target\config\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmStartupBatPath}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "${fmJar2exePath}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "${fmAttachmentsPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmConfigPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "${fmJreDirPath}\*"; DestDir: "{app}\{#MyJreName}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

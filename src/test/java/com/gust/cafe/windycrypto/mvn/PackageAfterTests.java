@@ -149,14 +149,25 @@ public class PackageAfterTests {
     }
 
     private static void exe4jHandleJar2Setup() {
+        File startupBatFrom = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/startup.bat");
+        File startupBatTo = FileUtil.file(getCurrentDir(), "target/startup.bat");
+        FileUtil.copy(startupBatFrom, startupBatTo, true);
+        //
         File directoryForTemplateLoading = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe");
         String templateName = "exe2setup.iss.ftl";
         File outputFile = FileUtil.file(getCurrentDir(), "target/windy-crypto-exe2setup.iss");
         Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("fmStartupBatPath", FileUtil.getAbsolutePath(startupBatTo));
+        dataModel.put("fmJar2exePath", FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/exe-jar2exe/windy-crypto.exe")));
+        dataModel.put("fmAttachmentsPath", FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/attachments")));
+        dataModel.put("fmConfigPath", FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/config")));
         dataModel.put("fmMyAppName", "windy-crypto");
         dataModel.put("fmMyAppPublisher", "windy");
         dataModel.put("fmAppId", IdUtil.randomUUID().toUpperCase());
-        dataModel.put("fmInfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt")), "\\", "/"));
+        File fmInfoAfterFileFrom = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/infoFileAfterInstall.txt");
+        File fmInfoAfterFileTo = FileUtil.file(getCurrentDir(), "target/infoFileAfterInstall.txt");
+        FileUtil.copy(fmInfoAfterFileFrom, fmInfoAfterFileTo, true);
+        dataModel.put("fmInfoAfterFile", StrUtil.replace(FileUtil.getAbsolutePath(fmInfoAfterFileTo), "\\", "/"));
         dataModel.put("fmOutputDir", StrUtil.replace(FileUtil.getAbsolutePath(FileUtil.file(getCurrentDir(), "target/exe-exe2setup")), "\\", "/"));
         dataModel.put("fmOutputBaseFilename", "windy-crypto-setup");
         File icoFrom = FileUtil.file(getCurrentDir(), "attachments/freemarker/exe/0002.ico");
