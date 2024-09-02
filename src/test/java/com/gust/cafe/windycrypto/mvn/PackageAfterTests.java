@@ -63,7 +63,7 @@ public class PackageAfterTests {
         File sqliteZip = max.get();
         File toDir = FileUtil.file(getCurrentDir(), "target/attachments/db");
         new ZipFile(sqliteZip).extractAll(FileUtil.getAbsolutePath(toDir));
-        Console.error("已释放sqlite文件");
+        Console.error("已释放sqlite文件:{}", FileUtil.getName(sqliteZip));
         //
         File bat = FileUtil.file(getCurrentDir(), "attachments/db/100---实时打包数据库文件.bat");
         if (FileUtil.exist(bat) && FileUtil.isFile(bat)) {
