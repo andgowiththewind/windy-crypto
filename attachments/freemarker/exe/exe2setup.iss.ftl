@@ -49,3 +49,8 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 ; Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: shellexec postinstall skipifsilent
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[InstallDelete]
+Type: files; Name: "{app}\attachments\redis\redis01\appendonly.aof"
+Type: files; Name: "{app}\attachments\redis\redis01\up_redis_windows.conf"
+Type: files; Name: "{app}\attachments\redis\redis02\dump.rdb"
+Type: files; Name: "{app}\attachments\redis\redis02\up_redis_windows.conf"
