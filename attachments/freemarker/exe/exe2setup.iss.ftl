@@ -36,9 +36,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "${fmStartupBatPath}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "${fmJar2exePath}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "${fmAttachmentsPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "${fmConfigPath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "${fmJreDirPath}\*"; DestDir: "{app}\{#MyJreName}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmAttachmentsPath}\*"; DestDir: "{app}\{#MyAttachmentsDirName}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmConfigPath}\*"; DestDir: "{app}\{#MyConfigDirName}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "${fmJreDirPath}\*"; DestDir: "{app}\{#MyJreDirName}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
