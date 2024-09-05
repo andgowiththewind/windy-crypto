@@ -1,6 +1,3 @@
-# windy-crypto
+<h1 align="center" style="color:rgb(0,133,125)">windy-crypto</h1>
 
-windy-crypto
-
-
-SpringBoot+Vue实现可视化管理文件加解密。
+<div style="text-align: center;"><img src="./attachments/md/logo_left.png" referrerpolicy="no-referrer" alt="logo"></div>
