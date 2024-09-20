@@ -26,7 +26,7 @@ public class InsightTableReqVo {
     @Getter
     @AllArgsConstructor
     public enum ScopeEnum {
-        NOT_ENCRYPTED("notEncrypted", "未加密"),
+        NOT_ENCRYPTED("unencrypted", "未加密"),
         ENCRYPTED("encrypted", "已加密"),
         ALL("all", "全部");
         private final String label;
